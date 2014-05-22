@@ -9,6 +9,14 @@ TFT_ILI9163C
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
 	
+
+	Pay Attention to connections!!!!
+	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
+	If you try to connect directly you can burn it very fast so PAY ATTENTION!
+	- My display works at 3V3 volt for logic but LED background has resistor for 5V. Your can be different
+	so carefully check out before connect it.
+
+
 	Background:
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
 	any working library so I decided to hack it. ILI9163C looks pretty similar to other 
