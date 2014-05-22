@@ -28,7 +28,8 @@ TFT_ILI9163C
 	My display it's a 1.44"", 128x128 that suppose to substitute Nokia 5110 LCD and here's the 
 	first confusion! Many sellers claim that it's compatible with Nokia 5110 (that use a philips
 	controller) but the only similarity it's the pin names since that this one it's color and
-	have totally different controller that's not compatible.
+	have totally different controller that's not compatible. Altrough I discovered that it's not
+	128x128 but 128x160 (!??)... Check links below to see if it's similar to yours.
 	http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
 	http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	Pay attention that ILI9163C can drive different resolutions and your display can be
