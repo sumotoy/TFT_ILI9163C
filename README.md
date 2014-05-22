@@ -15,6 +15,9 @@ TFT_ILI9163C
 	If you try to connect directly you can burn it very fast so PAY ATTENTION!
 	- My display works at 3V3 volt for logic but LED background has resistor for 5V. Your can be different
 	so carefully check out before connect it.
+	- My library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS).
+	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
+	the reset pin. The initialization routine will automatically use the software reset.
 
 
 	Background:
