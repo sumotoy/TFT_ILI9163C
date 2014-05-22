@@ -62,6 +62,7 @@
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Version:
 	0.1a1: First release, compile correctly. Altrough not fully working!
+	0.1a3: Better but still some addressing problems.
 	
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
@@ -98,8 +99,8 @@
 	#include <avr/pgmspace.h>
 #endif
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
-	#include "mk20dx128.h"
-	#include "core_pins.h"
+	// #include "mk20dx128.h"
+	// #include "core_pins.h"
 	#define __DMASPI
 	
 	#define CTAR_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0) | SPI_CTAR_DBR)
@@ -112,20 +113,26 @@
 
 //ILI9163C versions------------------------
 #if defined(__144_RED_PCB__)
-	#define _TFTWIDTH  		128//240
-	#define _TFTHEIGHT 		128//320
+	#define _TFTWIDTH  		128
+	#define _TFTHEIGHT 		160
+	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
+	#define __GAMMASET1
 #else
-	#define _TFTWIDTH  		128//240
-	#define _TFTHEIGHT 		128//320
+	#define _TFTWIDTH  		128
+	#define _TFTHEIGHT 		160
 #endif
+//-----------------------------------------
 
+
+#define _DTA_WIDTH		_TFTWIDTH//0x7F//=128 hex
+#define _DTA_HEIGHT		_TFTHEIGHT//0x7F//=128 hex
 //ILI9163C registers-----------------------
 #define CMD_NOP     	0x00//Non operation
 #define CMD_SWRESET 	0x01//Soft Reset
 #define CMD_RDDID   	0x04//Read Display Identification Information
 #define CMD_RDDST   	0x09//Read Display Status
 #define CMD_RDMODE  	0x0A//Read Display power mode
-#define CMD_RDMADCTL  	0x0B//Read Display MADCTL
+#define CMD_RDMADCTL  	0x0B//Read Display MADCTL (orientation)
 #define CMD_RDPIXFMT  	0x0C//Read Display Pixel Format
 #define CMD_RDIMMDE  	0x0D//Read Display Image Mode
 #define CMD_RDSNMDE  	0x0E//Read Display Signal Mode
@@ -170,6 +177,7 @@
 #define CMD_PWCTR4  	0xC3//Power_Control4
 #define CMD_PWCTR5  	0xC4//Power_Control5
 #define CMD_VCOMCTR1  	0xC5//VCOM_Control 1
+#define CMD_VCOMCTR2  	0xC6//VCOM_Control 2
 #define CMD_VCOMOFFS  	0xC7//VCOM Offset Control
 
 #define CMD_WRID4VL  	0xD3//Write ID4 Value 
@@ -186,7 +194,7 @@
 #define CMD_GAMRSEL		0xF2//GAM_R_SEL
 
 
-#define DTA_MADCTL_MX  	0x40
+#define DTA_MADCTL_MX  	0x00//0x40
 #define DTA_MADCTL_MY  	0x80
 #define DTA_MADCTL_MV  	0x20
 #define DTA_MADCTL_ML  	0x10
@@ -200,12 +208,14 @@ class TFT_ILI9163C : public Adafruit_GFX {
  public:
 
 	TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin);
-
-	//TFT_ILI9163C(uint8_t CS, uint8_t DC);
+	TFT_ILI9163C(uint8_t CS, uint8_t DC);
+	
 	void     	begin(void),
 				setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),
+				setCursor(int16_t x,int16_t y),
 				pushColor(uint16_t color),
 				fillScreen(uint16_t color=0x0000),
+				clearScreen(uint16_t color=0x0000),
 				drawPixel(int16_t x, int16_t y, uint16_t color),
 				drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
 				drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
@@ -223,6 +233,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	void		writedata16(uint16_t d);
 	void 		chipInit();
 	bool 		boundaryCheck(int16_t x,int16_t y);
+	void 		homeAddress();
 	#if defined(__AVR__)
 	void				spiwrite(uint8_t);
 	volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
@@ -238,7 +249,6 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	#endif //  #if defined(__SAM3X8E__)
   
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	void				spiwrite(uint8_t);
 	uint8_t 			_cs,_rs,_sid,_sclk,_rst;
 	uint8_t 			pcs_data, pcs_command;
 	uint32_t 			ctar;
