@@ -1,16 +1,18 @@
 TFT_ILI9163C
-============
+==============
 
 	ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
 	
 	Features:
+	
 	- Very FAST!, expecially with Teensy 3.x where uses DMA SPI.
 	- It uses just 4 or 5 wires.
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
 	
 
-	Pay Attention to connections!!!!
+	Pay Attention to connections!!!!:
+	
 	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
 	If you try to connect directly you can burn it very fast so PAY ATTENTION!
 	- My display works at 3V3 volt for logic but LED background has resistor for 5V. Your can be different
@@ -21,6 +23,7 @@ TFT_ILI9163C
 
 
 	Background:
+	
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
 	any working library so I decided to hack it. ILI9163C looks pretty similar to other 
 	display driver but it uses it's own commands so it's tricky to work with it unlsess you
@@ -30,8 +33,10 @@ TFT_ILI9163C
 	controller) but the only similarity it's the pin names since that this one it's color and
 	have totally different controller that's not compatible. Altrough I discovered that it's not
 	128x128 but 128x160 (!??)... Check links below to see if it's similar to yours.
+	
 	http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
 	http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
+	
 	Pay attention that ILI9163C can drive different resolutions and your display can be
 	160*128 or whatever, also there's a strain of this display with a black PCB that a friend of mine
 	got some weeks ago and need some small changes in library to get working.
@@ -39,6 +44,7 @@ TFT_ILI9163C
 	can include for future versions.
 	
 	Code Optimizations:
+	
 	The purpose of this library it's SPEED. I have tried to use hardware optimized calls
 	where was possible and results are quite good for most applications, actually nly filled circles
     are still a bit slow. Many SPI call has been optimized by reduce un-needed triggers to RS and CS
@@ -58,7 +64,7 @@ TFT_ILI9163C
 
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-	++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     This file needs the following Libraries:
  
     Adafruit_GFX by Adafruit:
@@ -68,16 +74,16 @@ TFT_ILI9163C
 	https://github.com/sumotoy/Adafruit-GFX-Library
 	It has faster char rendering and some small little optimizations but you can
 	choose one of the two freely since are both fully compatible.
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Special Thanks:
 	Thanks Adafruit for his Adafruit_GFX!
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and DMA SPI.
 	
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Version:
 	0.1a1: First release, compile correctly. Altrough not fully working!
 	
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
 	- This is an Alpha version and finally TFT reacts to code but I still have some 
