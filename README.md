@@ -20,6 +20,11 @@ Pay Attention to connections!!!!:
 	- My library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS).
 	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
 	the reset pin. The initialization routine will automatically use the software reset.
+	- People using Teensy3 should remember that have to choose for CS and DC a pin that satisfy:
+
+	if (pin == 2 || pin == 6 || pin == 9) return true;
+	if (pin == 10 || pin == 15) return true;
+	if (pin >= 20 && pin <= 23) return true;
 
 
 Background:
