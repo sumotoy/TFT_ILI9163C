@@ -3,7 +3,7 @@ TFT_ILI9163C
 
 	ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
 	
-	Features:
+Features:
 	
 	- Very FAST!, expecially with Teensy 3.x where uses DMA SPI.
 	- It uses just 4 or 5 wires.
@@ -11,7 +11,7 @@ TFT_ILI9163C
 	- It uses the standard Adafruit_GFX Library (you need to install). 
 	
 
-	Pay Attention to connections!!!!:
+Pay Attention to connections!!!!:
 	
 	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
 	If you try to connect directly you can burn it very fast so PAY ATTENTION!
@@ -22,7 +22,7 @@ TFT_ILI9163C
 	the reset pin. The initialization routine will automatically use the software reset.
 
 
-	Background:
+Background:
 	
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
 	any working library so I decided to hack it. ILI9163C looks pretty similar to other 
@@ -43,13 +43,13 @@ TFT_ILI9163C
 	If you look at TFT_ILI9163C.h file you can add your modifications and let me know so I
 	can include for future versions.
 	
-	Code Optimizations:
+Code Optimizations:
 	
 	The purpose of this library it's SPEED. I have tried to use hardware optimized calls
 	where was possible and results are quite good for most applications, actually nly filled circles
     are still a bit slow. Many SPI call has been optimized by reduce un-needed triggers to RS and CS
 	lines. Of course it can be improved so feel free to add suggestions.
-	-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
     Copyright (c) 2014, .S.U.M.O.T.O.Y., coded by Max MC Costa.    
 
     TFT_ILI9163C Library is free software: you can redistribute it and/or modify
@@ -66,7 +66,7 @@ TFT_ILI9163C
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    This file needs the following Libraries:
+This file needs the following Libraries:
  
     Adafruit_GFX by Adafruit:
     https://github.com/adafruit/Adafruit-GFX-Library
@@ -76,18 +76,21 @@ TFT_ILI9163C
 	It has faster char rendering and some small little optimizations but you can
 	choose one of the two freely since are both fully compatible.
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	Special Thanks:
+
+Special Thanks:
 	
 	Thanks Adafruit for his Adafruit_GFX!
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and DMA SPI.
 	
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	Version:
+
+Version:
 	
 	0.1a1: First release, compile correctly. Altrough not fully working!
 	0.1a3: Some bugfix, still some addressing problems, partial rotation solved.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	BugList of the current version:
+
+BugList of the current version:
 	
 	- This is an Alpha version and finally TFT reacts to code but I still have some 
 	issue to fix so if you want to download remember that pixel addressing it's still
