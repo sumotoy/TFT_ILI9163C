@@ -65,6 +65,7 @@ TFT_ILI9163C
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     This file needs the following Libraries:
  
     Adafruit_GFX by Adafruit:
@@ -76,13 +77,15 @@ TFT_ILI9163C
 	choose one of the two freely since are both fully compatible.
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Special Thanks:
+	
 	Thanks Adafruit for his Adafruit_GFX!
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and DMA SPI.
 	
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Version:
-	0.1a1: First release, compile correctly. Altrough not fully working!
 	
+	0.1a1: First release, compile correctly. Altrough not fully working!
+	0.1a3: Some bugfix, still some addressing problems, partial rotation solved.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
