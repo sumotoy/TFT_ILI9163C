@@ -3,6 +3,11 @@ TFT_ILI9163C
 
 	ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
 	
+	Link to a video:
+	https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
+	
+	
+	
 Features:
 	
 	- Very FAST!, expecially with Teensy 3.x where uses DMA SPI.
