@@ -47,10 +47,13 @@ TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
 
 void setup() {
   tft.begin();
+  #if defined(__MK20DX128__) || defined(__MK20DX256__)
+  tft.setBitrate(24000000);
+  #endif
 }
 
 void loop(){
-  tft.fillScreen();
+  tft.fillScreen(WHITE);
   r[0]=r[0]+1;
   r[1]=r[1]+1;
   if (r[0] == 36) r[0] = 0;
@@ -74,12 +77,12 @@ void loop(){
     p2y[i] = ((tft.height())/2)+ay*500/az;
   }
   for (int i=0;i<3;i++) {
-    tft.drawLine(p2x[i],p2y[i],p2x[i+1],p2y[i+1],RED);
-    tft.drawLine(p2x[i+4],p2y[i+4],p2x[i+5],p2y[i+5],RED);
-    tft.drawLine(p2x[i],p2y[i],p2x[i+4],p2y[i+4],RED);
+    tft.drawLine(p2x[i],p2y[i],p2x[i+1],p2y[i+1],BLACK);
+    tft.drawLine(p2x[i+4],p2y[i+4],p2x[i+5],p2y[i+5],BLACK);
+    tft.drawLine(p2x[i],p2y[i],p2x[i+4],p2y[i+4],BLACK);
   }   
-  tft.drawLine(p2x[3],p2y[3],p2x[0],p2y[0],RED);
-  tft.drawLine(p2x[7],p2y[7],p2x[4],p2y[4],RED);
-  tft.drawLine(p2x[3],p2y[3],p2x[7],p2y[7],RED);
-  delay(50);
+  tft.drawLine(p2x[3],p2y[3],p2x[0],p2y[0],BLACK);
+  tft.drawLine(p2x[7],p2y[7],p2x[4],p2y[4],BLACK);
+  tft.drawLine(p2x[3],p2y[3],p2x[7],p2y[7],BLACK);
+  delay(15);
 }

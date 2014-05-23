@@ -27,9 +27,10 @@ TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
 void setup() {
   Serial.begin(9600);
   //while (!Serial);
-  tft.setBitrate(24000000);
   tft.begin();
-  //tft.setBitrate(6000000);
+  #if defined(__MK20DX128__) || defined(__MK20DX256__)
+  tft.setBitrate(24000000);
+  #endif
 
   Serial.println(F("Benchmark                Time (microseconds)"));
   Serial.print(F("Screen fill              "));

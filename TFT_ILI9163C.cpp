@@ -269,6 +269,12 @@ void TFT_ILI9163C::chipInit() {
 	writecommand(CMD_GAMRSEL);//Enable Gamma adj    
 	writedata(0x01); 
 	delay(10);
+	writecommand(CMD_NORML);
+	
+	writecommand(0xB6);
+	writedata(0b11111111);//0x04
+	writedata(0b00000110);//0x04
+
 	writecommand(CMD_PGAMMAC);//Positive Gamma Correction Setting
 	#if defined(__GAMMASET1)
 	writedata(0x36);//p1
@@ -342,61 +348,68 @@ void TFT_ILI9163C::chipInit() {
 
 	
 	writecommand(CMD_FRMCTR1);//Frame Rate Control (In normal mode/Full colors)
-	writedata(0x08);//0x0C
-	writedata(0x08);//0x14
+	writedata(0x08);//0x0C//0x08
+	writedata(0x02);//0x14//0x08
 	delay(10);
 	writecommand(CMD_DINVCTR);//display inversion 
 	writedata(0x07);
     delay(10);
 	writecommand(CMD_PWCTR1);//Set VRH1[4:0] & VC[2:0] for VCI1 & GVDD   
-	writedata(0x0A);//0x0C
+	writedata(0x0A);//4.30 - 0x0A
 	writedata(0x02);//0x05
 	delay(10);
 	writecommand(CMD_PWCTR2);//Set BT[2:0] for AVDD & VCL & VGH & VGL   
 	writedata(0x02);
 	delay(10);
 	writecommand(CMD_VCOMCTR1);//Set VMH[6:0] & VML[6:0] for VOMH & VCOML   
-	writedata(0x50);
-	writedata(0x5B);
+	writedata(0x50);//0x50
+	writedata(99);//0x5b
 	delay(10);
 	writecommand(CMD_VCOMOFFS);
-	writedata(0x40);
+	writedata(0);//0x40
 	delay(10);
   
 	writecommand(CMD_CLMADRS);//Set Column Address  
 	writedata(0x00); 
 	writedata(0X00); 
 	writedata(0X00); 
-	writedata(_DTA_WIDTH); 
+	writedata(_GRAMWIDTH); 
   
 	writecommand(CMD_PGEADRS);//Set Page Address  
 	writedata(0x00); 
 	writedata(0X00); 
 	writedata(0X00); 
-	writedata(_DTA_HEIGHT); 
+	writedata(_GRAMHEIGH); 
   
 	writecommand(CMD_MADCTL);//Set Scanning Direction && Colorspace
 	writedata(DTA_MADCTL_MX | __COLORSPC); //08
 	delay(10);
-	writecommand(CMD_SDRVDIR);//Set Source Output Direction   
-	writedata(0x00); 
-	delay(10);
+	//writecommand(CMD_SDRVDIR);//Set Source Output Direction   
+	//writedata(0x00); 
+	//delay(10);
+	
 	writecommand(CMD_DISPON);//display ON 
 	delay(10);
 	writecommand(CMD_RAMWR);//Memory Write
+	writedata16(0X0000); 
+	writedata16(0X0000); 
+	writedata16(0X0000); 
+	writedata16(0X0000); 
 	delay(10);
+	fillScreen(BLACK);
+	setRotation(0);
 }
 
 
 void TFT_ILI9163C::clearScreen(uint16_t color) {
 	homeAddress();
-	for (int px=0;px <= (_TFTWIDTH*_TFTHEIGHT); px++){
+	for (int px=0;px < _GRAMSIZE; px++){
 		writedata16(color);
 	}
 }
 
 void TFT_ILI9163C::homeAddress() {
-	setAddrWindow(0x00,0x00,_DTA_WIDTH,_DTA_HEIGHT);
+	setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 }
 
 void TFT_ILI9163C::setCursor(int16_t x, int16_t y) {
@@ -405,27 +418,6 @@ void TFT_ILI9163C::setCursor(int16_t x, int16_t y) {
 	cursor_y = y;
 }
 
-void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-	writecommand(CMD_CLMADRS); // Column
-	writedata16(x0);
-	writedata16(x1);
-	
-	// writedata(0x00);
-	// writedata(x0);
-	// writedata(0x00);
-	// writedata(x1);
-
-	writecommand(CMD_PGEADRS); // Page
-	writedata16(y0);
-	writedata16(y1);
-	
-	// writedata(0x00);
-	// writedata(y0);
-	// writedata(0x00);
-	// writedata(y1);
-
-	writecommand(CMD_RAMWR); //Into RAM
-}
 
 
 void TFT_ILI9163C::pushColor(uint16_t color) {
@@ -466,8 +458,8 @@ void TFT_ILI9163C::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color
 }
 
 void TFT_ILI9163C::fillScreen(uint16_t color) {
-	fillRect(0, 0,  _width, _height, color);
-	homeAddress();
+	clearScreen(color);
+	//homeAddress();
 }
 
 // fill a rectangle
@@ -492,29 +484,68 @@ uint16_t TFT_ILI9163C::Color565(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 
+void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+	writecommand(CMD_CLMADRS); // Column
+	if (rotation == 0){
+		writedata16(x0);
+		writedata16(x1);
+	} else if (rotation == 1){
+		writedata16(x0+32);
+		writedata16(x1+32);
+	} else if (rotation == 2){
+		writedata16(x0);
+		writedata16(x1);
+	} else {
+		writedata16(x0);
+		writedata16(x1);
+	}
+
+	writecommand(CMD_PGEADRS); // Page
+	if (rotation == 0){
+		writedata16(y0+__OFFSET);
+		writedata16(y1+__OFFSET);
+	} else if (rotation == 1){
+		writedata16(y0);
+		writedata16(y1);
+	} else if (rotation == 2){
+		writedata16(y0);
+		writedata16(y1);
+	} else {
+		writedata16(y0);
+		writedata16(y1);
+	}
+
+	writecommand(CMD_RAMWR); //Into RAM
+}
+
+
 void TFT_ILI9163C::setRotation(uint8_t m) {
 	writecommand(CMD_MADCTL);
 	rotation = m % 4; // can't be higher than 3
 	switch (rotation) {
 	case 0:
-		writedata(DTA_MADCTL_MX | __COLORSPC);
+		writecommand(CMD_MADCTL);
+		writedata(0b00001000);
 		_width  = _TFTWIDTH;
-		_height = _TFTHEIGHT;
+		_height = _TFTHEIGHT;//-__OFFSET;
 		break;
 	case 1:
-		writedata(DTA_MADCTL_MV | __COLORSPC);
-		_width  = _TFTHEIGHT;
+		writecommand(CMD_MADCTL);
+		writedata(0b01101000);
+		_width  = _TFTHEIGHT;//-__OFFSET;
 		_height = _TFTWIDTH;
 		break;
 	case 2:
-		writedata(DTA_MADCTL_MY | __COLORSPC);
+		writecommand(CMD_MADCTL);
+		writedata(0b11001000);
 		_width  = _TFTWIDTH;
-		_height = _TFTHEIGHT;
+		_height = _TFTHEIGHT;//-__OFFSET;
 		break;
 	case 3:
-		writedata(DTA_MADCTL_MV | DTA_MADCTL_MY | DTA_MADCTL_MX | __COLORSPC);
-		_width  = _TFTHEIGHT;
-		_height = _TFTWIDTH;
+		writecommand(CMD_MADCTL);
+		writedata(0b10101000);
+		_width  = _TFTWIDTH;
+		_height = _TFTHEIGHT;//-__OFFSET;
 		break;
 	}
 }

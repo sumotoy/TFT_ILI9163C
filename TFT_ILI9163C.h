@@ -63,6 +63,7 @@
 	Version:
 	0.1a1: First release, compile correctly. Altrough not fully working!
 	0.1a3: Better but still some addressing problems.
+	0.1b1: Beta! Addressing solved, now rotation works and boundaries ok.
 	
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
@@ -113,19 +114,45 @@
 
 //ILI9163C versions------------------------
 #if defined(__144_RED_PCB__)
-	#define _TFTWIDTH  		128
-	#define _TFTHEIGHT 		160
+/*
+This display:
+http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/271422122271
+This particular display has a design error! The controller has 3 pins to configure to constrain
+the memory and resolution to a fixed dimension (in that case 128x128) but they leaved those pins
+configured for 128x160 so there was several pixel memory addressing problems.
+I solved by setup several parameters that dinamically fix the resolution as needit so below
+the parameters for this diplay. If you have a strain or a correct display (can happen with chinese)
+you can copy those parameters and create setup for different displays.
+*/
+	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
+	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
+	#define _GRAMWIDTH      128
+	#define _GRAMHEIGH      160
+	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
+	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
+	#define __GAMMASET1		//uncomment for another gamma
+	#define __OFFSET		32//*see note 2
+#else
+	#define _TFTWIDTH  		128//128
+	#define _TFTHEIGHT 		160//160
+	#define _GRAMWIDTH      128
+	#define _GRAMHEIGH      160
+	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
 	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
 	#define __GAMMASET1
-#else
-	#define _TFTWIDTH  		128
-	#define _TFTHEIGHT 		160
+	#define __OFFSET		0
 #endif
+/*
+	Note 1: The __144_RED_PCB__ display has hardware addressing of 128 x 160
+	but the tft resolution it's 128 x 128 so the dram should be set correctly
+	
+	Note 2: This is the offset between image in RAM and TFT. In that case 160 - 128 = 32;
+*/
 //-----------------------------------------
 
+#define	BLACK   		0x0000
+#define WHITE   		0xFFFF
 
-#define _DTA_WIDTH		_TFTWIDTH//0x7F//=128 hex
-#define _DTA_HEIGHT		_TFTHEIGHT//0x7F//=128 hex
 //ILI9163C registers-----------------------
 #define CMD_NOP     	0x00//Non operation
 #define CMD_SWRESET 	0x01//Soft Reset
@@ -144,7 +171,7 @@
 #define CMD_NORML   	0x13//Normal Display ON
 #define CMD_DINVOF  	0x20//Display Inversion OFF
 #define CMD_DINVON   	0x21//Display Inversion ON
-#define CMD_GAMMASET 	0x26//Gamma Set
+#define CMD_GAMMASET 	0x26//Gamma Set (0x01[1],0x02[2],0x04[3],0x08[4])
 #define CMD_DISPOFF 	0x28//Display OFF
 #define CMD_DISPON  	0x29//Display ON
 #define CMD_IDLEON  	0x39//Idle Mode ON
@@ -194,7 +221,7 @@
 #define CMD_GAMRSEL		0xF2//GAM_R_SEL
 
 
-#define DTA_MADCTL_MX  	0x00//0x40
+#define DTA_MADCTL_MX  	0x40//0x40 or 00
 #define DTA_MADCTL_MY  	0x80
 #define DTA_MADCTL_MV  	0x20
 #define DTA_MADCTL_ML  	0x10
@@ -224,6 +251,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				invertDisplay(boolean i);
   uint16_t 		Color565(uint8_t r, uint8_t g, uint8_t b);
   void 			setBitrate(uint32_t n);	
+  //void 			test(uint8_t rot);
 
  private:
 
