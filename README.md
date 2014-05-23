@@ -104,11 +104,9 @@ Version:
 	
 	0.1a1: First release, compile correctly. Altrough not fully working!
 	0.1a3: Some bugfix, still some addressing problems, partial rotation solved.
+	0.1b1: Beta version! Fully working but still not tested with Arduino and DUE (altrough it compile)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 BugList of the current version:
 	
-	- This is an Alpha version and finally TFT reacts to code but I still have some 
-	issue to fix so if you want to download remember that pixel addressing it's still
-	not complete and display rotation have several issues.
-	Actually no scroll commands (only in release will be included).
+	- Beta version fully working!
