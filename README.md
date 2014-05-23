@@ -1,10 +1,13 @@
 TFT_ILI9163C
+
+![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
+
+
 ==============
 
 	ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
 	
-	![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
-
+	
 	
 	Link to a video:
 	https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
