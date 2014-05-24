@@ -66,6 +66,7 @@
 	0.1b1: Beta! Addressing solved, now rotation works and boundaries ok.
 	0.2b1: Cleaned up.
 	0.2b3: Added 2.2" Red PCB parameters
+	0.2b4: Bug fixes, added colorSpace (for future send image)
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -128,7 +129,7 @@ you can copy those parameters and create setup for different displays.
 	#define _GRAMWIDTH      128
 	#define _GRAMHEIGH      160
 	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
-	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
+	#define __COLORSPC		1// 1:GBR - 0:RGB
 	#define __GAMMASET1		//uncomment for another gamma
 	#define __OFFSET		32//*see note 2
 	//Tested!
@@ -143,7 +144,7 @@ Not tested!
 	#define _GRAMWIDTH      240
 	#define _GRAMHEIGH      320
 	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
-	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
+	#define __COLORSPC		1// 1:GBR - 0:RGB
 	#define __GAMMASET1		//uncomment for another gamma
 	#define __OFFSET		0
 #else
@@ -152,7 +153,7 @@ Not tested!
 	#define _GRAMWIDTH      128
 	#define _GRAMHEIGH      160
 	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
-	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
+	#define __COLORSPC		1// 1:GBR - 0:RGB
 	#define __GAMMASET1
 	#define __OFFSET		0
 #endif
@@ -267,8 +268,10 @@ class TFT_ILI9163C : public Adafruit_GFX {
   void 			setBitrate(uint32_t n);	
 
  private:
-
+	uint8_t		_Mactrl_Data;//container for the memory access control data
+	uint8_t		_colorspaceData;
 	uint8_t  	tabcolor;
+	void 		colorSpace(uint8_t cspace);
 	void		writecommand(uint8_t c);
 	void		writedata(uint8_t d);
 	void		writedata16(uint16_t d);
