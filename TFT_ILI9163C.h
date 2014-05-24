@@ -65,13 +65,11 @@
 	0.1a3: Better but still some addressing problems.
 	0.1b1: Beta! Addressing solved, now rotation works and boundaries ok.
 	0.2b1: Cleaned up.
+	0.2b3: Added 2.2" Red PCB parameters
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
-	- This is an Alpha version and finally TFT reacts to code but I still have some 
-	issue to fix so if you want to download remember that pixel addressing it's still
-	not complete and display rotation have several issues.
-	Actually no scroll commands (only in release will be included).
+	- Actually no scroll commands (only in release will be included).
 */
 #ifndef _TFT_ILI9163CLIB_H_
 #define _TFT_ILI9163CLIB_H_
@@ -87,6 +85,7 @@
 
 //----- Define here witch display you own
 #define __144_RED_PCB__//128x128
+//#define __22_RED_PCB__//240x320
 //---------------------------------------
 
 #if defined(__SAM3X8E__)
@@ -132,12 +131,27 @@ you can copy those parameters and create setup for different displays.
 	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
 	#define __GAMMASET1		//uncomment for another gamma
 	#define __OFFSET		32//*see note 2
+	//Tested!
+#elif defined (__22_RED_PCB__)
+/*
+Like this one:
+http://www.ebay.it/itm/2-2-Serial-SPI-TFT-LCD-Display-Module-240x320-Chip-ILI9340C-PCB-Adapter-SD-Card-/281304733556
+Not tested!
+*/
+	#define _TFTWIDTH  		240//the REAL W resolution of the TFT
+	#define _TFTHEIGHT 		320//the REAL H resolution of the TFT
+	#define _GRAMWIDTH      240
+	#define _GRAMHEIGH      320
+	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
+	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
+	#define __GAMMASET1		//uncomment for another gamma
+	#define __OFFSET		0
 #else
 	#define _TFTWIDTH  		128//128
 	#define _TFTHEIGHT 		160//160
 	#define _GRAMWIDTH      128
 	#define _GRAMHEIGH      160
-	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
+	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
 	#define __COLORSPC		DTA_MADCTL_BGR//DTA_MADCTL_RGB
 	#define __GAMMASET1
 	#define __OFFSET		0
