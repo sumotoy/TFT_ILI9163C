@@ -1,19 +1,14 @@
 TFT_ILI9163C
 
+ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
+
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
-
-==============
-
-	ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
-	
-	
-	
 	Link to a video:
 	https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	
-	
-	
+==========================
+
 Features:
 	
 	- Very FAST!, expecially with Teensy 3.x where uses DMA SPI.
@@ -85,12 +80,13 @@ Code Optimizations:
 This file needs the following Libraries:
  
     Adafruit_GFX by Adafruit:
-    https://github.com/adafruit/Adafruit-GFX-Library
-	Remember to update GFX library often to have more features with this library!
-	From this version I'm using my version of Adafruit_GFX library:
-	https://github.com/sumotoy/Adafruit-GFX-Library
-	It has faster char rendering and some small little optimizations but you can
-	choose one of the two freely since are both fully compatible.
+https://github.com/adafruit/Adafruit-GFX-Library
+    Remember to update GFX library often to have more features with this library!
+	
+    From this version I'm using my version of Adafruit_GFX library:
+https://github.com/sumotoy/Adafruit-GFX-Library
+    It has faster char rendering and some small little optimizations but you can
+    choose one of the two freely since are both fully compatible.
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 Special Thanks:
