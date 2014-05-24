@@ -5,7 +5,8 @@ ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
 	Link to a video:
-	https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
+	
+https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	
 ==========================
 
@@ -45,8 +46,9 @@ Background:
 	have totally different controller that's not compatible. Altrough I discovered that it's not
 	128x128 but 128x160 (!??)... Check links below to see if it's similar to yours.
 	
-	http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
-	http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
+http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
+
+http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	
 	Pay attention that ILI9163C can drive different resolutions and your display can be
 	160*128 or whatever, also there's a strain of this display with a black PCB that a friend of mine
@@ -79,12 +81,16 @@ Code Optimizations:
 
 This file needs the following Libraries:
  
-    Adafruit_GFX by Adafruit:
+    *Adafruit_GFX by Adafruit:
+    
 https://github.com/adafruit/Adafruit-GFX-Library
+
     Remember to update GFX library often to have more features with this library!
 	
-    From this version I'm using my version of Adafruit_GFX library:
+    *From this version I'm using my version of Adafruit_GFX library:
+    
 https://github.com/sumotoy/Adafruit-GFX-Library
+
     It has faster char rendering and some small little optimizations but you can
     choose one of the two freely since are both fully compatible.
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -101,6 +107,7 @@ Version:
 	0.1a1: First release, compile correctly. Altrough not fully working!
 	0.1a3: Some bugfix, still some addressing problems, partial rotation solved.
 	0.1b1: Beta version! Fully working but still not tested with Arduino and DUE (altrough it compile)
+	0.2b2: Code cleaned and added support for 2.2" RED PCB displays.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 BugList of the current version:
