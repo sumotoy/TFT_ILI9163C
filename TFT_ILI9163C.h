@@ -18,7 +18,7 @@
 	have totally different controller that's not compatible.
 	http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
 	http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
-	Pay attention that ILI9163C can drive different resolutions and your display can be
+	Pay attention that   can drive different resolutions and your display can be
 	160*128 or whatever, also there's a strain of this display with a black PCB that a friend of mine
 	got some weeks ago and need some small changes in library to get working.
 	If you look at TFT_ILI9163C.h file you can add your modifications and let me know so I
@@ -64,7 +64,7 @@
 	0.1a1: First release, compile correctly. Altrough not fully working!
 	0.1a3: Better but still some addressing problems.
 	0.1b1: Beta! Addressing solved, now rotation works and boundaries ok.
-	
+	0.2b1: Cleaned up.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -156,13 +156,13 @@ you can copy those parameters and create setup for different displays.
 //ILI9163C registers-----------------------
 #define CMD_NOP     	0x00//Non operation
 #define CMD_SWRESET 	0x01//Soft Reset
-#define CMD_RDDID   	0x04//Read Display Identification Information
-#define CMD_RDDST   	0x09//Read Display Status
-#define CMD_RDMODE  	0x0A//Read Display power mode
-#define CMD_RDMADCTL  	0x0B//Read Display MADCTL (orientation)
-#define CMD_RDPIXFMT  	0x0C//Read Display Pixel Format
-#define CMD_RDIMMDE  	0x0D//Read Display Image Mode
-#define CMD_RDSNMDE  	0x0E//Read Display Signal Mode
+// #define CMD_RDDID   	0x04//Read Display Identification Information
+// #define CMD_RDDST   	0x09//Read Display Status
+// #define CMD_RDMODE  	0x0A//Read Display power mode
+// #define CMD_RDMADCTL  	0x0B//Read Display MADCTL (orientation)
+// #define CMD_RDPIXFMT  	0x0C//Read Display Pixel Format
+// #define CMD_RDIMMDE  	0x0D//Read Display Image Mode
+// #define CMD_RDSNMDE  	0x0E//Read Display Signal Mode
 //#define CMD_RDSNMDE  	0x0F//Read Display Signal Mode
 
 #define CMD_SLPIN   	0x10//Sleep ON
@@ -207,27 +207,27 @@ you can copy those parameters and create setup for different displays.
 #define CMD_VCOMCTR2  	0xC6//VCOM_Control 2
 #define CMD_VCOMOFFS  	0xC7//VCOM Offset Control
 
-#define CMD_WRID4VL  	0xD3//Write ID4 Value 
+// #define CMD_WRID4VL  	0xD3//Write ID4 Value 
 
-#define CMD_NVMEMFC1  	0xD5//NV Memory Function Controller(1)
-#define CMD_NVMEMFC2  	0xD6//NV Memory Function Controller(1)
-#define CMD_NVMEMFC3  	0xD7//NV Memory Function Controller(1)
-#define CMD_RDID1   	0xDA//Read ID1
-#define CMD_RDID2   	0xDB//Read ID2
-#define CMD_RDID3   	0xDC//Read ID3
-#define CMD_RDID4   	0xDD//Read ID4
+// #define CMD_NVMEMFC1  	0xD5//NV Memory Function Controller(1)
+// #define CMD_NVMEMFC2  	0xD6//NV Memory Function Controller(1)
+// #define CMD_NVMEMFC3  	0xD7//NV Memory Function Controller(1)
+// #define CMD_RDID1   	0xDA//Read ID1
+// #define CMD_RDID2   	0xDB//Read ID2
+// #define CMD_RDID3   	0xDC//Read ID3
+// #define CMD_RDID4   	0xDD//Read ID4
 #define CMD_PGAMMAC		0xE0//Positive Gamma Correction Setting
 #define CMD_NGAMMAC		0xE1//Negative Gamma Correction Setting
 #define CMD_GAMRSEL		0xF2//GAM_R_SEL
 
 
-#define DTA_MADCTL_MX  	0x40//0x40 or 00
-#define DTA_MADCTL_MY  	0x80
-#define DTA_MADCTL_MV  	0x20
-#define DTA_MADCTL_ML  	0x10
-#define DTA_MADCTL_RGB 	0x00
-#define DTA_MADCTL_BGR 	0x08
-#define DTA_MADCTL_MH  	0x04
+// #define DTA_MADCTL_MX  	0x40//0x40 or 00
+// #define DTA_MADCTL_MY  	0x80
+// #define DTA_MADCTL_MV  	0x20
+// #define DTA_MADCTL_ML  	0x10
+// #define DTA_MADCTL_RGB 	0x00
+// #define DTA_MADCTL_BGR 	0x08
+// #define DTA_MADCTL_MH  	0x04
 
 
 class TFT_ILI9163C : public Adafruit_GFX {
@@ -251,7 +251,6 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				invertDisplay(boolean i);
   uint16_t 		Color565(uint8_t r, uint8_t g, uint8_t b);
   void 			setBitrate(uint32_t n);	
-  //void 			test(uint8_t rot);
 
  private:
 

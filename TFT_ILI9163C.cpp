@@ -381,12 +381,12 @@ void TFT_ILI9163C::chipInit() {
 	writedata(0X00); 
 	writedata(_GRAMHEIGH); 
   
-	writecommand(CMD_MADCTL);//Set Scanning Direction && Colorspace
-	writedata(DTA_MADCTL_MX | __COLORSPC); //08
+	//writecommand(CMD_MADCTL);//Set Scanning Direction && Colorspace
+	//writedata(DTA_MADCTL_MX | __COLORSPC); //08
+	writecommand(CMD_MADCTL);
+	writedata(0b00001000);
 	delay(10);
-	//writecommand(CMD_SDRVDIR);//Set Source Output Direction   
-	//writedata(0x00); 
-	//delay(10);
+
 	
 	writecommand(CMD_DISPON);//display ON 
 	delay(10);
@@ -518,7 +518,24 @@ void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 	writecommand(CMD_RAMWR); //Into RAM
 }
 
-
+//MY:  1(bottom to top), 0(top to bottom) Row Address Order
+//MX:  1(R to L),        0(L to R)        Column Address Order
+//MV:  1(Exchanged),     0(normal)        Row/Column exchange
+//ML:  1(bottom to top), 0(top to bottom) Vertical Refresh Order
+//RGB: 1(BGR), 			 0(RGB)           Color Space
+//MH:  1(R to L),        0(L to R)        Horizontal Refresh Order
+//   MY, MX, MV, ML,RGB, MH, D1, D0
+/*
+	( 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0),//normal
+	( 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0),//Y-Mirror
+	( 0 | 1 | 0 | 0 | 1 | 0 | 0 | 0),//X-Mirror
+	( 1 | 1 | 0 | 0 | 1 | 0 | 0 | 0),//X-Y-Mirror
+	( 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0),//X-Y Exchange
+	( 1 | 0 | 1 | 0 | 1 | 0 | 0 | 0),//X-Y Exchange, Y-Mirror
+	( 0 | 1 | 1 | 0 | 1 | 0 | 0 | 0),//XY exchange
+	( 1 | 1 | 1 | 0 | 1 | 0 | 0 | 0)
+	};
+*/
 void TFT_ILI9163C::setRotation(uint8_t m) {
 	writecommand(CMD_MADCTL);
 	rotation = m % 4; // can't be higher than 3
