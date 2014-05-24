@@ -108,6 +108,7 @@ Version:
 	0.1a3: Some bugfix, still some addressing problems, partial rotation solved.
 	0.1b1: Beta version! Fully working but still not tested with Arduino and DUE (altrough it compile)
 	0.2b2: Code cleaned and added support for 2.2" RED PCB displays.
+	0.2b4: Bug fixes and added color space support.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 BugList of the current version:
