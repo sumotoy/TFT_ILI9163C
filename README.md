@@ -59,9 +59,8 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 Code Optimizations:
 	
 	The purpose of this library it's SPEED. I have tried to use hardware optimized calls
-	where was possible and results are quite good for most applications, actually nly filled circles
-    are still a bit slow. Many SPI call has been optimized by reduce un-needed triggers to RS and CS
-	lines. Of course it can be improved so feel free to add suggestions.
+	where was possible and results are quite good for most applications.
+	Of course it can be improved so feel free to add suggestions.
 -------------------------------------------------------------------------------
     Copyright (c) 2014, .S.U.M.O.T.O.Y., coded by Max MC Costa.    
 
