@@ -402,7 +402,6 @@ void TFT_ILI9163C::chipInit() {
 	writedata(0X00); 
 	writedata(_GRAMHEIGH); 
 
-	//colorSpace(__COLORSPC);//set default colorspace and other access data 
 	colorSpace(_colorspaceData);
 	setRotation(0);
 	writecommand(CMD_DISPON);//display ON 
@@ -411,7 +410,6 @@ void TFT_ILI9163C::chipInit() {
 
 	delay(1);
 	fillScreen(BLACK);
-	
 }
 
 /*
@@ -425,9 +423,6 @@ void TFT_ILI9163C::colorSpace(uint8_t cspace) {
 	} else {
 		bitSet(_Mactrl_Data,3);
 	}
-	//writecommand(CMD_MADCTL);
-	//writedata(_Mactrl_Data);
-	//delay(1);
 }
 
 
@@ -442,7 +437,10 @@ void TFT_ILI9163C::homeAddress() {
 	setAddrWindow(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
 }
 
+
+
 void TFT_ILI9163C::setCursor(int16_t x, int16_t y) {
+	if (boundaryCheck(x,y)) return;
 	setAddrWindow(0x00,0x00,x,y);
 	cursor_x = x;
 	cursor_y = y;
@@ -451,7 +449,7 @@ void TFT_ILI9163C::setCursor(int16_t x, int16_t y) {
 
 
 void TFT_ILI9163C::pushColor(uint16_t color) {
-	writedata16(color);
+	 writedata16(color);
 }
 
 void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color) {

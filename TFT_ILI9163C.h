@@ -67,6 +67,7 @@
 	0.2b1: Cleaned up.
 	0.2b3: Added 2.2" Red PCB parameters
 	0.2b4: Bug fixes, added colorSpace (for future send image)
+	0.2b5: Cleaning
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -100,10 +101,7 @@
 	#include <avr/pgmspace.h>
 #endif
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
-	// #include "mk20dx128.h"
-	// #include "core_pins.h"
 	#define __DMASPI
-	
 	#define CTAR_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0) | SPI_CTAR_DBR)
 	#define CTAR_16MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0) | SPI_CTAR_DBR)
 	#define CTAR_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0))
@@ -163,7 +161,7 @@ Not tested!
 	
 	Note 2: This is the offset between image in RAM and TFT. In that case 160 - 128 = 32;
 */
-//-----------------------------------------
+//--------- Keep out hands from here!-------------
 
 #define	BLACK   		0x0000
 #define WHITE   		0xFFFF
@@ -171,15 +169,6 @@ Not tested!
 //ILI9163C registers-----------------------
 #define CMD_NOP     	0x00//Non operation
 #define CMD_SWRESET 	0x01//Soft Reset
-// #define CMD_RDDID   	0x04//Read Display Identification Information
-// #define CMD_RDDST   	0x09//Read Display Status
-// #define CMD_RDMODE  	0x0A//Read Display power mode
-// #define CMD_RDMADCTL  	0x0B//Read Display MADCTL (orientation)
-// #define CMD_RDPIXFMT  	0x0C//Read Display Pixel Format
-// #define CMD_RDIMMDE  	0x0D//Read Display Image Mode
-// #define CMD_RDSNMDE  	0x0E//Read Display Signal Mode
-//#define CMD_RDSNMDE  	0x0F//Read Display Signal Mode
-
 #define CMD_SLPIN   	0x10//Sleep ON
 #define CMD_SLPOUT  	0x11//Sleep OFF
 #define CMD_PTLON   	0x12//Partial Mode ON
@@ -221,28 +210,9 @@ Not tested!
 #define CMD_VCOMCTR1  	0xC5//VCOM_Control 1
 #define CMD_VCOMCTR2  	0xC6//VCOM_Control 2
 #define CMD_VCOMOFFS  	0xC7//VCOM Offset Control
-
-// #define CMD_WRID4VL  	0xD3//Write ID4 Value 
-
-// #define CMD_NVMEMFC1  	0xD5//NV Memory Function Controller(1)
-// #define CMD_NVMEMFC2  	0xD6//NV Memory Function Controller(1)
-// #define CMD_NVMEMFC3  	0xD7//NV Memory Function Controller(1)
-// #define CMD_RDID1   	0xDA//Read ID1
-// #define CMD_RDID2   	0xDB//Read ID2
-// #define CMD_RDID3   	0xDC//Read ID3
-// #define CMD_RDID4   	0xDD//Read ID4
 #define CMD_PGAMMAC		0xE0//Positive Gamma Correction Setting
 #define CMD_NGAMMAC		0xE1//Negative Gamma Correction Setting
 #define CMD_GAMRSEL		0xF2//GAM_R_SEL
-
-
-// #define DTA_MADCTL_MX  	0x40//0x40 or 00
-// #define DTA_MADCTL_MY  	0x80
-// #define DTA_MADCTL_MV  	0x20
-// #define DTA_MADCTL_ML  	0x10
-// #define DTA_MADCTL_RGB 	0x00
-// #define DTA_MADCTL_BGR 	0x08
-// #define DTA_MADCTL_MH  	0x04
 
 
 class TFT_ILI9163C : public Adafruit_GFX {
@@ -250,14 +220,14 @@ class TFT_ILI9163C : public Adafruit_GFX {
  public:
 
 	TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin);
-	TFT_ILI9163C(uint8_t CS, uint8_t DC);
+	TFT_ILI9163C(uint8_t CS, uint8_t DC);//connect rst pin to VDD
 	
 	void     	begin(void),
-				setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),
-				setCursor(int16_t x,int16_t y),
+				setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),//graphic Addressing
+				setCursor(int16_t x,int16_t y),//char addressing
 				pushColor(uint16_t color),
 				fillScreen(uint16_t color=0x0000),
-				clearScreen(uint16_t color=0x0000),
+				clearScreen(uint16_t color=0x0000),//same as fillScreen
 				drawPixel(int16_t x, int16_t y, uint16_t color),
 				drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
 				drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
@@ -270,7 +240,6 @@ class TFT_ILI9163C : public Adafruit_GFX {
  private:
 	uint8_t		_Mactrl_Data;//container for the memory access control data
 	uint8_t		_colorspaceData;
-	uint8_t  	tabcolor;
 	void 		colorSpace(uint8_t cspace);
 	void		writecommand(uint8_t c);
 	void		writedata(uint8_t d);
@@ -287,7 +256,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 
 	#if defined(__SAM3X8E__)
 	void				spiwrite(uint8_t);
-					Pio *dataport, *clkport, *csport, *rsport;
+	Pio 				*dataport, *clkport, *csport, *rsport;
 	uint8_t 			_cs,_rs,_sid,_sclk,_rst;
 	uint32_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
 	#endif //  #if defined(__SAM3X8E__)
