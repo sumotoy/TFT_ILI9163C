@@ -16,7 +16,7 @@ Features:
 	- It uses just 4 or 5 wires.
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
-	
+	- Teensy3 optimized and SPI transaction compatible
 
 Pay Attention to connections!!!!:
 	
@@ -108,6 +108,8 @@ Version:
 	0.1b1: Beta version! Fully working but still not tested with Arduino and DUE (altrough it compile)
 	0.2b2: Code cleaned and added support for 2.2" RED PCB displays.
 	0.2b4: Bug fixes and added color space support.
+	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
+	SPI transaction,added BLACK TAG 2.2 display
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 BugList of the current version:
