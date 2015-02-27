@@ -68,10 +68,29 @@
 	0.2b3: Added 2.2" Red PCB parameters
 	0.2b4: Bug fixes, added colorSpace (for future send image)
 	0.2b5: Cleaning
+	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
+	SPI transaction,added BLACK TAG 2.2 display
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
 	- Actually no scroll commands (only in release will be included).
+
+	
+Here's the speed test between 0.2b5 and 0.3b1 on Teensy3.1
+------------------------------------------------------------------------
+Lines                    17024  	16115	BETTER
+Horiz/Vert Lines         5360		5080	BETTER
+Rectangles (outline)     4384		4217	BETTER
+Rectangles (filled)      96315		91265	BETTER
+Circles (filled)         16053		15829	LITTLE BETTER
+Circles (outline)        11540		20320	WORST!
+Triangles (outline)      5359		5143	BETTER
+Triangles (filled)       19088		18741	BETTER
+Rounded rects (outline)  8681		12498	LITTLE WORST
+Rounded rects (filled)   105453		100213	BETTER
+Done!
+
+
 */
 #ifndef _TFT_ILI9163CLIB_H_
 #define _TFT_ILI9163CLIB_H_
@@ -87,6 +106,7 @@
 
 //----- Define here witch display you own
 #define __144_RED_PCB__//128x128
+//#define __144_BLACK_PCB__//128x128
 //#define __22_RED_PCB__//240x320
 //---------------------------------------
 
@@ -101,13 +121,7 @@
 	#include <avr/pgmspace.h>
 #endif
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
-	#define __DMASPI
-	#define CTAR_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0) | SPI_CTAR_DBR)
-	#define CTAR_16MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0) | SPI_CTAR_DBR)
-	#define CTAR_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0))
-	#define CTAR_8MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_CSSCK(0))
-	#define CTAR_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1) | SPI_CTAR_CSSCK(1))
-	#define CTAR_4MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(1) | SPI_CTAR_CSSCK(1))
+	#define SPICLOCK 30000000
 #endif
 
 //ILI9163C versions------------------------
@@ -118,7 +132,7 @@ http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color
 This particular display has a design error! The controller has 3 pins to configure to constrain
 the memory and resolution to a fixed dimension (in that case 128x128) but they leaved those pins
 configured for 128x160 so there was several pixel memory addressing problems.
-I solved by setup several parameters that dinamically fix the resolution as needit so below
+I solved by setup several parameters that dinamically fix the resolution as needed so below
 the parameters for this diplay. If you have a strain or a correct display (can happen with chinese)
 you can copy those parameters and create setup for different displays.
 */
@@ -131,6 +145,16 @@ you can copy those parameters and create setup for different displays.
 	#define __GAMMASET1		//uncomment for another gamma
 	#define __OFFSET		32//*see note 2
 	//Tested!
+#elif defined (__144_BLACK_PCB__)
+	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
+	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
+	#define _GRAMWIDTH      128
+	#define _GRAMHEIGH      128
+	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
+	#define __COLORSPC		1// 1:GBR - 0:RGB
+	#define __GAMMASET1		//uncomment for another gamma
+	#define __OFFSET		0
+	//not tested
 #elif defined (__22_RED_PCB__)
 /*
 Like this one:
@@ -231,6 +255,11 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				drawPixel(int16_t x, int16_t y, uint16_t color),
 				drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
 				drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
+				#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
+				drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
+				#endif
+				//drawChar(int16_t x, int16_t y, unsigned char c, uint16_t fgcolor, uint16_t bgcolor, uint8_t size),
 				fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color),
 				setRotation(uint8_t r),
 				invertDisplay(boolean i);
@@ -241,9 +270,12 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	uint8_t		_Mactrl_Data;//container for the memory access control data
 	uint8_t		_colorspaceData;
 	void 		colorSpace(uint8_t cspace);
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+	#else
 	void		writecommand(uint8_t c);
 	void		writedata(uint8_t d);
 	void		writedata16(uint16_t d);
+	#endif
 	void 		chipInit();
 	bool 		boundaryCheck(int16_t x,int16_t y);
 	void 		homeAddress();
@@ -262,10 +294,100 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	#endif //  #if defined(__SAM3X8E__)
   
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	uint8_t 			_cs,_rs,_sid,_sclk,_rst;
-	uint8_t 			pcs_data, pcs_command;
-	uint32_t 			ctar;
-	volatile uint8_t 	*datapin, *clkpin, *cspin, *rspin;
+	uint8_t _cs, _rs, _rst;
+	uint8_t pcs_data, pcs_command;
+	
+	void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing
+	
+/*  	void setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) __attribute__((always_inline)) {
+		writecommand_cont(CMD_CLMADRS); // Column addr set
+		writedata16_cont(x0);   // XSTART
+		writedata16_cont(x1);   // XEND
+		writecommand_cont(CMD_PGEADRS); // Row addr set
+		writedata16_cont(y0);   // YSTART
+		writedata16_cont(y1);   // YEND
+	}  */
+	
+	void waitFifoNotFull(void) {
+		uint32_t sr;
+		uint32_t tmp __attribute__((unused));
+		do {
+			sr = SPI0.SR;
+			if (sr & 0xF0) tmp = SPI0_POPR; // drain RX FIFO
+		} while ((sr & (15 << 12)) > (3 << 12));
+	}
+	
+	void waitFifoEmpty(void) {
+		uint32_t sr;
+		uint32_t tmp __attribute__((unused));
+		do {
+			sr = SPI0.SR;
+			if (sr & 0xF0) tmp = SPI0_POPR; // drain RX FIFO
+			} while ((sr & 0xF0F0) > 0); // wait both RX & TX empty
+	}
+	
+	void waitTransmitComplete(void) __attribute__((always_inline)) {
+		uint32_t tmp __attribute__((unused));
+		while (!(SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
+		tmp = SPI0_POPR; // drain the final RX FIFO word
+	}
+	
+	void writecommand_cont(uint8_t c) __attribute__((always_inline)) {
+		SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		waitFifoNotFull();
+	}
+	
+	void writecommand_last(uint8_t c) __attribute__((always_inline)) {
+		waitFifoEmpty();
+		SPI0.SR = SPI_SR_TCF;
+		SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
+		waitTransmitComplete();
+	}
+	
+	void writedata8_cont(uint8_t c) __attribute__((always_inline)) {
+		SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		waitFifoNotFull();
+	}
+	
+	void writedata8_last(uint8_t c) __attribute__((always_inline)) {
+		waitFifoEmpty();
+		SPI0.SR = SPI_SR_TCF;
+		SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
+		waitTransmitComplete();
+	}
+	
+	void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
+		SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+		waitFifoNotFull();
+	}
+	
+	void writedata16_last(uint16_t d) __attribute__((always_inline)) {
+		waitFifoEmpty();
+		SPI0.SR = SPI_SR_TCF;
+		SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
+		waitTransmitComplete();
+	}
+	
+	void HLine(int16_t x, int16_t y, int16_t w, uint16_t color) __attribute__((always_inline)) {
+		_setAddrWindow(x, y, x+w-1, y);
+		//writecommand_cont(CMD_RAMWR);//not needed
+		do { writedata16_cont(color); } while (--w > 0);
+	}
+
+	void Pixel(int16_t x, int16_t y, uint16_t color) __attribute__((always_inline)) {
+		_setAddrWindow(x, y, x, y);
+		//writecommand_cont(CMD_RAMWR);//not needed
+		writedata16_cont(color);
+	}
+	
+	void VLine(int16_t x, int16_t y, int16_t h, uint16_t color) __attribute__((always_inline)) {
+		_setAddrWindow(x, y, x, y+h-1);
+		//writecommand_cont(CMD_RAMWR);//not needed
+		do { writedata16_cont(color); } while (--h > 0);
+	}
 	#endif
+	
 };
+
+
 #endif
