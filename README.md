@@ -115,3 +115,5 @@ Version:
 BugList of the current version:
 	
 	- Beta version fully working!
+	
+http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
