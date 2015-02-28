@@ -27,12 +27,13 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	
 	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
 	If you try to connect directly you can burn it very fast so PAY ATTENTION!
-	- My display works at 3V3 volt for logic but LED background has resistor for 5V. Your can be different
-	so carefully check out before connect it.
-	- My library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS).
+	- My display works at 3V3 volt and uses 3V3 for logic but LED background has resistor for 5V. 
+	Your can be different so carefully check out before connect it.
+	- Library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS).
 	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
 	the reset pin. The initialization routine will automatically use the software reset.
-	- People using <b>Teensy3</b> should remember that have to choose for CS and DC a pin that should be:
+
+	- People using Teensy3 should remember that have to choose for CS and DC a pin that should be:
 	pins:2,6,9 or 10,15 or 20,13 for CS and DC, any for RST (but you can connect RST to +3v3 and forget it.
 
 <b>Backgrounds:</b>
@@ -68,7 +69,7 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	where was possible and results are quite good for most applications.
 	Of course it can be improved so feel free to add suggestions.
 
-<b>Needed stuff you have to install first:</b>
+<b>Needed stuff you have to install first!!!</b>
 
 	This library use Adafruit GFX library as all my TFT,OLED and LCD libraries:
     
@@ -87,13 +88,15 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 
 	You are a newbie and need help? Here's:
 	This display has 8 pin (at the time I'm writing this):
+	
+	TFT side   -------------------- microprocessor  
 	- Vcc		-->		+3V3V(!!!!)
 	- Gnd		-->		Gnd
-	- CS		-->		CS pin
+	- CS		-->		CS pin (3v3 level!)
 	- RST		-->		connect to a MCU pin or tie to +3V3
-	- A0		-->		DC pin
-	- SDA		-->		Mosi
-	- SCK		-->		Sclk
+	- A0		-->		DC or RS pin (3v3 level!)
+	- SDA		-->		Mosi (3v3 level!)
+	- SCK		-->		Sclk (3v3 level!)
 	- LED		-->		Some display need a resistor (see note below)
 	
 * Note about led:
