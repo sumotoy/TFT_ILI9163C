@@ -116,4 +116,7 @@ BugList of the current version:
 	
 	- Beta version fully working!
 	
+mbed (Nucleo F411RE) version is here
 http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
+
+(thanks https://github.com/MasudaNaika)
