@@ -20,7 +20,25 @@ uint16_t     t_b[NBINS];
 
 uint16_t datax_[NBINS];
 
-TFT_ILI9163C tft = TFT_ILI9163C(10, 9);
+/*
+Teensy3.x and Arduino's
+You are using 4 wire SPI here, so:
+ MOSI:  11//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ MISO:  12//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ the rest of pin below:
+ */
+#define __CS 10
+#define __DC 9
+/*
+Teensy 3.x can use: 2,6,9,10,15,20,21,22,23
+Arduino's 8 bit: any
+DUE: check arduino site
+If you do not use reset, tie it to +3V3
+*/
+
+
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
 
 void setup(void) {
   Serial.begin(38400);

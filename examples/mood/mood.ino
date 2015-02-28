@@ -26,6 +26,7 @@ You are using 4 wire SPI here, so:
 Teensy 3.x can use: 2,6,9,10,15,20,21,22,23
 Arduino's 8 bit: any
 DUE: check arduino site
+If you do not use reset, tie it to +3V3
 */
 
 

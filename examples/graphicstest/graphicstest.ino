@@ -8,9 +8,6 @@
 #define F(string_literal) string_literal
 #endif
 
-#define __CS 10
-#define __DC 9
-#define __RST 14
 
 // Color definitions
 #define	BLACK   0x0000
@@ -22,15 +19,30 @@
 #define YELLOW  0xFFE0  
 #define WHITE   0xFFFF
 
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
+/*
+Teensy3.x and Arduino's
+You are using 4 wire SPI here, so:
+ MOSI:  11//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ MISO:  12//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ the rest of pin below:
+ */
+#define __CS 10
+#define __DC 9
+/*
+Teensy 3.x can use: 2,6,9,10,15,20,21,22,23
+Arduino's 8 bit: any
+DUE: check arduino site
+If you do not use reset, tie it to +3V3
+*/
+
+
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
 
 void setup() {
   Serial.begin(9600);
   //while (!Serial);
   tft.begin();
-  #if defined(__MK20DX128__) || defined(__MK20DX256__)
-  tft.setBitrate(24000000);
-  #endif
 
   Serial.println(F("Benchmark                Time (microseconds)"));
   Serial.print(F("Screen fill              "));

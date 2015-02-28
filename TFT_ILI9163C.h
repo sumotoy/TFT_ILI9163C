@@ -71,6 +71,7 @@
 	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
 	SPI transaction,added BLACK TAG 2.2 display
 	0.3b2: Minor fix, load 24bit image, Added conversion utility
+	0.4:some improvement, new ballistic gauge example!
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -236,6 +237,7 @@ Not tested!
 #define CMD_GAMRSEL		0xF2//GAM_R_SEL
 
 
+
 class TFT_ILI9163C : public Adafruit_GFX {
 
  public:
@@ -269,6 +271,8 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	uint8_t		_Mactrl_Data;//container for the memory access control data
 	uint8_t		_colorspaceData;
 	void 		colorSpace(uint8_t cspace);
+	void setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	void endProc(void);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 	//
 	#else
@@ -381,6 +385,4 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	#endif
 	
 };
-
-
 #endif

@@ -2,9 +2,6 @@
 #include <Adafruit_GFX.h>
 #include <TFT_ILI9163C.h>
 
-#define __CS 10
-#define __DC 9
-#define __RST 14
 
 // Color definitions
 #define	BLACK   0x0000
@@ -16,17 +13,17 @@
 #define YELLOW  0xFFE0  
 #define WHITE   0xFFFF
 
-float sin_d[] = { 
+const float sin_d[] = { 
   0,0.17,0.34,0.5,0.64,0.77,0.87,0.94,0.98,1,0.98,0.94,
   0.87,0.77,0.64,0.5,0.34,0.17,0,-0.17,-0.34,-0.5,-0.64,
   -0.77,-0.87,-0.94,-0.98,-1,-0.98,-0.94,-0.87,-0.77,
   -0.64,-0.5,-0.34,-0.17 };
-float cos_d[] = { 
+const float cos_d[] = { 
   1,0.98,0.94,0.87,0.77,0.64,0.5,0.34,0.17,0,-0.17,-0.34,
   -0.5,-0.64,-0.77,-0.87,-0.94,-0.98,-1,-0.98,-0.94,-0.87,
   -0.77,-0.64,-0.5,-0.34,-0.17,0,0.17,0.34,0.5,0.64,0.77,
   0.87,0.94,0.98};
-float d = 10;
+const float d = 10;
 float px[] = { 
   -d,  d,  d, -d, -d,  d,  d, -d };
 float py[] = { 
@@ -42,14 +39,28 @@ float p2y[] = {
 int r[] = {
   0,0,0};
 
+/*
+Teensy3.x and Arduino's
+You are using 4 wire SPI here, so:
+ MOSI:  11//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ MISO:  12//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+ the rest of pin below:
+ */
+#define __CS 10
+#define __DC 9
+/*
+Teensy 3.x can use: 2,6,9,10,15,20,21,22,23
+Arduino's 8 bit: any
+DUE: check arduino site
+If you do not use reset, tie it to +3V3
+*/
 
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
+
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
 
 void setup() {
   tft.begin();
-  #if defined(__MK20DX128__) || defined(__MK20DX256__)
-  tft.setBitrate(24000000);
-  #endif
 }
 
 void loop(){
