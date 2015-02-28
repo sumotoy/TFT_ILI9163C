@@ -10,31 +10,32 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	
 ==========================
 
-Features:
+<b>Features:</b>
 	
-	- Very FAST!, expecially with Teensy 3.x where uses DMA SPI.
+	- Very FAST!, expecially with Teensy 3.x where uses hyper fast SPI.
 	- It uses just 4 or 5 wires.
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
-	- Teensy3 optimized and SPI transaction compatible
+	- SPI transaction compatible (only where supported, actually only Teensy3 but soon more)
+	- Working with IDE 1.0.6, 1.5.8 (or newer), Energia (soon)
+	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1 and Teensy LC
+	- Working with Energia supported MCU (not yet but really soon)
+	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika
+	here: http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 
-Pay Attention to connections!!!!:
+<b>Pay Attention to connections!!!!:</b>
 	
-	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
+	- This display has logic at <b>3V3 volt</b> so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
 	If you try to connect directly you can burn it very fast so PAY ATTENTION!
 	- My display works at 3V3 volt for logic but LED background has resistor for 5V. Your can be different
 	so carefully check out before connect it.
 	- My library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS).
 	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
 	the reset pin. The initialization routine will automatically use the software reset.
-	- People using Teensy3 should remember that have to choose for CS and DC a pin that satisfy:
+	- People using <b>Teensy3</b> should remember that have to choose for CS and DC a pin that should be:
+	<b>pins:2,6,9 or 10,15 or 20,13 for CS and DC, any for RST</b> (but you can connect RST to +3v3 and forget it.
 
-	if (pin == 2 || pin == 6 || pin == 9) return true;
-	if (pin == 10 || pin == 15) return true;
-	if (pin >= 20 && pin <= 23) return true;
-
-
-Background:
+<b>Backgrounds:</b>
 	
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
 	any working library so I decided to hack it. ILI9163C looks pretty similar to other 
@@ -50,58 +51,72 @@ http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color
 
 http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	
-	Pay attention that ILI9163C can drive different resolutions and your display can be
-	160*128 or whatever, also there's a strain of this display with a black PCB that a friend of mine
-	got some weeks ago and need some small changes in library to get working.
-	If you look at TFT_ILI9163C.h file you can add your modifications and let me know so I
-	can include for future versions.
+	This TFT it's really cheap but has surprising features since it support very high speed SPI trasfer 
+	(over 40Mhz tested!) and can be used as frame buffer, colors are quite tunable and has a tons of settings.
+	It also support repetitive serial transfer so it can react very fast.
 	
-Code Optimizations:
+<b>BLACK, RED or ...</b>
+	
+	There's different strain of this display on ebay, I have try to tracking all of them but may missing some 		species! Actually the more popular has a RED pcb and a BLACK pcb that are completely same pcb but mount a 		different display that need some tweaking, in particular RED ones need offset but also some tweak for 			colors, etc. In the .h file in the library try to comment out one of the presets:
+	//#define __144_RED_PCB__
+	#define __144_BLACK_PCB__
+	//#define __22_RED_PCB__
+	
+<b>Code Optimizations:</b>
 	
 	The purpose of this library it's SPEED. I have tried to use hardware optimized calls
 	where was possible and results are quite good for most applications.
 	Of course it can be improved so feel free to add suggestions.
--------------------------------------------------------------------------------
-    Copyright (c) 2014, .S.U.M.O.T.O.Y., coded by Max MC Costa.    
 
-    TFT_ILI9163C Library is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+<b>Needed stuff you have to install first:</b>
 
-    TFT_ILI9163C Library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-This file needs the following Libraries:
- 
-    *Adafruit_GFX by Adafruit:
+	This library use Adafruit GFX library as all my TFT,OLED and LCD libraries:
     
-https://github.com/adafruit/Adafruit-GFX-Library
-
-    Remember to update GFX library often to have more features with this library!
+	https://github.com/adafruit/Adafruit-GFX-Library
 	
-    *From this version I'm using my version of Adafruit_GFX library:
+        (Remember to update GFX library often to have more features with this and other library!)
+	
+    	Since Adafruit are quite reluctant to update often I have a 100% compatible one that it's faster and has
+    	more features, faster char rendering, ability to use different fonts etc.
     
-https://github.com/sumotoy/Adafruit-GFX-Library
+	https://github.com/sumotoy/Adafruit-GFX-Library
 
-    It has faster char rendering and some small little optimizations but you can
-    choose one of the two freely since are both fully compatible.
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    	It's 100% compatible with the Adafruit one so don't worry about.
+    	
+<b>Wiring:</b>
 
-Special Thanks:
+	You are a newbie and need help? Here's:
+	This display has 8 pin (at the time I'm writing this):
+	- Vcc		-->		+3V3V(!!!!)
+	- Gnd		-->		Gnd
+	- CS		-->		CS pin
+	- RST		-->		connect to a MCU pin or tie to +3V3
+	- A0		-->		DC pin
+	- SDA		-->		Mosi
+	- SCK		-->		Sclk
+	- LED		-->		Some display need a resistor (see note below)
+	
+* Note about led:
+
+Some display have an internal resistor to limit current, you see on the back of the display, following LED pcb
+trace with your eyes and if you see a resistor (100 Ohm mine) you can connect this line directly to +5V.
+But be careful <u>do not try connect to 5V before you check the presence of this resistor on pcb</u>, you can try first by using a resistor of 220 ohm, if the image looks very dark, try 100 and if still very dark, tie directly to 5v.
+
+<b>Utility included:</b>
+
+	Included you will find https://code.google.com/p/lcd-image-converter/ an utility to convert in code a 24bit
+	image that you can load with this library, see example bigPicture.ino. 
+	I have included datasheet as well.
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+<b>Special Thanks:</b>
 	
 	Thanks Adafruit for his Adafruit_GFX!
-	Thanks to Paul Stoffregen for his beautiful Teensy3 and DMA SPI.
+	Thanks to Paul Stoffregen for his beautiful Teensy3 and high speed SPI magic.
 	
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Version:
+<b>Version:</b>
 	
 	0.1a1: First release, compile correctly. Altrough not fully working!
 	0.1a3: Some bugfix, still some addressing problems, partial rotation solved.
@@ -110,13 +125,5 @@ Version:
 	0.2b4: Bug fixes and added color space support.
 	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
 	SPI transaction,added BLACK TAG 2.2 display
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-BugList of the current version:
-	
-	- Beta version fully working!
-	
-mbed (Nucleo F411RE) version is here
-http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
-
-(thanks https://github.com/MasudaNaika)
+	0.3b2: Added 24bit image display code and example.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
