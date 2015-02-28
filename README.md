@@ -72,15 +72,15 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 <b>Needed stuff you have to install first!!!</b>
 
 	This library use Adafruit GFX library as all my TFT,OLED and LCD libraries:
-    
-	https://github.com/adafruit/Adafruit-GFX-Library
+	(Remember to update GFX library often to have more features with this and other library!)
 	
-        (Remember to update GFX library often to have more features with this and other library!)
+
+https://github.com/adafruit/Adafruit-GFX-Library
 	
     	Since Adafruit are quite reluctant to update often I have a 100% compatible one that it's faster and has
     	more features, faster char rendering, ability to use different fonts etc.
-    
-	https://github.com/sumotoy/Adafruit-GFX-Library
+
+https://github.com/sumotoy/Adafruit-GFX-Library
 
     	It's 100% compatible with the Adafruit one so don't worry about.
     	
@@ -107,8 +107,11 @@ But be careful <u>do not try connect to 5V before you check the presence of this
 
 <b>Utility included:</b>
 
-	Included you will find https://code.google.com/p/lcd-image-converter/ an utility to convert in code a 24bit
-	image that you can load with this library, see example bigPicture.ino. 
+	Included you will find LCD Image Converter a free utility to convert in code a 24bit image.
+	
+https://code.google.com/p/lcd-image-converter/
+
+	see example bigPicture.ino. 
 	I have included datasheet as well.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
