@@ -120,7 +120,7 @@ https://code.google.com/p/lcd-image-converter/
 	Thanks Adafruit for his Adafruit_GFX!
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and high speed SPI magic.
 	
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b>Version:</b>
 	
@@ -133,3 +133,13 @@ https://code.google.com/p/lcd-image-converter/
 	SPI transaction,added BLACK TAG 2.2 display
 	0.3b2: Added 24bit image display code and example.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<b> Legal Notes:</b>
+	
+	This library it's free to use but if you port for other MCU or include in distribution or whatever you have
+	to leave intact the readme inside the library, add your text about modifications but leave intact the text
+	in the .h file.
+	If you included in distributions please leave me a note.
+	If you porting for other MCU or IDE, leave me a note, I will included in the readme here the link.
+	
+	I'm not responsable for any damage created by using this library, it was developed for the community and
+	I uses my spare time to support it
