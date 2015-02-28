@@ -96,16 +96,12 @@ Done!
 #ifndef _TFT_ILI9163CLIB_H_
 #define _TFT_ILI9163CLIB_H_
 
-#if ARDUINO >= 100
-	#include "Arduino.h"
-	#include "Print.h"
-#else
-	#include "WProgram.h"
-#endif
 
+#include "Arduino.h"
+#include "Print.h"
 #include <Adafruit_GFX.h>
 
-//----- Define here witch display you own
+//DID YOU HAVE A RED PCB, BLACk PCB or WHAT DISPLAY TYPE???????????? ---> SELECT HERE <----
 #define __144_RED_PCB__//128x128
 //#define __144_BLACK_PCB__//128x128
 //#define __22_RED_PCB__//240x320
@@ -125,7 +121,7 @@ Done!
 	#define SPICLOCK 30000000
 #endif
 
-//ILI9163C versions------------------------
+
 #if defined(__144_RED_PCB__)
 /*
 This display:
@@ -256,7 +252,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				drawPixel(int16_t x, int16_t y, uint16_t color),
 				drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
 				drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
-				#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				#if defined(__MK20DX128__) || defined(__MK20DX256__)//workaround to get more speed from Teensy
 				drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
 				drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
 				#endif
@@ -274,6 +270,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	uint8_t		_colorspaceData;
 	void 		colorSpace(uint8_t cspace);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+	//
 	#else
 	void		writecommand(uint8_t c);
 	void		writedata(uint8_t d);
@@ -297,19 +294,12 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	#endif //  #if defined(__SAM3X8E__)
   
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+	//Here's Paul Stoffregen magic in action...
 	uint8_t _cs, _rs, _rst;
 	uint8_t pcs_data, pcs_command;
 	
-	void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing
+	void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing for Teensy
 	
-/*  	void setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) __attribute__((always_inline)) {
-		writecommand_cont(CMD_CLMADRS); // Column addr set
-		writedata16_cont(x0);   // XSTART
-		writedata16_cont(x1);   // XEND
-		writecommand_cont(CMD_PGEADRS); // Row addr set
-		writedata16_cont(y0);   // YSTART
-		writedata16_cont(y1);   // YEND
-	}  */
 	
 	void waitFifoNotFull(void) {
 		uint32_t sr;
