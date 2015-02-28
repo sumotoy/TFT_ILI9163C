@@ -132,7 +132,8 @@ https://code.google.com/p/lcd-image-converter/
 	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
 	SPI transaction,added BLACK TAG 2.2 display
 	0.3b2: Added 24bit image display code and example.
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 <b> Legal Notes:</b>
 	
 	This library it's free to use but if you port for other MCU or include in distribution or whatever you have
