@@ -70,6 +70,7 @@
 	0.2b5: Cleaning
 	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
 	SPI transaction,added BLACK TAG 2.2 display
+	0.3b2: Minor fix, load 24bit image, Added conversion utility
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -139,10 +140,10 @@ you can copy those parameters and create setup for different displays.
 	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
 	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
 	#define _GRAMWIDTH      128
-	#define _GRAMHEIGH      160
+	#define _GRAMHEIGH      128//160
 	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
 	#define __COLORSPC		1// 1:GBR - 0:RGB
-	#define __GAMMASET1		//uncomment for another gamma
+	#define __GAMMASET3		//uncomment for another gamma
 	#define __OFFSET		32//*see note 2
 	//Tested!
 #elif defined (__144_BLACK_PCB__)
@@ -212,8 +213,8 @@ Not tested!
 #define CMD_CLRSPACE   	0x2D//Color Space : 4K/65K/262K
 #define CMD_PARTAREA	0x30//Partial Area
 #define CMD_VSCLLDEF	0x33//Vertical Scroll Definition
-#define CMD_TEFXLON		0x34//Tearing Effect Line ON
-#define CMD_TEFXLOF		0x35//Tearing Effect Line OFF
+#define CMD_TEFXLON		0x35//Tearing Effect Line ON
+#define CMD_TEFXLOF		0x34//Tearing Effect Line OFF
 #define CMD_MADCTL  	0x36//Memory Access Control
 
 #define CMD_PIXFMT  	0x3A//Interface Pixel Format
@@ -259,12 +260,14 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
 				drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
 				#endif
-				//drawChar(int16_t x, int16_t y, unsigned char c, uint16_t fgcolor, uint16_t bgcolor, uint8_t size),
 				fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color),
 				setRotation(uint8_t r),
 				invertDisplay(boolean i);
-  uint16_t 		Color565(uint8_t r, uint8_t g, uint8_t b);
-  void 			setBitrate(uint32_t n);	
+	void		writeScreen(const uint32_t *bitmap);
+	uint16_t 		Color565(uint8_t r, uint8_t g, uint8_t b);
+  //convert 24bit color into packet 16 bit one (credits for this are all mine)
+	inline uint16_t Color24To565(int32_t color_) { return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) &  0xFF) / 8);}
+	void 			setBitrate(uint32_t n);	
 
  private:
 	uint8_t		_Mactrl_Data;//container for the memory access control data

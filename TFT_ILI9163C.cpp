@@ -192,9 +192,17 @@ void TFT_ILI9163C::begin(void) {
 
 
 void TFT_ILI9163C::chipInit() {
+	uint8_t i;
 	#if defined(__GAMMASET1)
 	const uint8_t pGammaSet[15]= {0x36,0x29,0x12,0x22,0x1C,0x15,0x42,0xB7,0x2F,0x13,0x12,0x0A,0x11,0x0B,0x06};
 	const uint8_t nGammaSet[15]= {0x09,0x16,0x2D,0x0D,0x13,0x15,0x40,0x48,0x53,0x0C,0x1D,0x25,0x2E,0x34,0x39};
+	#elif defined(__GAMMASET2)
+	const uint8_t pGammaSet[15]= {0x3F,0x21,0x12,0x22,0x1C,0x15,0x42,0xB7,0x2F,0x13,0x02,0x0A,0x01,0x00,0x00};
+	const uint8_t nGammaSet[15]= {0x09,0x18,0x2D,0x0D,0x13,0x15,0x40,0x48,0x53,0x0C,0x1D,0x25,0x2E,0x24,0x29};
+	#elif defined(__GAMMASET3)
+	const uint8_t pGammaSet[15]= {0x3F,0x26,0x23,0x30,0x28,0x10,0x55,0xB7,0x40,0x19,0x10,0x1E,0x02,0x01,0x00};
+	//&const uint8_t nGammaSet[15]= {0x00,0x19,0x1C,0x0F,0x14,0x0F,0x2A,0x48,0x3F,0x06,0x1D,0x21,0x3D,0x3F,0x3F};
+	const uint8_t nGammaSet[15]= {0x09,0x18,0x2D,0x0D,0x13,0x15,0x40,0x48,0x53,0x0C,0x1D,0x25,0x2E,0x24,0x29};
 	#else
 	const uint8_t pGammaSet[15]= {0x3F,0x25,0x1C,0x1E,0x20,0x12,0x2A,0x90,0x24,0x11,0x00,0x00,0x00,0x00,0x00};
 	const uint8_t nGammaSet[15]= {0x20,0x20,0x20,0x20,0x05,0x15,0x00,0xA7,0x3D,0x18,0x25,0x2A,0x2B,0x2B,0x3A};
@@ -210,23 +218,24 @@ void TFT_ILI9163C::chipInit() {
 	writedata8_cont(0x05);
 	delay(5);
 	writecommand_cont(CMD_GAMMASET);//default gamma curve 3
-	writedata8_cont(0x04);//0x04
+	writedata8_cont(0x08);//0x04
 	delay(1);
 	writecommand_cont(CMD_GAMRSEL);//Enable Gamma adj    
 	writedata8_cont(0x01); 
 	delay(1);
 	writecommand_cont(CMD_NORML);
 	
+	
 	writecommand_cont(CMD_DFUNCTR);
 	writedata8_cont(0b11111111);//
 	writedata8_cont(0b00000110);//
 
 	writecommand_cont(CMD_PGAMMAC);//Positive Gamma Correction Setting
-	for (uint8_t i=0;i<15;i++){
+	for (i=0;i<15;i++){
 		writedata8_cont(pGammaSet[i]);
 	}
 	writecommand_cont(CMD_NGAMMAC);//Negative Gamma Correction Setting
-	for (uint8_t i=0;i<15;i++){
+	for (i=0;i<15;i++){
 		writedata8_cont(nGammaSet[i]);
 	}
 	
@@ -298,11 +307,11 @@ void TFT_ILI9163C::chipInit() {
 	writedata(0b00000110);//
 
 	writecommand(CMD_PGAMMAC);//Positive Gamma Correction Setting
-	for (uint8_t i=0;i<15;i++){
+	for (i=0;i<15;i++){
 		writedata(pGammaSet[i]);
 	}
 	writecommand(CMD_NGAMMAC);//Negative Gamma Correction Setting
-	for (uint8_t i=0;i<15;i++){
+	for (i=0;i<15;i++){
 		writedata(nGammaSet[i]);
 	}
 
@@ -377,6 +386,27 @@ void TFT_ILI9163C::clearScreen(uint16_t color) {
 	#else
 		homeAddress();
 	for (int px = 0;px < _GRAMSIZE; px++){
+		writedata16(color);
+	}
+	#endif
+}
+
+void TFT_ILI9163C::writeScreen(const uint32_t *bitmap) {
+	uint16_t color;
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		_setAddrWindow(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
+		for (uint32_t px = 0;px < 16383; px++){
+			color = Color24To565(bitmap[px]);
+			writedata16_cont(color);
+		}
+		color = Color24To565(bitmap[16383]);
+		writedata16_last(color);
+		SPI.endTransaction();
+	#else
+		homeAddress();
+	for (uint32_t px = 0;px < 16384; px++){
+		color = Color24To565(bitmap[px]);
 		writedata16(color);
 	}
 	#endif
