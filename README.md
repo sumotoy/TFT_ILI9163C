@@ -25,7 +25,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 
 <b>Pay Attention to connections!!!!:</b>
 	
-	- This display has logic at <b>3V3 volt</b> so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
+	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
 	If you try to connect directly you can burn it very fast so PAY ATTENTION!
 	- My display works at 3V3 volt for logic but LED background has resistor for 5V. Your can be different
 	so carefully check out before connect it.
@@ -33,7 +33,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
 	the reset pin. The initialization routine will automatically use the software reset.
 	- People using <b>Teensy3</b> should remember that have to choose for CS and DC a pin that should be:
-	<b>pins:2,6,9 or 10,15 or 20,13 for CS and DC, any for RST</b> (but you can connect RST to +3v3 and forget it.
+	pins:2,6,9 or 10,15 or 20,13 for CS and DC, any for RST (but you can connect RST to +3v3 and forget it.
 
 <b>Backgrounds:</b>
 	
