@@ -117,6 +117,7 @@ void TFT_ILI9163C::setBitrate(uint32_t n){
 
 
 void TFT_ILI9163C::begin(void) {
+	sleep = 0;
 #ifdef __AVR__
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
@@ -267,16 +268,25 @@ void TFT_ILI9163C::chipInit() {
 	delay(1);
   
 	writecommand_cont(CMD_CLMADRS);//Set Column Address  
+	/*
 	writedata8_cont(0x00); 
 	writedata8_cont(0X00); 
 	writedata8_cont(0X00); 
 	writedata8_cont(_GRAMWIDTH); 
+	*/
+	writedata16_cont(0x00);
+	writedata16_cont(_GRAMWIDTH); 
   
 	writecommand_cont(CMD_PGEADRS);//Set Page Address  
+	/*
 	writedata8_cont(0x00); 
 	writedata8_cont(0X00); 
 	writedata8_cont(0X00); 
-	writedata8_last(_GRAMHEIGH); 
+	writedata8_last(_GRAMHEIGH);
+	*/
+	writedata16_cont(0x00);
+	writedata16_last(_GRAMHEIGH); 
+	
 	SPI.endTransaction();
 	colorSpace(_colorspaceData);
 	setRotation(0);
@@ -338,16 +348,20 @@ void TFT_ILI9163C::chipInit() {
 	delay(1);
   
 	writecommand(CMD_CLMADRS);//Set Column Address  
-	writedata(0x00); 
-	writedata(0X00); 
-	writedata(0X00); 
-	writedata(_GRAMWIDTH); 
+	//writedata(0x00); 
+	//writedata(0X00); 
+	//writedata(0X00); 
+	//writedata(_GRAMWIDTH); 
+	writedata16(0x00); 
+	writedata16(_GRAMWIDTH); 
   
 	writecommand(CMD_PGEADRS);//Set Page Address  
-	writedata(0x00); 
-	writedata(0X00); 
-	writedata(0X00); 
-	writedata(_GRAMHEIGH); 
+	//writedata(0x00); 
+	//writedata(0X00); 
+	//writedata(0X00); 
+	//writedata(_GRAMHEIGH); 
+	writedata16(0X00); 
+	writedata16(_GRAMHEIGH)
 
 	colorSpace(_colorspaceData);
 	setRotation(0);
@@ -373,46 +387,139 @@ void TFT_ILI9163C::colorSpace(uint8_t cspace) {
 	}
 }
 
+void TFT_ILI9163C::invertDisplay(boolean i) {
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		writecommand_last(i ? CMD_DINVON : CMD_DINVOF);
+		SPI.endTransaction();
+	#else
+		writecommand(i ? CMD_DINVON : CMD_DINVOF);
+	#endif
+}
 
+void TFT_ILI9163C::display(boolean onOff) {
+	if (onOff){
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			writecommand_last(CMD_DISPON);
+			endProc();
+		#else
+			writecommand(CMD_DISPON);
+		#endif
+	} else {
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			writecommand_last(CMD_DISPOFF);
+			endProc();
+		#else
+			writecommand(CMD_DISPOFF);
+		#endif
+	}
+}
+
+void TFT_ILI9163C::sleepMode(boolean mode) {
+	if (mode){
+		if (sleep == 1) return;//already sleeping
+		sleep = 1;
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			writecommand_last(CMD_SLPIN);
+			endProc();
+		#else
+			writecommand(CMD_SLPIN);
+		#endif
+		delay(5);//needed
+	} else {
+		if (sleep == 0) return; //Already awake
+		sleep = 0;
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			writecommand_last(CMD_SLPOUT);
+			endProc();
+		#else
+			writecommand(CMD_SLPOUT);
+		#endif
+		delay(120);//needed
+	}
+}
+
+/*
+void TFT_ILI9163C::defineScrollArea(uint16_t a,uint16_t c){
+	//0,2
+		uint16_t b;
+		if ((a+c) > _TFTWIDTH) return;
+		b = (_TFTWIDTH - (a+c));
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		writecommand_cont(0x33);
+		if (rotation == 0 || rotation > 1){
+			writedata16_cont(a);
+			writedata16_cont(b);
+			writedata16_last(c);
+		} else {
+			writedata16_cont(a + __OFFSET);
+			writedata16_cont(b + __OFFSET);
+			writedata16_last(c + __OFFSET);
+		}
+		endProc();
+		setAddr(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
+		setRotation(0);
+		
+}
+*/
+
+void TFT_ILI9163C::scroll(uint16_t adrs) {
+	SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+	writecommand_cont(CMD_VSSTADRS);
+	writedata16_last(adrs);
+	endProc();
+}
+
+
+//corrected!
 void TFT_ILI9163C::clearScreen(uint16_t color) {
 	int px;
-	setAddr(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		for (px = 0;px < _GRAMSIZE-1; px++){
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		writecommand_cont(CMD_RAMWR);//this was missed!
+		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16_cont(color);
 		}
-		writedata16_last(color);
+		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
+		writecommand_last(CMD_NOP);
 		endProc();
 	#else
+		writecommand(CMD_RAMWR);
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16(color);
 		}
+		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
 	#endif
-	
 }
 
 void TFT_ILI9163C::writeScreen(const uint32_t *bitmap) {
 	uint16_t color;
 	int px;
-	setAddr(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		for (px = 0;px < 16383; px++){
+		writecommand_cont(CMD_RAMWR);
+		for (px = 0;px < 16384; px++){
 			color = Color24To565(bitmap[px]);
 			writedata16_cont(color);
 		}
-		color = Color24To565(bitmap[16383]);
-		writedata16_last(color);
+		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 		endProc();
 	#else
-	for (px = 0;px < 16384; px++){
-		color = Color24To565(bitmap[px]);
-		writedata16(color);
-	}
+		writecommand(CMD_RAMWR);
+		for (px = 0;px < 16384; px++){
+			color = Color24To565(bitmap[px]);
+			writedata16(color);
+		}
+		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 	#endif
 }
 
 void TFT_ILI9163C::homeAddress() {
-	setAddrWindow(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
+	//setAddrWindow(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
+	setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 }
 
 
@@ -441,7 +548,6 @@ void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color) {
 	if ((x < 0) || (y < 0)) return;
 	setAddr(x,y,x+1,y+1);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		//writecommand_cont(CMD_RAMWR);//not needed
 		writedata16_last(color);
 		endProc();
 	#else
@@ -648,30 +754,18 @@ void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 		SPI.endTransaction();
 	#else
 		writecommand(CMD_CLMADRS); // Column
-		if (rotation == 0){
-			writedata16(x0);
-			writedata16(x1);
-		} else if (rotation == 1){
-			writedata16(x0 + __OFFSET);
-			writedata16(x1 + __OFFSET);
-		} else if (rotation == 2){
+		if (rotation == 0 || rotation > 1){
 			writedata16(x0);
 			writedata16(x1);
 		} else {
-			writedata16(x0);
-			writedata16(x1);
+			writedata16(x0 + __OFFSET);
+			writedata16(x1 + __OFFSET);
 		}
 
 		writecommand(CMD_PGEADRS); // Page
 		if (rotation == 0){
 			writedata16(y0 + __OFFSET);
 			writedata16(y1 + __OFFSET);
-		} else if (rotation == 1){
-			writedata16(y0);
-			writedata16(y1);
-		} else if (rotation == 2){
-			writedata16(y0);
-			writedata16(y1);
 		} else {
 			writedata16(y0);
 			writedata16(y1);
@@ -683,30 +777,18 @@ void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
 void TFT_ILI9163C::_setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 	writecommand_cont(CMD_CLMADRS); // Column
-	if (rotation == 0){
-		writedata16_cont(x0);
-		writedata16_cont(x1);
-	} else if (rotation == 1){
-		writedata16_cont(x0 + __OFFSET);
-		writedata16_cont(x1 + __OFFSET);
-	} else if (rotation == 2){
+	if (rotation == 0 || rotation > 1){
 		writedata16_cont(x0);
 		writedata16_cont(x1);
 	} else {
-		writedata16_cont(x0);
-		writedata16_cont(x1);
+		writedata16_cont(x0 + __OFFSET);
+		writedata16_cont(x1 + __OFFSET);
 	}
 
 	writecommand_cont(CMD_PGEADRS); // Page
 	if (rotation == 0){
 		writedata16_cont(y0 + __OFFSET);
 		writedata16_cont(y1 + __OFFSET);
-	} else if (rotation == 1){
-		writedata16_cont(y0);
-		writedata16_cont(y1);
-	} else if (rotation == 2){
-		writedata16_cont(y0);
-		writedata16_cont(y1);
 	} else {
 		writedata16_cont(y0);
 		writedata16_cont(y1);
@@ -752,13 +834,5 @@ void TFT_ILI9163C::setRotation(uint8_t m) {
 }
 
 
-void TFT_ILI9163C::invertDisplay(boolean i) {
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		writecommand_last(i ? CMD_DINVON : CMD_DINVOF);
-		SPI.endTransaction();
-	#else
-		writecommand(i ? CMD_DINVON : CMD_DINVOF);
-	#endif
-}
+
 

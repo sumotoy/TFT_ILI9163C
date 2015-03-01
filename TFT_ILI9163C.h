@@ -71,14 +71,16 @@
 	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
 	SPI transaction,added BLACK TAG 2.2 display
 	0.3b2: Minor fix, load 24bit image, Added conversion utility
-	0.4:some improvement, new ballistic gauge example!
+	0.4:	some improvement, new ballistic gauge example!
+	0.5:	Added scroll and more commands, optimizations
+	Fixed a nasty bug in fill screen!
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
-	- Actually no scroll commands (only in release will be included).
+	Please report any!
 
 	
-Here's the speed test between 0.2b5 and 0.3b1 on Teensy3.1
+Here's the speed test between 0.2b5 and 0.3b1 on Teensy3.1 (major SPI changes)
 ------------------------------------------------------------------------
 Lines                    17024  	16115	BETTER
 Horiz/Vert Lines         5360		5080	BETTER
@@ -137,7 +139,7 @@ you can copy those parameters and create setup for different displays.
 	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
 	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
 	#define _GRAMWIDTH      128
-	#define _GRAMHEIGH      128//160
+	#define _GRAMHEIGH      160//160
 	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
 	#define __COLORSPC		1// 1:GBR - 0:RGB
 	#define __GAMMASET3		//uncomment for another gamma
@@ -213,7 +215,7 @@ Not tested!
 #define CMD_TEFXLON		0x35//Tearing Effect Line ON
 #define CMD_TEFXLOF		0x34//Tearing Effect Line OFF
 #define CMD_MADCTL  	0x36//Memory Access Control
-
+#define CMD_VSSTADRS	0x37//Vertical Scrolling Start address
 #define CMD_PIXFMT  	0x3A//Interface Pixel Format
 #define CMD_FRMCTR1 	0xB1//Frame Rate Control (In normal mode/Full colors)
 #define CMD_FRMCTR2 	0xB2//Frame Rate Control(In Idle mode/8-colors)
@@ -235,7 +237,6 @@ Not tested!
 #define CMD_PGAMMAC		0xE0//Positive Gamma Correction Setting
 #define CMD_NGAMMAC		0xE1//Negative Gamma Correction Setting
 #define CMD_GAMRSEL		0xF2//GAM_R_SEL
-
 
 
 class TFT_ILI9163C : public Adafruit_GFX {
@@ -261,18 +262,23 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color),
 				setRotation(uint8_t r),
 				invertDisplay(boolean i);
+	void		display(boolean onOff);	
+	void		sleepMode(boolean mode);
+	//void		defineScrollArea(uint16_t a,uint16_t c);
+	void		scroll(uint16_t adrs);
 	void		writeScreen(const uint32_t *bitmap);
-	uint16_t 		Color565(uint8_t r, uint8_t g, uint8_t b);
+	uint16_t 	Color565(uint8_t r, uint8_t g, uint8_t b);
   //convert 24bit color into packet 16 bit one (credits for this are all mine)
 	inline uint16_t Color24To565(int32_t color_) { return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) &  0xFF) / 8);}
-	void 			setBitrate(uint32_t n);	
+	void 		setBitrate(uint32_t n);	
 
  private:
 	uint8_t		_Mactrl_Data;//container for the memory access control data
 	uint8_t		_colorspaceData;
 	void 		colorSpace(uint8_t cspace);
-	void setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-	void endProc(void);
+	void 		setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	void 		endProc(void);
+	uint8_t		sleep;
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 	//
 	#else
