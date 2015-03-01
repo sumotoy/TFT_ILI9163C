@@ -62,6 +62,21 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	//#define __144_RED_PCB__
 	#define __144_BLACK_PCB__
 	//#define __22_RED_PCB__
+	I have a discussion here where a couple of users claim that the _GRAMHEIGH propriety should be always 128.
+	This is true ONLY if you will never use scroll! Scroll use the entire memory mapped to screen, my RED tag one
+	it's 128x128 but it uses 128x160! If during scroll you have some garbage means that you have not correctly
+	setup the display property:
+	
+	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
+	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
+	#define _GRAMWIDTH      	128
+	#define _GRAMHEIGH      	160//Heh? Yes! My display uses offset!
+	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH //
+	#define __COLORSPC		1// 1:GBR - 0:RGB
+	#define __GAMMASET3		//uncomment for another gamma (1,2,3)
+	#define __OFFSET		32//this is the offset of my display, 160 - 128 = 32
+	
+	You can write your own one by adding it in the .h file but let me know so I can add for other users.
 	
 <b>Code Optimizations:</b>
 	
@@ -132,6 +147,9 @@ https://code.google.com/p/lcd-image-converter/
 	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
 	SPI transaction,added BLACK TAG 2.2 display
 	0.3b2: Added 24bit image display code and example.
+	0.5:   A lot of changes, preliminary scroll, added sleep and some other command but
+	most important fixed a nasty bug on fillScreen. If you have download any previous
+	version you should upgrade since there was several fixes.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
