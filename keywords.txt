@@ -14,6 +14,7 @@ display	KEYWORD2
 startPushData	KEYWORD2
 pushData	KEYWORD2
 endPushData	KEYWORD2
+defineScrollArea	KEYWORD2
 writeScreen24	KEYWORD2
 
 

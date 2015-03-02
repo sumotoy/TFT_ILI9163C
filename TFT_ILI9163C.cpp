@@ -443,29 +443,25 @@ void TFT_ILI9163C::sleepMode(boolean mode) {
 	}
 }
 
-/*
-void TFT_ILI9163C::defineScrollArea(uint16_t a,uint16_t c){
-	//0,2
-		uint16_t b;
-		if ((a+c) > _TFTWIDTH) return;
-		b = (_TFTWIDTH - (a+c));
+void TFT_ILI9163C::defineScrollArea(uint16_t tfa, uint16_t bfa){
+    tfa += __OFFSET;
+    int16_t vsa = _GRAMHEIGH - tfa - bfa;
+    if (vsa >= 0) {
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		writecommand_cont(0x33);
-		if (rotation == 0 || rotation > 1){
-			writedata16_cont(a);
-			writedata16_cont(b);
-			writedata16_last(c);
-		} else {
-			writedata16_cont(a + __OFFSET);
-			writedata16_cont(b + __OFFSET);
-			writedata16_last(c + __OFFSET);
-		}
+        writecommand_cont(CMD_VSCLLDEF);
+        writedata16_cont(tfa);
+        writedata16_cont(vsa);
+        writedata16_last(bfa);
 		endProc();
-		setAddr(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
-		setRotation(0);
-		
+		#else
+        writecommand(CMD_VSCLLDEF);
+        writedata16(tfa);
+        writedata16(vsa);
+        writedata16(bfa);
+		#endif
+    }
 }
-*/
 
 void TFT_ILI9163C::scroll(uint16_t adrs) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)

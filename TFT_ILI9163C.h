@@ -76,6 +76,7 @@
 	Fixed a nasty bug in fill screen!
 	0.6:	Small fix, added SD example and subroutines
 	0.6b1:  Fix clearscreen, missed a parameter.
+	0.6b2:  Scroll completed. (thanks Masuda)
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -266,7 +267,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				invertDisplay(boolean i);
 	void		display(boolean onOff);	
 	void		sleepMode(boolean mode);
-	//void		defineScrollArea(uint16_t a,uint16_t c);
+	void 		defineScrollArea(uint16_t tfa, uint16_t bfa);
 	void		scroll(uint16_t adrs);
 	void 		startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 	void 		pushData(uint16_t color);

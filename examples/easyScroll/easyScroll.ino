@@ -64,6 +64,8 @@ void setup() {
   tft.println("in the gobberwarts");
   tft.println("with my blurglecruncheon,");
   tft.println("see if I don't!");
+  tft.defineScrollArea(23,50);
+  //try load again with this commented out!
 }
 
 
