@@ -484,8 +484,9 @@ void TFT_ILI9163C::scroll(uint16_t adrs) {
 void TFT_ILI9163C::clearScreen(uint16_t color) {
 	int px;
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		writecommand_cont(CMD_RAMWR);//this was missed!
+		//SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
+		//writecommand_cont(CMD_RAMWR);//this was missed!
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16_cont(color);
 		}
@@ -493,11 +494,12 @@ void TFT_ILI9163C::clearScreen(uint16_t color) {
 		writecommand_last(CMD_NOP);
 		endProc();
 	#else
-		writecommand(CMD_RAMWR);
+		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
+		//writecommand(CMD_RAMWR);
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16(color);
 		}
-		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
+		
 	#endif
 }
 

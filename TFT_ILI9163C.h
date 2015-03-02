@@ -75,6 +75,7 @@
 	0.5:	Added scroll and more commands, optimizations
 	Fixed a nasty bug in fill screen!
 	0.6:	Small fix, added SD example and subroutines
+	0.6b1:  Fix clearscreen, missed a parameter.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
