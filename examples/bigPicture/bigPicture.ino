@@ -2,9 +2,29 @@
 #include <Adafruit_GFX.h>
 #include <TFT_ILI9163C.h>
 
-//be careful, big image! Only Teensy or DUE probably work
+/* 
+Want to load 24 bit iamges directly? This demo it's cool to understand how it works. 
+The 24bit data can also be stored in a flash if you like!
+be careful, big ram requirements!! Only Teensy or DUE probably work
+You need the utility lcd-image-converter in the utility folder.
+Open an image with lcd-image-converter, go to menu->Options->Conversion...
+'Prepare' sub-menu tag should be set as follow:
+Type: color
+Main Scan Direction: Top to Bottom
+Line Scan Direction: Forwaed
+All the rest should be unchecked.
+Go to sub-menu tag 'Image'
+Prefix:0x
+Block size: 24bit
+Delimeter:,
+Byte Order: Little-Endian
+Done. Now save preset if you like!
+Now go to menu File->Convert and save .c file
+Open with any text editor, you need to copy in your sketch only the data so the array
+that start with static const uint24_t yourimage[16384] = { ....};
+Change uint24_t to uint32_t.
 
-
+*/
 /*
 Teensy3.x and Arduino's
 You are using 4 wire SPI here, so:
@@ -32,7 +52,7 @@ static const uint32_t image_data_batman_ume[16384] = {
 
 void setup() {
   tft.begin();
-  tft.writeScreen(image_data_batman_ume);
+  tft.writeScreen24bit(image_data_batman_ume);
 }
 
 

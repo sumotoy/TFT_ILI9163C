@@ -74,6 +74,7 @@
 	0.4:	some improvement, new ballistic gauge example!
 	0.5:	Added scroll and more commands, optimizations
 	Fixed a nasty bug in fill screen!
+	0.6:	Small fix, added SD example and subroutines
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -266,8 +267,11 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	void		sleepMode(boolean mode);
 	//void		defineScrollArea(uint16_t a,uint16_t c);
 	void		scroll(uint16_t adrs);
-	void		writeScreen(const uint32_t *bitmap);
-	uint16_t 	Color565(uint8_t r, uint8_t g, uint8_t b);
+	void 		startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	void 		pushData(uint16_t color);
+	void 		endPushData();
+	void		writeScreen24(const uint32_t *bitmap,uint16_t size=_TFTWIDTH*_TFTHEIGHT);
+	inline uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);};
   //convert 24bit color into packet 16 bit one (credits for this are all mine)
 	inline uint16_t Color24To565(int32_t color_) { return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) &  0xFF) / 8);}
 	void 		setBitrate(uint32_t n);	

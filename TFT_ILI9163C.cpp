@@ -287,7 +287,7 @@ void TFT_ILI9163C::chipInit() {
 	writedata16_cont(0x00);
 	writedata16_last(_GRAMHEIGH); 
 	
-	SPI.endTransaction();
+	endProc();
 	colorSpace(_colorspaceData);
 	setRotation(0);
 	SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
@@ -361,7 +361,7 @@ void TFT_ILI9163C::chipInit() {
 	//writedata(0X00); 
 	//writedata(_GRAMHEIGH); 
 	writedata16(0X00); 
-	writedata16(_GRAMHEIGH)
+	writedata16(_GRAMHEIGH);
 
 	colorSpace(_colorspaceData);
 	setRotation(0);
@@ -468,10 +468,15 @@ void TFT_ILI9163C::defineScrollArea(uint16_t a,uint16_t c){
 */
 
 void TFT_ILI9163C::scroll(uint16_t adrs) {
-	SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-	writecommand_cont(CMD_VSSTADRS);
-	writedata16_last(adrs);
-	endProc();
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		writecommand_cont(CMD_VSSTADRS);
+		writedata16_last(adrs);
+		endProc();
+	#else
+		writecommand(CMD_VSSTADRS);
+		writedata16(adrs);
+	#endif
 }
 
 
@@ -496,24 +501,55 @@ void TFT_ILI9163C::clearScreen(uint16_t color) {
 	#endif
 }
 
-void TFT_ILI9163C::writeScreen(const uint32_t *bitmap) {
+void TFT_ILI9163C::startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+	setAddr(x0,y0,x1,y1);
+}
+
+void TFT_ILI9163C::pushData(uint16_t color) {
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		writedata16_cont(color);
+	#else
+		writedata16(color);
+	#endif
+}
+
+
+void TFT_ILI9163C::endPushData() {
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		writecommand_last(CMD_NOP);
+		endProc();
+	#endif
+}
+
+
+void TFT_ILI9163C::pushColor(uint16_t color) {
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		writedata16_last(color);
+		endProc();
+	#else
+		writedata16(color);
+	#endif
+}
+	
+void TFT_ILI9163C::writeScreen24(const uint32_t *bitmap,uint16_t size) {
 	uint16_t color;
 	int px;
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_cont(CMD_RAMWR);
-		for (px = 0;px < 16384; px++){
+		for (px = 0;px < size; px++){//16384
 			color = Color24To565(bitmap[px]);
 			writedata16_cont(color);
 		}
-		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
+		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//home
 		endProc();
 	#else
 		writecommand(CMD_RAMWR);
-		for (px = 0;px < 16384; px++){
+		for (px = 0;px < size; px++){
 			color = Color24To565(bitmap[px]);
 			writedata16(color);
 		}
-		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
+		homeAddress();
 	#endif
 }
 
@@ -533,15 +569,7 @@ void TFT_ILI9163C::setCursor(int16_t x, int16_t y) {
 
 
 
-void TFT_ILI9163C::pushColor(uint16_t color) {
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		writedata16_last(color);
-		SPI.endTransaction();
-	#else
-		writedata16(color);
-	#endif
-}
+
 
 void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color) {
 	if (boundaryCheck(x,y)) return;
@@ -740,11 +768,6 @@ void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 
 #endif
 
-// Pass 8-bit (each) R,G,B, get back 16-bit packed color
-
-uint16_t TFT_ILI9163C::Color565(uint8_t r, uint8_t g, uint8_t b) {
-	return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
-}
 
 
 void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
@@ -784,7 +807,6 @@ void TFT_ILI9163C::_setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_
 		writedata16_cont(x0 + __OFFSET);
 		writedata16_cont(x1 + __OFFSET);
 	}
-
 	writecommand_cont(CMD_PGEADRS); // Page
 	if (rotation == 0){
 		writedata16_cont(y0 + __OFFSET);
@@ -826,7 +848,7 @@ void TFT_ILI9163C::setRotation(uint8_t m) {
 		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
 		writecommand_cont(CMD_MADCTL);
 		writedata8_last(_Mactrl_Data);
-		SPI.endTransaction();
+		endProc();
 	#else
 		writecommand(CMD_MADCTL);
 		writedata(_Mactrl_Data);
