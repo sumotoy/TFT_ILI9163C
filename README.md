@@ -101,6 +101,11 @@ https://github.com/sumotoy/Adafruit-GFX-Library
 
     	It's 100% compatible with the Adafruit one so don't worry about.
     	
+    	If you plan to use an SD for the SD example you will need Bill Greyman's SdFat
+    	
+https://github.com/greiman/SdFat
+
+    	
 <b>Wiring:</b>
 
 	You are a newbie and need help? Here's:
