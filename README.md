@@ -24,7 +24,8 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1 and Teensy LC
 	- Working with Energia supported MCU (not yet but really soon)
 	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika
-	here: http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
+	- 
+http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 
 <b>Pay Attention to connections!!!!:</b>
 	
