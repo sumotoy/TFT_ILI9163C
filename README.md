@@ -2,7 +2,7 @@ TFT_ILI9163C
 
 ILI9163C- A fast SPI driver for TFT that use Ilitek ILI9163C.
 
-Actual release: 0.6b1
+Actual release: 0.6b2
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
@@ -86,6 +86,11 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	The purpose of this library it's SPEED. I have tried to use hardware optimized calls
 	where was possible and results are quite good for most applications.
 	Of course it can be improved so feel free to add suggestions.
+	You will notice that not all display command was added, this because this chip it's really fast
+	but have very poor hardware design, for example, the display on/off command will result in a bright
+	white screen since chip will pullup all display lines (at list my display act as this), a nonsense to me,
+	should be exact the opposite! Apart display there's other commands that act the same so I decided to 
+	don't include to save space.
 
 <b>Needed stuff you have to install first!!!</b>
 
@@ -160,6 +165,7 @@ https://code.google.com/p/lcd-image-converter/
 	version you should upgrade since there was several fixes.
 	0.6: Added subroutines for SD fast load images (mainly for Teensy3)
 	0.6b1: Rolled back clearScreen. Again the datasheet have wrong infos! Grrr
+	0.6b2: scroll completed.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
