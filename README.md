@@ -84,6 +84,9 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	#define __OFFSET		32//this is the offset of my display, 160 - 128 = 32
 	
 	You can write your own one by adding it in the .h file but let me know so I can add for other users.
+	The OFFSET have sense if the chinese vendor decided to align TFT at bottom lines of the controller.
+	This is nonsense since it will force you to use all the off-screen area as well (visible only when you use
+	scrolling).
 	
 <b>Code Optimizations:</b>
 	
