@@ -16,5 +16,5 @@ pushData	KEYWORD2
 endPushData	KEYWORD2
 defineScrollArea	KEYWORD2
 writeScreen24	KEYWORD2
-
+idleMode	KEYWORD2
 

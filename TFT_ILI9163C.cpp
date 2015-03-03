@@ -417,6 +417,26 @@ void TFT_ILI9163C::display(boolean onOff) {
 	}
 }
 
+void TFT_ILI9163C::idleMode(boolean onOff) {
+	if (onOff){
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			writecommand_last(CMD_IDLEON);
+			endProc();
+		#else
+			writecommand(CMD_IDLEON);
+		#endif
+	} else {
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			writecommand_last(CMD_IDLEOF);
+			endProc();
+		#else
+			writecommand(CMD_IDLEOF);
+		#endif
+	}
+}
+
 void TFT_ILI9163C::sleepMode(boolean mode) {
 	if (mode){
 		if (sleep == 1) return;//already sleeping
@@ -464,38 +484,38 @@ void TFT_ILI9163C::defineScrollArea(uint16_t tfa, uint16_t bfa){
 }
 
 void TFT_ILI9163C::scroll(uint16_t adrs) {
+	if (adrs <= _GRAMHEIGH) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
 		writecommand_cont(CMD_VSSTADRS);
-		writedata16_last(adrs);
+		writedata16_last(adrs + __OFFSET);
 		endProc();
 	#else
 		writecommand(CMD_VSSTADRS);
-		writedata16(adrs);
+		writedata16(adrs + __OFFSET);
 	#endif
+	}
 }
 
 
-//corrected!
+//corrected! v2
 void TFT_ILI9163C::clearScreen(uint16_t color) {
 	int px;
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		//SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
-		//writecommand_cont(CMD_RAMWR);//this was missed!
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		writecommand_cont(CMD_RAMWR);//this was missed!
+		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16_cont(color);
 		}
-		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
 		writecommand_last(CMD_NOP);
 		endProc();
 	#else
+		writecommand(CMD_RAMWR);
 		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
-		//writecommand(CMD_RAMWR);
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16(color);
 		}
-		
 	#endif
 }
 
