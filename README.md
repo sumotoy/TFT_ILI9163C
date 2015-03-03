@@ -15,6 +15,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 <b>Features:</b>
 	
 	- Very FAST!, expecially with Teensy 3.x where uses hyper fast SPI.
+	- Tons of examples !!!
 	- It uses just 4 or 5 wires.
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
