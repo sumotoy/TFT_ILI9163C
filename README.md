@@ -43,14 +43,17 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 <b>Backgrounds:</b>
 	
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
-	any working library so I decided to hack it. ILI9163C looks pretty similar to other 
+	any working library so I decided to work on it. ILI9163C looks pretty similar to other 
 	display driver but it uses it's own commands so it's tricky to work with it unlsess you
-	carefully fight with his gigantic and not so clever datasheet.
+	carefully fight with his gigantic and confused datasheet.
 	My display it's a 1.44"", 128x128 that suppose to substitute Nokia 5110 LCD and here's the 
 	first confusion! Many sellers claim that it's compatible with Nokia 5110 (that use a philips
 	controller) but the only similarity it's the pin names since that this one it's color and
 	have totally different controller that's not compatible. Altrough I discovered that it's not
 	128x128 but 128x160 (!??)... Check links below to see if it's similar to yours.
+	UPDATE:
+	Some chinese seller connected the TFT aligned to bottom, other aligned to top, there's not a sure
+	way to discover witch is yours so better try one of the configurations.
 	
 http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
 
