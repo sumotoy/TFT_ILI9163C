@@ -2,7 +2,7 @@ TFT_ILI9163C
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's Teensy's and more...
 
-Actual release: 0.6b3
+Actual release: 0.7
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
@@ -174,6 +174,7 @@ https://code.google.com/p/lcd-image-converter/
 	0.6b1: Rolled back clearScreen. Again the datasheet have wrong infos! Grrr
 	0.6b2: scroll completed.
 	0.6b3: ClearScreen v2 fix. Added idle mode.
+	0.7:   Gold release candidate. Fixed initialization (thanks Masuda)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
