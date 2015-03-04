@@ -2,7 +2,7 @@
 	ILI9163C - A fast SPI driver for TFT that use Ilitek ILI9163C.
 	
 	Features:
-	- Very FAST!, expecially with Teensy 3.x where uses DMA SPI.
+	- Very FAST!, expecially with Teensy 3.x where uses hyper optimized SPI.
 	- It uses just 4 or 5 wires.
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
@@ -73,11 +73,11 @@
 	0.3b2: Minor fix, load 24bit image, Added conversion utility
 	0.4:	some improvement, new ballistic gauge example!
 	0.5:	Added scroll and more commands, optimizations
-	Fixed a nasty bug in fill screen!
 	0.6:	Small fix, added SD example and subroutines
 	0.6b1:  Fix clearscreen, missed a parameter.
 	0.6b2:  Scroll completed. (thanks Masuda)
-	0.6b3:	Clear Screen fix v2.
+	0.6b3:	Clear Screen fix v2. Added Idle mode.
+	0.7:    Init correction.Clear Screen fix v3 (last time?)
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -317,7 +317,6 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	uint8_t pcs_data, pcs_command;
 	
 	void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing for Teensy
-	
 	
 	void waitFifoNotFull(void) {
 		uint32_t sr;

@@ -268,25 +268,18 @@ void TFT_ILI9163C::chipInit() {
 	delay(1);
   
 	writecommand_cont(CMD_CLMADRS);//Set Column Address  
-	/*
-	writedata8_cont(0x00); 
-	writedata8_cont(0X00); 
-	writedata8_cont(0X00); 
-	writedata8_cont(_GRAMWIDTH); 
-	*/
 	writedata16_cont(0x00);
 	writedata16_cont(_GRAMWIDTH); 
   
 	writecommand_cont(CMD_PGEADRS);//Set Page Address  
-	/*
-	writedata8_cont(0x00); 
-	writedata8_cont(0X00); 
-	writedata8_cont(0X00); 
-	writedata8_last(_GRAMHEIGH);
-	*/
 	writedata16_cont(0x00);
-	writedata16_last(_GRAMHEIGH); 
-	
+	writedata16_cont(_GRAMHEIGH); 
+	// set scroll area (thanks Masuda)
+    writecommand_cont(CMD_VSCLLDEF);
+    writedata16_cont(__OFFSET);
+    writedata16_cont(_GRAMHEIGH - __OFFSET);
+    writedata16_last(0);
+		
 	endProc();
 	colorSpace(_colorspaceData);
 	setRotation(0);
@@ -348,21 +341,17 @@ void TFT_ILI9163C::chipInit() {
 	delay(1);
   
 	writecommand(CMD_CLMADRS);//Set Column Address  
-	//writedata(0x00); 
-	//writedata(0X00); 
-	//writedata(0X00); 
-	//writedata(_GRAMWIDTH); 
 	writedata16(0x00); 
 	writedata16(_GRAMWIDTH); 
   
 	writecommand(CMD_PGEADRS);//Set Page Address  
-	//writedata(0x00); 
-	//writedata(0X00); 
-	//writedata(0X00); 
-	//writedata(_GRAMHEIGH); 
 	writedata16(0X00); 
 	writedata16(_GRAMHEIGH);
-
+	// set scroll area (thanks Masuda)
+    writecommand(CMD_VSCLLDEF);
+    writedata16(__OFFSET);
+    writedata16(_GRAMHEIGH - __OFFSET);
+    writedata16(0);
 	colorSpace(_colorspaceData);
 	setRotation(0);
 	writecommand(CMD_DISPON);//display ON 
@@ -498,12 +487,12 @@ void TFT_ILI9163C::scroll(uint16_t adrs) {
 }
 
 
-//corrected! v2
+//corrected! v3
 void TFT_ILI9163C::clearScreen(uint16_t color) {
 	int px;
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		writecommand_cont(CMD_RAMWR);//this was missed!
+		//writecommand_cont(CMD_RAMWR);
 		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16_cont(color);
@@ -511,7 +500,7 @@ void TFT_ILI9163C::clearScreen(uint16_t color) {
 		writecommand_last(CMD_NOP);
 		endProc();
 	#else
-		writecommand(CMD_RAMWR);
+		//writecommand(CMD_RAMWR);
 		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16(color);
@@ -572,7 +561,6 @@ void TFT_ILI9163C::writeScreen24(const uint32_t *bitmap,uint16_t size) {
 }
 
 void TFT_ILI9163C::homeAddress() {
-	//setAddrWindow(0x00,0x00,_GRAMWIDTH-1,_GRAMHEIGH-1);
 	setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 }
 
