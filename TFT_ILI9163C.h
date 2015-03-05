@@ -78,6 +78,7 @@
 	0.6b2:  Scroll completed. (thanks Masuda)
 	0.6b3:	Clear Screen fix v2. Added Idle mode.
 	0.7:    Init correction.Clear Screen fix v3 (last time?)
+	0.75:  SPI transactions for arduino's (beta)
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	

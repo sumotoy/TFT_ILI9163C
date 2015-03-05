@@ -76,6 +76,7 @@ void TFT_ILI9163C::writedata16(uint16_t d){
 } 
 
 void TFT_ILI9163C::setBitrate(uint32_t n){
+	#if !defined (SPI_HAS_TRANSACTION)
 	if (n >= 8000000) {
 		SPI.setClockDivider(SPI_CLOCK_DIV2);
 	} else if (n >= 4000000) {
@@ -85,6 +86,7 @@ void TFT_ILI9163C::setBitrate(uint32_t n){
 	} else {
 		SPI.setClockDivider(SPI_CLOCK_DIV16);
 	}
+	#endif
 }
 #elif defined(__SAM3X8E__)
 // Arduino Due
@@ -135,12 +137,14 @@ void TFT_ILI9163C::writedata16(uint16_t d){
 
 
 void TFT_ILI9163C::setBitrate(uint32_t n){
+	#if !defined (SPI_HAS_TRANSACTION)
 	uint32_t divider=1;
 	while (divider < 255) {
 		if (n >= 84000000 / divider) break;
 		divider = divider - 1;
 	}
 	SPI.setClockDivider(divider);
+	#endif
 }
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)
 //Teensy 3.0 & 3.1  
