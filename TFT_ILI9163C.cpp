@@ -36,25 +36,43 @@ inline void TFT_ILI9163C::spiwrite(uint8_t c){
 }
 
 void TFT_ILI9163C::writecommand(uint8_t c){
+	#ifdef SPI_HAS_TRANSACTION
+    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+    #endif
 	*rsport &= ~rspinmask;//low
 	*csport &= ~cspinmask;//low
 	spiwrite(c);
 	*csport |= cspinmask;//hi
+	#ifdef SPI_HAS_TRANSACTION
+	SPI.endTransaction();
+	#endif
 }
 
 void TFT_ILI9163C::writedata(uint8_t c){
+	#ifdef SPI_HAS_TRANSACTION
+    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+    #endif
 	*rsport |=  rspinmask;
 	*csport &= ~cspinmask;
 	spiwrite(c);
 	*csport |= cspinmask;
+	#ifdef SPI_HAS_TRANSACTION
+	SPI.endTransaction();
+	#endif
 } 
 
 void TFT_ILI9163C::writedata16(uint16_t d){
+	#ifdef SPI_HAS_TRANSACTION
+    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+    #endif
 	*rsport |=  rspinmask;
 	*csport &= ~cspinmask;
 	spiwrite(d >> 8);
 	spiwrite(d);
 	*csport |= cspinmask;
+	#ifdef SPI_HAS_TRANSACTION
+	SPI.endTransaction();
+	#endif
 } 
 
 void TFT_ILI9163C::setBitrate(uint32_t n){
@@ -76,25 +94,43 @@ inline void TFT_ILI9163C::spiwrite(uint8_t c){
 }
 
 void TFT_ILI9163C::writecommand(uint8_t c){
+	#ifdef SPI_HAS_TRANSACTION
+    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+    #endif
 	rsport->PIO_CODR |=  rspinmask;//LO
 	csport->PIO_CODR  |=  cspinmask;//LO
 	spiwrite(c);
 	csport->PIO_SODR  |=  cspinmask;//HI
+	#ifdef SPI_HAS_TRANSACTION
+	SPI.endTransaction();
+	#endif
 }
 
 void TFT_ILI9163C::writedata(uint8_t c){
+	#ifdef SPI_HAS_TRANSACTION
+    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+    #endif
 	rsport->PIO_SODR |=  rspinmask;//HI
 	csport->PIO_CODR  |=  cspinmask;//LO
 	spiwrite(c);
 	csport->PIO_SODR  |=  cspinmask;//HI
+	#ifdef SPI_HAS_TRANSACTION
+	SPI.endTransaction();
+	#endif
 } 
 
 void TFT_ILI9163C::writedata16(uint16_t d){
+	#ifdef SPI_HAS_TRANSACTION
+    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+    #endif
 	rsport->PIO_SODR |=  rspinmask;//HI
 	csport->PIO_CODR  |=  cspinmask;//LO
 	spiwrite(d >> 8);
 	spiwrite(d);
 	csport->PIO_SODR  |=  cspinmask;//HI
+	#ifdef SPI_HAS_TRANSACTION
+	SPI.endTransaction();
+	#endif
 }
 
 
@@ -126,9 +162,11 @@ void TFT_ILI9163C::begin(void) {
 	cspinmask = digitalPinToBitMask(_cs);
 	rspinmask = digitalPinToBitMask(_rs);
     SPI.begin();
+	#if !defined (SPI_HAS_TRANSACTION)
     SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz
     SPI.setBitOrder(MSBFIRST);
     SPI.setDataMode(SPI_MODE0);
+	#endif
 	// toggle RST low to reset; CS low so it'll listen to us
 	*csport &= ~cspinmask;
 #elif defined(__SAM3X8E__)
@@ -139,9 +177,11 @@ void TFT_ILI9163C::begin(void) {
 	cspinmask = digitalPinToBitMask(_cs);
 	rspinmask = digitalPinToBitMask(_rs);
     SPI.begin();
+	#if !defined (SPI_HAS_TRANSACTION)
     SPI.setClockDivider(11); // 8 MHz
     SPI.setBitOrder(MSBFIRST);
     SPI.setDataMode(SPI_MODE0);
+	#endif
 	// toggle RST low to reset; CS low so it'll listen to us
 	csport ->PIO_CODR  |=  cspinmask; // Set control bits to LOW (idle)
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)

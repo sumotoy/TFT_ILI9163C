@@ -120,9 +120,11 @@ Done!
 	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 	#define pgm_read_word(addr) (*(const unsigned short *)(addr))
 	typedef unsigned char prog_uchar;
+	#define SPICLOCK 8000000
 #endif
 #ifdef __AVR__
 	#include <avr/pgmspace.h>
+	#define SPICLOCK 8000000
 #endif
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
 	#define SPICLOCK 30000000
