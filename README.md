@@ -2,7 +2,7 @@ TFT_ILI9163C
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's Teensy's and more...
 
-Actual release: 0.7
+Actual release: 0.75
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
@@ -98,6 +98,8 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	white screen since chip will pullup all display lines (at list my display act as this), a nonsense to me,
 	should be exact the opposite! Apart display there's other commands that act the same so I decided to 
 	don't include to save space.
+	The Teensy 3 side it's almost complete and quite optimized, however Arduino's side can be tweaked a bit
+	by using the same Teensy3 technique (multiple transfer with just one CS call, etc), this will be the 1.0 		version.
 
 <b>Needed stuff you have to install first!!!</b>
 
@@ -175,6 +177,7 @@ https://code.google.com/p/lcd-image-converter/
 	0.6b2: scroll completed.
 	0.6b3: ClearScreen v2 fix. Added idle mode.
 	0.7:   Gold release candidate. Fixed initialization (thanks Masuda)
+	0.75: SPI transactions for Arduino's (beta) please report if troubles (not tested)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
