@@ -78,7 +78,8 @@
 	0.6b2:  Scroll completed. (thanks Masuda)
 	0.6b3:	Clear Screen fix v2. Added Idle mode.
 	0.7:    Init correction.Clear Screen fix v3 (last time?)
-	0.75:  SPI transactions for arduino's (beta)
+	0.75:   SPI transactions for arduino's (beta)
+	0.8:	Compatiblke with IDE 1.0.6 (teensyduino 1.20) and IDE 1.6.x (teensyduino 1.21b)
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -325,59 +326,98 @@ class TFT_ILI9163C : public Adafruit_GFX {
 		uint32_t sr;
 		uint32_t tmp __attribute__((unused));
 		do {
-			sr = SPI0.SR;
-			if (sr & 0xF0) tmp = SPI0_POPR; // drain RX FIFO
+			#if ARDUINO >= 160
+				sr = KINETISK_SPI0.SR;
+			#else
+				sr = SPI0.SR;
+			#endif
+			if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
 		} while ((sr & (15 << 12)) > (3 << 12));
 	}
-	
+
 	void waitFifoEmpty(void) {
 		uint32_t sr;
 		uint32_t tmp __attribute__((unused));
 		do {
-			sr = SPI0.SR;
-			if (sr & 0xF0) tmp = SPI0_POPR; // drain RX FIFO
-			} while ((sr & 0xF0F0) > 0); // wait both RX & TX empty
+			#if ARDUINO >= 160
+				sr = KINETISK_SPI0.SR;
+			#else
+				sr = SPI0.SR;
+			#endif
+			if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
+		} while ((sr & 0xF0F0) > 0);             // wait both RX & TX empty
 	}
 	
 	void waitTransmitComplete(void) __attribute__((always_inline)) {
 		uint32_t tmp __attribute__((unused));
+		#if ARDUINO >= 160
+		while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
+		#else
 		while (!(SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-		tmp = SPI0_POPR; // drain the final RX FIFO word
+		#endif
+		tmp = SPI0_POPR;                  // drain the final RX FIFO word
 	}
 	
 	void writecommand_cont(uint8_t c) __attribute__((always_inline)) {
+		#if ARDUINO >= 160
+		KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		#else
 		SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		#endif
+		waitFifoNotFull();
+	}
+	
+	void writedata8_cont(uint8_t c) __attribute__((always_inline)) {
+		#if ARDUINO >= 160
+		KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		#else
+		SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		#endif
+		waitFifoNotFull();
+	}
+	
+	void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
+		#if ARDUINO >= 160
+		KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+		#else
+		SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+		#endif
 		waitFifoNotFull();
 	}
 	
 	void writecommand_last(uint8_t c) __attribute__((always_inline)) {
 		waitFifoEmpty();
+		#if ARDUINO >= 160
+		KINETISK_SPI0.SR = SPI_SR_TCF;
+		KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
+		#else
 		SPI0.SR = SPI_SR_TCF;
 		SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
+		#endif
 		waitTransmitComplete();
-	}
-	
-	void writedata8_cont(uint8_t c) __attribute__((always_inline)) {
-		SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-		waitFifoNotFull();
 	}
 	
 	void writedata8_last(uint8_t c) __attribute__((always_inline)) {
 		waitFifoEmpty();
+		#if ARDUINO >= 160
+		KINETISK_SPI0.SR = SPI_SR_TCF;
+		KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
+		#else
 		SPI0.SR = SPI_SR_TCF;
 		SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
+		#endif
 		waitTransmitComplete();
-	}
-	
-	void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
-		SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
-		waitFifoNotFull();
 	}
 	
 	void writedata16_last(uint16_t d) __attribute__((always_inline)) {
 		waitFifoEmpty();
+		#if ARDUINO >= 160
+		KINETISK_SPI0.SR = SPI_SR_TCF;
+		KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
+		#else
 		SPI0.SR = SPI_SR_TCF;
 		SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
+		#endif
 		waitTransmitComplete();
 	}
 	

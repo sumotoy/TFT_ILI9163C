@@ -189,25 +189,25 @@ void TFT_ILI9163C::begin(void) {
 	// toggle RST low to reset; CS low so it'll listen to us
 	csport ->PIO_CODR  |=  cspinmask; // Set control bits to LOW (idle)
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.begin();
-		if (SPI.pinIsChipSelect(_cs, _rs)) {
-			pcs_data = SPI.setCS(_cs);
-			pcs_command = pcs_data | SPI.setCS(_rs);
-		} else {
-			pcs_data = 0;
-			pcs_command = 0;
-			return;
-		}
+	SPI.begin();
+	if (SPI.pinIsChipSelect(_cs, _rs)) {
+		pcs_data = SPI.setCS(_cs);
+		pcs_command = pcs_data | SPI.setCS(_rs);
+	} else {
+		pcs_data = 0;
+		pcs_command = 0;
+		return;
+	}
 #endif
-  if (_rst != 0) {
-    pinMode(_rst, OUTPUT);
-    digitalWrite(_rst, HIGH);
-    delay(500);
-    digitalWrite(_rst, LOW);
-    delay(500);
-    digitalWrite(_rst, HIGH);
-    delay(500);
-  }
+	if (_rst != 0) {
+		pinMode(_rst, OUTPUT);
+		digitalWrite(_rst, HIGH);
+		delay(500);
+		digitalWrite(_rst, LOW);
+		delay(500);
+		digitalWrite(_rst, HIGH);
+		delay(500);
+	}
 
 /*
 7) MY:  1(bottom to top), 0(top to bottom) 	Row Address Order
@@ -631,17 +631,9 @@ void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color) {
 	#else
 		writedata16(color);
 	#endif
-	
 }
 
-void TFT_ILI9163C::setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1){
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		_setAddrWindow(x0,y0,x1,y1);
-	#else
-		setAddrWindow(x0,y0,x1,y1);
-	#endif
-}
+
 
 void TFT_ILI9163C::endProc(void){
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
@@ -818,7 +810,14 @@ void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 
 #endif
 
-
+void TFT_ILI9163C::setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1){
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		_setAddrWindow(x0,y0,x1,y1);
+	#else
+		setAddrWindow(x0,y0,x1,y1);
+	#endif
+}
 
 void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
