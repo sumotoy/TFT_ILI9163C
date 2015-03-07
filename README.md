@@ -3,6 +3,7 @@ TFT_ILI9163C
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's Teensy's and more...
 
 Actual release: 0.8
+
 Can be used with IDE 1.0.6 (Teensyduino 1.20) or IDE 1.6.x (Teensyduino 1.21b)
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
