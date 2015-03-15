@@ -148,7 +148,7 @@ But be careful <u>do not try connect to 5V before you check the presence of this
 
 	Included you will find LCD Image Converter a free utility to convert in code a 24bit image.
 	
-https://code.google.com/p/lcd-image-converter/
+https://github.com/riuson/lcd-image-converter
 
 	see example bigPicture.ino. 
 	I have included datasheet as well.
