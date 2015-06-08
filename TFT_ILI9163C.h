@@ -80,6 +80,8 @@
 	0.7:    Init correction.Clear Screen fix v3 (last time?)
 	0.75:   SPI transactions for arduino's (beta)
 	0.8:	Compatiblke with IDE 1.0.6 (teensyduino 1.20) and IDE 1.6.x (teensyduino 1.21b)
+	0.9:    Many changes! Now works with more CPU's, alternative pins for Teensy and Teensy LC
+	Works (in standard SPI) with Teensy LC.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -105,154 +107,47 @@ Done!
 #ifndef _TFT_ILI9163CLIB_H_
 #define _TFT_ILI9163CLIB_H_
 
-
+//defined(__MKL26Z64__)
 #include "Arduino.h"
 #include "Print.h"
 #include <Adafruit_GFX.h>
 
-//DID YOU HAVE A RED PCB, BLACk PCB or WHAT DISPLAY TYPE???????????? ---> SELECT HERE <----
-#define __144_RED_PCB__//128x128
-//#define __144_BLACK_PCB__//128x128
-//#define __22_RED_PCB__//240x320
-//---------------------------------------
+#include "_settings/TFT_ILI9163C_settings.h"
 
-#if defined(__SAM3X8E__)
-	#include <include/pio.h>
-	#define PROGMEM
-	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-	#define pgm_read_word(addr) (*(const unsigned short *)(addr))
-	typedef unsigned char prog_uchar;
-	#define SPICLOCK 8000000
-#endif
-#ifdef __AVR__
-	#include <avr/pgmspace.h>
-	#define SPICLOCK 8000000
-#endif
-#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	#define SPICLOCK 30000000
+#if !defined(_ADAFRUIT_GFX_VARIANT)
+	#ifdef __AVR__
+		#include <avr/pgmspace.h>
+	#elif defined(__SAM3X8E__)
+		#include <include/pio.h>
+		#define PROGMEM
+		#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+		#define pgm_read_word(addr) (*(const unsigned short *)(addr))
+		typedef unsigned char prog_uchar;
+	#endif
 #endif
 
 
-#if defined(__144_RED_PCB__)
-/*
-This display:
-http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/271422122271
-This particular display has a design error! The controller has 3 pins to configure to constrain
-the memory and resolution to a fixed dimension (in that case 128x128) but they leaved those pins
-configured for 128x160 so there was several pixel memory addressing problems.
-I solved by setup several parameters that dinamically fix the resolution as needed so below
-the parameters for this diplay. If you have a strain or a correct display (can happen with chinese)
-you can copy those parameters and create setup for different displays.
-*/
-	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
-	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
-	#define _GRAMWIDTH      128
-	#define _GRAMHEIGH      160//160
-	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
-	#define __COLORSPC		1// 1:GBR - 0:RGB
-	#define __GAMMASET3		//uncomment for another gamma
-	#define __OFFSET		32//*see note 2
-	//Tested!
-#elif defined (__144_BLACK_PCB__)
-	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
-	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
-	#define _GRAMWIDTH      128
-	#define _GRAMHEIGH      128
-	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH//*see note 1
-	#define __COLORSPC		1// 1:GBR - 0:RGB
-	#define __GAMMASET1		//uncomment for another gamma
-	#define __OFFSET		0
-	//not tested
-#elif defined (__22_RED_PCB__)
-/*
-Like this one:
-http://www.ebay.it/itm/2-2-Serial-SPI-TFT-LCD-Display-Module-240x320-Chip-ILI9340C-PCB-Adapter-SD-Card-/281304733556
-Not tested!
-*/
-	#define _TFTWIDTH  		240//the REAL W resolution of the TFT
-	#define _TFTHEIGHT 		320//the REAL H resolution of the TFT
-	#define _GRAMWIDTH      240
-	#define _GRAMHEIGH      320
-	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
-	#define __COLORSPC		1// 1:GBR - 0:RGB
-	#define __GAMMASET1		//uncomment for another gamma
-	#define __OFFSET		0
-#else
-	#define _TFTWIDTH  		128//128
-	#define _TFTHEIGHT 		160//160
-	#define _GRAMWIDTH      128
-	#define _GRAMHEIGH      160
-	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
-	#define __COLORSPC		1// 1:GBR - 0:RGB
-	#define __GAMMASET1
-	#define __OFFSET		0
-#endif
-/*
-	Note 1: The __144_RED_PCB__ display has hardware addressing of 128 x 160
-	but the tft resolution it's 128 x 128 so the dram should be set correctly
-	
-	Note 2: This is the offset between image in RAM and TFT. In that case 160 - 128 = 32;
-*/
 //--------- Keep out hands from here!-------------
 
 #define	BLACK   		0x0000
 #define WHITE   		0xFFFF
 
-//ILI9163C registers-----------------------
-#define CMD_NOP     	0x00//Non operation
-#define CMD_SWRESET 	0x01//Soft Reset
-#define CMD_SLPIN   	0x10//Sleep ON
-#define CMD_SLPOUT  	0x11//Sleep OFF
-#define CMD_PTLON   	0x12//Partial Mode ON
-#define CMD_NORML   	0x13//Normal Display ON
-#define CMD_DINVOF  	0x20//Display Inversion OFF
-#define CMD_DINVON   	0x21//Display Inversion ON
-#define CMD_GAMMASET 	0x26//Gamma Set (0x01[1],0x02[2],0x04[3],0x08[4])
-#define CMD_DISPOFF 	0x28//Display OFF
-#define CMD_DISPON  	0x29//Display ON
-#define CMD_IDLEON  	0x39//Idle Mode ON
-#define CMD_IDLEOF  	0x38//Idle Mode OFF
-#define CMD_CLMADRS   	0x2A//Column Address Set
-#define CMD_PGEADRS   	0x2B//Page Address Set
+#include "_settings/TFT_ILI9163C_registers.h"
 
-#define CMD_RAMWR   	0x2C//Memory Write
-#define CMD_RAMRD   	0x2E//Memory Read
-#define CMD_CLRSPACE   	0x2D//Color Space : 4K/65K/262K
-#define CMD_PARTAREA	0x30//Partial Area
-#define CMD_VSCLLDEF	0x33//Vertical Scroll Definition
-#define CMD_TEFXLON		0x35//Tearing Effect Line ON
-#define CMD_TEFXLOF		0x34//Tearing Effect Line OFF
-#define CMD_MADCTL  	0x36//Memory Access Control
-#define CMD_VSSTADRS	0x37//Vertical Scrolling Start address
-#define CMD_PIXFMT  	0x3A//Interface Pixel Format
-#define CMD_FRMCTR1 	0xB1//Frame Rate Control (In normal mode/Full colors)
-#define CMD_FRMCTR2 	0xB2//Frame Rate Control(In Idle mode/8-colors)
-#define CMD_FRMCTR3 	0xB3//Frame Rate Control(In Partial mode/full colors)
-#define CMD_DINVCTR		0xB4//Display Inversion Control
-#define CMD_RGBBLK		0xB5//RGB Interface Blanking Porch setting
-#define CMD_DFUNCTR 	0xB6//Display Fuction set 5
-#define CMD_SDRVDIR 	0xB7//Source Driver Direction Control
-#define CMD_GDRVDIR 	0xB8//Gate Driver Direction Control 
-
-#define CMD_PWCTR1  	0xC0//Power_Control1
-#define CMD_PWCTR2  	0xC1//Power_Control2
-#define CMD_PWCTR3  	0xC2//Power_Control3
-#define CMD_PWCTR4  	0xC3//Power_Control4
-#define CMD_PWCTR5  	0xC4//Power_Control5
-#define CMD_VCOMCTR1  	0xC5//VCOM_Control 1
-#define CMD_VCOMCTR2  	0xC6//VCOM_Control 2
-#define CMD_VCOMOFFS  	0xC7//VCOM Offset Control
-#define CMD_PGAMMAC		0xE0//Positive Gamma Correction Setting
-#define CMD_NGAMMAC		0xE1//Negative Gamma Correction Setting
-#define CMD_GAMRSEL		0xF2//GAM_R_SEL
 
 
 class TFT_ILI9163C : public Adafruit_GFX {
 
  public:
 
-	TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin);
-	TFT_ILI9163C(uint8_t CS, uint8_t DC);//connect rst pin to VDD
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,uint8_t mosi=11,uint8_t sclk=13);
+	#elif defined(__MKL26Z64__)
+		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,bool useSPI1=false);
+	#else
+		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255);
+	#endif
+	//TFT_ILI9163C(uint8_t CS, uint8_t DC);//connect rst pin to VDD
 	
 	void     	begin(void),
 				setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),//graphic Addressing
@@ -264,8 +159,8 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
 				drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
 				#if defined(__MK20DX128__) || defined(__MK20DX256__)//workaround to get more speed from Teensy
-				drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
-				drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
+					drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
+					drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
 				#endif
 				fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color),
 				setRotation(uint8_t r),
@@ -283,162 +178,274 @@ class TFT_ILI9163C : public Adafruit_GFX {
   //convert 24bit color into packet 16 bit one (credits for this are all mine)
 	inline uint16_t Color24To565(int32_t color_) { return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) &  0xFF) / 8);}
 	void 		setBitrate(uint32_t n);	
+ protected:
+	volatile uint8_t		_Mactrl_Data;//container for the memory access control data
+	uint8_t					_colorspaceData;
+	
+/* 	inline void startTransaction(void){
+	//__attribute__((always_inline)) {
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		#endif
+		#if defined(__AVR__)
+			*csport &= ~cspinmask;//low
+		#elif defined(__SAM3X8E__)
+			csport->PIO_CODR  |=  cspinmask;//LO
+		#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+			//nop
+		#elif defined(__MKL26Z64__)
+			digitalWriteFast(_cs,LOW);
+		#else
+			digitalWrite(_cs,LOW);
+		#endif
+	} */
+	
+/* 	inline void stopTransaction(void){
+	//__attribute__((always_inline)) {
+		#if defined(__AVR__)
+			*csport |= cspinmask;//hi
+		#elif defined(__SAM3X8E__)
+			csport->PIO_SODR  |=  cspinmask;//HI
+		#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+			//nop
+		#elif defined(__MKL26Z64__)
+			digitalWriteFast(_cs,HIGH);
+		#else
+			digitalWrite(_cs,HIGH);
+		#endif
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	}
+		 */
+	#if defined(__AVR__)
+		void				spiwrite(uint8_t);
+		volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
+		uint8_t 			_cs,_rs,_rst;
+		uint8_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
+	#elif defined(__SAM3X8E__)
+		void				spiwrite(uint8_t);
+		Pio 				*dataport, *clkport, *csport, *rsport;
+		uint8_t 			_cs,_rs,_rst;
+		uint32_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
+	#elif defined(__MKL26Z64__)
+		uint8_t 			_cs,_rs,_rst;
+		bool				_useSPI1;
+	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+		uint8_t 			_cs, _rs, _rst;
+		uint8_t 			pcs_data, pcs_command;
+		uint8_t 			_miso, _mosi, _sclk;
+	
+		void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing for Teensy
+		
 
+		//Here's Paul Stoffregen magic in action...
+		void waitFifoNotFull(void) {
+			uint32_t sr;
+			uint32_t tmp __attribute__((unused));
+			do {
+				#if ARDUINO >= 160
+					sr = KINETISK_SPI0.SR;
+				#else
+					sr = SPI0.SR;
+				#endif
+				if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
+			} while ((sr & (15 << 12)) > (3 << 12));
+		}
+
+		void waitFifoEmpty(void) {
+			uint32_t sr;
+			uint32_t tmp __attribute__((unused));
+			do {
+				#if ARDUINO >= 160
+					sr = KINETISK_SPI0.SR;
+					if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
+				#else
+					sr = SPI0.SR;
+					if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
+				#endif
+			} while ((sr & 0xF0F0) > 0);             // wait both RX & TX empty
+		}
+		
+		#if !defined(__FORCECOMPAT_SPI)//faster
+			void waitTransmitComplete(void) 
+			__attribute__((always_inline)) {
+				uint32_t tmp __attribute__((unused));
+				#if ARDUINO >= 160
+					while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
+				#else
+					while (!(SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
+				#endif
+				tmp = SPI0_POPR;                  // drain the final RX FIFO word
+			}
+		#else
+			void waitTransmitComplete(uint32_t mcr)
+			__attribute__((always_inline)) {
+				uint32_t tmp __attribute__((unused));
+				#if ARDUINO >= 160
+					while (1) {
+						uint32_t sr = KINETISK_SPI0.SR;
+						if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+						if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
+					}
+					KINETISK_SPI0.SR = SPI_SR_EOQF;
+					SPI0_MCR = mcr;
+					while (KINETISK_SPI0.SR & 0xF0) {
+						tmp = KINETISK_SPI0.POPR;
+					}
+				#else
+					while (1) {
+						uint32_t sr = SPI0.SR;
+						if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+						if (sr &  0xF0) tmp = SPI0_POPR;
+					}
+					SPI0.SR = SPI_SR_EOQF;
+					SPI0_MCR = mcr;
+					while (SPI0.SR & 0xF0) {
+						tmp = SPI0_POPR;
+					}
+				#endif
+			}
+		#endif
+	
+		void writecommand_cont(uint8_t c) 
+		__attribute__((always_inline)) {
+			#if ARDUINO >= 160
+				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+			#else
+				SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+			#endif
+			waitFifoNotFull();
+		}
+	
+		void writedata8_cont(uint8_t c) 
+		__attribute__((always_inline)) {
+			#if ARDUINO >= 160
+				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+			#else
+				SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+			#endif
+			waitFifoNotFull();
+		}
+	
+		void writedata16_cont(uint16_t d) 
+		__attribute__((always_inline)) {
+			#if ARDUINO >= 160
+				KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+			#else
+				SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+			#endif
+			waitFifoNotFull();
+		}
+
+		#if !defined(__FORCECOMPAT_SPI)
+			void writecommand_last(uint8_t c) 
+			__attribute__((always_inline)) {
+				waitFifoEmpty();
+				#if ARDUINO >= 160
+					KINETISK_SPI0.SR = SPI_SR_TCF;
+					KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
+				#else
+					SPI0.SR = SPI_SR_TCF;
+					SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
+				#endif
+				waitTransmitComplete();
+			}
+			
+	
+			void writedata8_last(uint8_t c) 
+			__attribute__((always_inline)) {
+				waitFifoEmpty();
+				#if ARDUINO >= 160
+					KINETISK_SPI0.SR = SPI_SR_TCF;
+					KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
+				#else
+					SPI0.SR = SPI_SR_TCF;
+					SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
+				#endif
+				waitTransmitComplete();
+			}	
+	
+			void writedata16_last(uint16_t d) 
+			__attribute__((always_inline)) {
+				waitFifoEmpty();
+				#if ARDUINO >= 160
+					KINETISK_SPI0.SR = SPI_SR_TCF;
+					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
+				#else
+					SPI0.SR = SPI_SR_TCF;
+					SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
+				#endif
+				waitTransmitComplete();
+			}
+		#else
+			void writecommand_last(uint8_t c) 
+			__attribute__((always_inline)) {
+				uint32_t mcr = SPI0_MCR;
+				#if ARDUINO >= 160
+					KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				#else
+					SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				#endif
+				waitTransmitComplete(mcr);
+			}
+
+		
+			void writedata8_last(uint8_t c) 
+			__attribute__((always_inline)) {
+				uint32_t mcr = SPI0_MCR;
+				#if ARDUINO >= 160
+					KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				#else
+					SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				#endif
+				waitTransmitComplete(mcr);
+			}	
+
+		
+			void writedata16_last(uint16_t d) 
+			__attribute__((always_inline)) {
+				uint32_t mcr = SPI0_MCR;
+				#if ARDUINO >= 160
+					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+				#else
+					SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+				#endif
+				waitTransmitComplete(mcr);
+			}
+		#endif
+		void HLine(int16_t x, int16_t y, int16_t w, uint16_t color) 
+		__attribute__((always_inline)) {
+			_setAddrWindow(x, y, x+w-1, y);
+			do { writedata16_cont(color); } while (--w > 0);
+		}
+
+		void VLine(int16_t x, int16_t y, int16_t h, uint16_t color) 
+		__attribute__((always_inline)) {
+			_setAddrWindow(x, y, x, y+h-1);
+			do { writedata16_cont(color); } while (--h > 0);
+		}
+		
+		void Pixel(int16_t x, int16_t y, uint16_t color) 
+		__attribute__((always_inline)) {
+			_setAddrWindow(x, y, x, y);
+			writedata16_cont(color);
+		}
+	#else
+		uint8_t 			_cs,_rs,_rst;	
+	#endif
+	
+	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
+		void		writecommand(uint8_t c);
+		void		writedata(uint8_t d);
+		void		writedata16(uint16_t d);
+	#endif
  private:
-	uint8_t		_Mactrl_Data;//container for the memory access control data
-	uint8_t		_colorspaceData;
 	void 		colorSpace(uint8_t cspace);
 	void 		setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-	void 		endProc(void);
 	uint8_t		sleep;
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	//
-	#else
-	void		writecommand(uint8_t c);
-	void		writedata(uint8_t d);
-	void		writedata16(uint16_t d);
-	#endif
 	void 		chipInit();
 	bool 		boundaryCheck(int16_t x,int16_t y);
 	void 		homeAddress();
-	#if defined(__AVR__)
-	void				spiwrite(uint8_t);
-	volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
-	uint8_t 			_cs,_rs,_sid,_sclk,_rst;
-	uint8_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
-	#endif //  #ifdef __AVR__
-
-	#if defined(__SAM3X8E__)
-	void				spiwrite(uint8_t);
-	Pio 				*dataport, *clkport, *csport, *rsport;
-	uint8_t 			_cs,_rs,_sid,_sclk,_rst;
-	uint32_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
-	#endif //  #if defined(__SAM3X8E__)
-  
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	//Here's Paul Stoffregen magic in action...
-	uint8_t _cs, _rs, _rst;
-	uint8_t pcs_data, pcs_command;
-	
-	void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing for Teensy
-	
-	void waitFifoNotFull(void) {
-		uint32_t sr;
-		uint32_t tmp __attribute__((unused));
-		do {
-			#if ARDUINO >= 160
-				sr = KINETISK_SPI0.SR;
-			#else
-				sr = SPI0.SR;
-			#endif
-			if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
-		} while ((sr & (15 << 12)) > (3 << 12));
-	}
-
-	void waitFifoEmpty(void) {
-		uint32_t sr;
-		uint32_t tmp __attribute__((unused));
-		do {
-			#if ARDUINO >= 160
-				sr = KINETISK_SPI0.SR;
-			#else
-				sr = SPI0.SR;
-			#endif
-			if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
-		} while ((sr & 0xF0F0) > 0);             // wait both RX & TX empty
-	}
-	
-	void waitTransmitComplete(void) __attribute__((always_inline)) {
-		uint32_t tmp __attribute__((unused));
-		#if ARDUINO >= 160
-		while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-		#else
-		while (!(SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-		#endif
-		tmp = SPI0_POPR;                  // drain the final RX FIFO word
-	}
-	
-	void writecommand_cont(uint8_t c) __attribute__((always_inline)) {
-		#if ARDUINO >= 160
-		KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-		#else
-		SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-		#endif
-		waitFifoNotFull();
-	}
-	
-	void writedata8_cont(uint8_t c) __attribute__((always_inline)) {
-		#if ARDUINO >= 160
-		KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-		#else
-		SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-		#endif
-		waitFifoNotFull();
-	}
-	
-	void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
-		#if ARDUINO >= 160
-		KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
-		#else
-		SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
-		#endif
-		waitFifoNotFull();
-	}
-	
-	void writecommand_last(uint8_t c) __attribute__((always_inline)) {
-		waitFifoEmpty();
-		#if ARDUINO >= 160
-		KINETISK_SPI0.SR = SPI_SR_TCF;
-		KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
-		#else
-		SPI0.SR = SPI_SR_TCF;
-		SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
-		#endif
-		waitTransmitComplete();
-	}
-	
-	void writedata8_last(uint8_t c) __attribute__((always_inline)) {
-		waitFifoEmpty();
-		#if ARDUINO >= 160
-		KINETISK_SPI0.SR = SPI_SR_TCF;
-		KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
-		#else
-		SPI0.SR = SPI_SR_TCF;
-		SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
-		#endif
-		waitTransmitComplete();
-	}
-	
-	void writedata16_last(uint16_t d) __attribute__((always_inline)) {
-		waitFifoEmpty();
-		#if ARDUINO >= 160
-		KINETISK_SPI0.SR = SPI_SR_TCF;
-		KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
-		#else
-		SPI0.SR = SPI_SR_TCF;
-		SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
-		#endif
-		waitTransmitComplete();
-	}
-	
-	void HLine(int16_t x, int16_t y, int16_t w, uint16_t color) __attribute__((always_inline)) {
-		_setAddrWindow(x, y, x+w-1, y);
-		//writecommand_cont(CMD_RAMWR);//not needed
-		do { writedata16_cont(color); } while (--w > 0);
-	}
-
-	void Pixel(int16_t x, int16_t y, uint16_t color) __attribute__((always_inline)) {
-		_setAddrWindow(x, y, x, y);
-		//writecommand_cont(CMD_RAMWR);//not needed
-		writedata16_cont(color);
-	}
-	
-	void VLine(int16_t x, int16_t y, int16_t h, uint16_t color) __attribute__((always_inline)) {
-		_setAddrWindow(x, y, x, y+h-1);
-		//writecommand_cont(CMD_RAMWR);//not needed
-		do { writedata16_cont(color); } while (--h > 0);
-	}
-	#endif
-	
 };
 #endif

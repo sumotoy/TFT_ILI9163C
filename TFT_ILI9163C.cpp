@@ -4,161 +4,278 @@
 #include "wiring_private.h"
 #include <SPI.h>
 
+#if defined(SPI_HAS_TRANSACTION)
+	static SPISettings ILI9163C_SPI;
+#endif
+
 
 //constructors
-TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin) : Adafruit_GFX(_TFTWIDTH,_TFTHEIGHT){
-	_cs   = cspin;
-	_rs   = dcpin;
-	_rst  = rstpin;
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	#else
-	_sid  = _sclk = 0;
-	#endif
-}
 
+#if defined(__MK20DX128__) || defined(__MK20DX256__)
+	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk) : Adafruit_GFX(_TFTWIDTH,_TFTHEIGHT)
+	{
+		_cs   = cspin;
+		_rs   = dcpin;
+		_rst  = rstpin;
+		_mosi = mosi;
+		_sclk = sclk;
+	}
+#elif defined(__MKL26Z64__)
+	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,bool useSPI1) : Adafruit_GFX(_TFTWIDTH,_TFTHEIGHT)
+	{
+		_cs   = cspin;
+		_rs   = dcpin;
+		_rst  = rstpin;
+		_useSPI1 = useSPI1;
+	}
+#else
+	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin) : Adafruit_GFX(_TFTWIDTH,_TFTHEIGHT)
+	{
+		_cs   = cspin;
+		_rs   = dcpin;
+		_rst  = rstpin;
+	}
+#endif
 
-TFT_ILI9163C::TFT_ILI9163C(uint8_t CS, uint8_t DC) : Adafruit_GFX(_TFTWIDTH, _TFTHEIGHT) {
-	_cs   = CS;
-	_rs   = DC;
-	_rst  = 0;
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	#else
-	_sid  = _sclk = 0;
-	#endif
-}
 
 //Arduino Uno, Leonardo, Mega, Teensy 2.0, etc
-#ifdef __AVR__
+#if defined(__AVR__)
 
-inline void TFT_ILI9163C::spiwrite(uint8_t c){
-    SPDR = c;
-    while(!(SPSR & _BV(SPIF)));
-}
-
-void TFT_ILI9163C::writecommand(uint8_t c){
-	#ifdef SPI_HAS_TRANSACTION
-    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-    #endif
-	*rsport &= ~rspinmask;//low
-	*csport &= ~cspinmask;//low
-	spiwrite(c);
-	*csport |= cspinmask;//hi
-	#ifdef SPI_HAS_TRANSACTION
-	SPI.endTransaction();
-	#endif
-}
-
-void TFT_ILI9163C::writedata(uint8_t c){
-	#ifdef SPI_HAS_TRANSACTION
-    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-    #endif
-	*rsport |=  rspinmask;
-	*csport &= ~cspinmask;
-	spiwrite(c);
-	*csport |= cspinmask;
-	#ifdef SPI_HAS_TRANSACTION
-	SPI.endTransaction();
-	#endif
-} 
-
-void TFT_ILI9163C::writedata16(uint16_t d){
-	#ifdef SPI_HAS_TRANSACTION
-    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-    #endif
-	*rsport |=  rspinmask;
-	*csport &= ~cspinmask;
-	spiwrite(d >> 8);
-	spiwrite(d);
-	*csport |= cspinmask;
-	#ifdef SPI_HAS_TRANSACTION
-	SPI.endTransaction();
-	#endif
-} 
-
-void TFT_ILI9163C::setBitrate(uint32_t n){
-	#if !defined (SPI_HAS_TRANSACTION)
-	if (n >= 8000000) {
-		SPI.setClockDivider(SPI_CLOCK_DIV2);
-	} else if (n >= 4000000) {
-		SPI.setClockDivider(SPI_CLOCK_DIV4);
-	} else if (n >= 2000000) {
-		SPI.setClockDivider(SPI_CLOCK_DIV8);
-	} else {
-		SPI.setClockDivider(SPI_CLOCK_DIV16);
+	inline void TFT_ILI9163C::spiwrite(uint8_t c)
+	{
+		SPDR = c;
+		while(!(SPSR & _BV(SPIF)));
 	}
-	#endif
-}
-#elif defined(__SAM3X8E__)
-// Arduino Due
 
-inline void TFT_ILI9163C::spiwrite(uint8_t c){
-    SPI.transfer(c);
-}
-
-void TFT_ILI9163C::writecommand(uint8_t c){
-	#ifdef SPI_HAS_TRANSACTION
-    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-    #endif
-	rsport->PIO_CODR |=  rspinmask;//LO
-	csport->PIO_CODR  |=  cspinmask;//LO
-	spiwrite(c);
-	csport->PIO_SODR  |=  cspinmask;//HI
-	#ifdef SPI_HAS_TRANSACTION
-	SPI.endTransaction();
-	#endif
-}
-
-void TFT_ILI9163C::writedata(uint8_t c){
-	#ifdef SPI_HAS_TRANSACTION
-    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-    #endif
-	rsport->PIO_SODR |=  rspinmask;//HI
-	csport->PIO_CODR  |=  cspinmask;//LO
-	spiwrite(c);
-	csport->PIO_SODR  |=  cspinmask;//HI
-	#ifdef SPI_HAS_TRANSACTION
-	SPI.endTransaction();
-	#endif
-} 
-
-void TFT_ILI9163C::writedata16(uint16_t d){
-	#ifdef SPI_HAS_TRANSACTION
-    SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-    #endif
-	rsport->PIO_SODR |=  rspinmask;//HI
-	csport->PIO_CODR  |=  cspinmask;//LO
-	spiwrite(d >> 8);
-	spiwrite(d);
-	csport->PIO_SODR  |=  cspinmask;//HI
-	#ifdef SPI_HAS_TRANSACTION
-	SPI.endTransaction();
-	#endif
-}
-
-
-void TFT_ILI9163C::setBitrate(uint32_t n){
-	#if !defined (SPI_HAS_TRANSACTION)
-	uint32_t divider=1;
-	while (divider < 255) {
-		if (n >= 84000000 / divider) break;
-		divider = divider - 1;
+	void TFT_ILI9163C::writecommand(uint8_t c)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		*rsport &= ~rspinmask;//low
+		*csport &= ~cspinmask;//low
+		spiwrite(c);
+		*csport |= cspinmask;//hi
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
 	}
-	SPI.setClockDivider(divider);
-	#endif
-}
-#elif defined(__MK20DX128__) || defined(__MK20DX256__)
-//Teensy 3.0 & 3.1  
 
-void TFT_ILI9163C::setBitrate(uint32_t n){
-	//nop
-}
+	void TFT_ILI9163C::writedata(uint8_t c)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		*rsport |=  rspinmask;//hi
+		*csport &= ~cspinmask;//low
+		spiwrite(c);
+		*csport |= cspinmask;//hi
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	} 
 
+	void TFT_ILI9163C::writedata16(uint16_t d)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		*rsport |=  rspinmask;//hi
+		*csport &= ~cspinmask;//low
+		spiwrite(d >> 8);
+		spiwrite(d);
+		*csport |= cspinmask;//hi
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	} 
+
+	void TFT_ILI9163C::setBitrate(uint32_t n)
+	{
+		#if !defined (SPI_HAS_TRANSACTION)
+			if (n >= 8000000) {
+				SPI.setClockDivider(SPI_CLOCK_DIV2);
+			} else if (n >= 4000000) {
+				SPI.setClockDivider(SPI_CLOCK_DIV4);
+			} else if (n >= 2000000) {
+				SPI.setClockDivider(SPI_CLOCK_DIV8);
+			} else {
+				SPI.setClockDivider(SPI_CLOCK_DIV16);
+			}
+		#endif
+	}
+#elif defined(__SAM3X8E__)// Arduino Due
+	inline void TFT_ILI9163C::spiwrite(uint8_t c)
+	{
+		SPI.transfer(c);
+	}
+
+	void TFT_ILI9163C::writecommand(uint8_t c)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		rsport->PIO_CODR |=  rspinmask;//LO
+		csport->PIO_CODR  |=  cspinmask;//LO
+		spiwrite(c);
+		csport->PIO_SODR  |=  cspinmask;//HI
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	}
+
+	void TFT_ILI9163C::writedata(uint8_t c)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		rsport->PIO_SODR |=  rspinmask;//HI
+		csport->PIO_CODR  |=  cspinmask;//LO
+		spiwrite(c);
+		csport->PIO_SODR  |=  cspinmask;//HI
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	} 
+
+	void TFT_ILI9163C::writedata16(uint16_t d)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		rsport->PIO_SODR |=  rspinmask;//HI
+		csport->PIO_CODR  |=  cspinmask;//LO
+		spiwrite(d >> 8);
+		spiwrite(d);
+		csport->PIO_SODR  |=  cspinmask;//HI
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	}
+
+
+	void TFT_ILI9163C::setBitrate(uint32_t n)
+	{
+		#if !defined(SPI_HAS_TRANSACTION)
+			uint32_t divider = 1;
+			while (divider < 255) {
+				if (n >= 84000000 / divider) break;
+				divider = divider - 1;
+			}
+			SPI.setClockDivider(divider);
+		#endif
+	}
+#elif defined(__MKL26Z64__)//Teensy LC (preliminary
+
+	void TFT_ILI9163C::writecommand(uint8_t c)
+	{
+		SPI.beginTransaction(ILI9163C_SPI);
+		digitalWriteFast(_rs,LOW);
+		digitalWriteFast(_cs,LOW);
+		if (_useSPI1){
+			SPI1.transfer(c);
+		} else {
+			SPI.transfer(c);
+		}
+		digitalWriteFast(_cs,HIGH);
+		SPI.endTransaction();
+	}
+
+	void TFT_ILI9163C::writedata(uint8_t c)
+	{
+		SPI.beginTransaction(ILI9163C_SPI);
+		digitalWriteFast(_rs,HIGH);
+		digitalWriteFast(_cs,LOW);
+		if (_useSPI1){
+			SPI1.transfer(c);
+		} else {
+			SPI.transfer(c);
+		}
+		digitalWriteFast(_cs,HIGH);
+		SPI.endTransaction();
+	} 
+
+	void TFT_ILI9163C::writedata16(uint16_t d)
+	{
+		SPI.beginTransaction(ILI9163C_SPI);
+		digitalWriteFast(_rs,HIGH);
+		digitalWriteFast(_cs,LOW);
+		if (_useSPI1){
+			SPI1.transfer16(d);
+		} else {
+			SPI.transfer16(d);
+		}
+		digitalWriteFast(_cs,HIGH);
+		SPI.endTransaction();
+	} 
+
+	void TFT_ILI9163C::setBitrate(uint32_t n)
+	{
+		//nop
+	}
+#elif defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3.0 & 3.1 
+ 
+	void TFT_ILI9163C::setBitrate(uint32_t n)
+	{
+		//nop
+	}
+#else
+
+	void TFT_ILI9163C::writecommand(uint8_t c)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		digitalWrite(_rs,LOW);
+		digitalWrite(_cs,LOW);
+		SPI.transfer(c);
+		digitalWrite(_cs,HIGH);
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	}
+
+	void TFT_ILI9163C::writedata(uint8_t c)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		digitalWrite(_rs,HIGH);
+		digitalWrite(_cs,LOW);
+		SPI.transfer(c);
+		digitalWrite(_cs,HIGH);
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	} 
+
+	void TFT_ILI9163C::writedata16(uint16_t d)
+	{
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.beginTransaction(ILI9163C_SPI);
+		#endif
+		digitalWrite(_rs,HIGH);
+		digitalWrite(_cs,LOW);
+		SPI.transfer(d >> 8);
+		SPI.transfer(d);
+		digitalWrite(_cs,HIGH);
+		#if defined(SPI_HAS_TRANSACTION)
+			SPI.endTransaction();
+		#endif
+	} 
+
+	void TFT_ILI9163C::setBitrate(uint32_t n)
+	{
+		//nop
+	}
 #endif //#if defined(TEENSY3.x)
 
 
-void TFT_ILI9163C::begin(void) {
+void TFT_ILI9163C::begin(void) 
+{
 	sleep = 0;
-#ifdef __AVR__
+
+#if defined(__AVR__)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	csport    = portOutputRegister(digitalPinToPort(_cs));
@@ -166,13 +283,14 @@ void TFT_ILI9163C::begin(void) {
 	cspinmask = digitalPinToBitMask(_cs);
 	rspinmask = digitalPinToBitMask(_rs);
     SPI.begin();
-	#if !defined (SPI_HAS_TRANSACTION)
-    SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setDataMode(SPI_MODE0);
+	#if !defined(SPI_HAS_TRANSACTION)
+		SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz
+		SPI.setBitOrder(MSBFIRST);
+		SPI.setDataMode(SPI_MODE0);
+	#else
+		ILI9163C_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
 	#endif
-	// toggle RST low to reset; CS low so it'll listen to us
-	*csport &= ~cspinmask;
+	*csport &= ~cspinmask;// toggle CS low so it'll listen to us
 #elif defined(__SAM3X8E__)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
@@ -181,14 +299,34 @@ void TFT_ILI9163C::begin(void) {
 	cspinmask = digitalPinToBitMask(_cs);
 	rspinmask = digitalPinToBitMask(_rs);
     SPI.begin();
-	#if !defined (SPI_HAS_TRANSACTION)
-    SPI.setClockDivider(11); // 8 MHz
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setDataMode(SPI_MODE0);
+	#if !defined(SPI_HAS_TRANSACTION)
+		SPI.setClockDivider(5); // 8 MHz
+		SPI.setBitOrder(MSBFIRST);
+		SPI.setDataMode(SPI_MODE0);
+	#else
+		ILI9163C_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);
 	#endif
-	// toggle RST low to reset; CS low so it'll listen to us
-	csport ->PIO_CODR  |=  cspinmask; // Set control bits to LOW (idle)
+	csport ->PIO_CODR  |=  cspinmask; // toggle CS low so it'll listen to us
+#elif defined(__MKL26Z64__)//Teensy LC (preliminary)
+	pinMode(_rs, OUTPUT);
+	pinMode(_cs, OUTPUT);
+	
+	if (_useSPI1){
+		ILI9163C_SPI = SPISettings(12000000, MSBFIRST, SPI_MODE0);
+		SPI1.begin();
+	} else {
+		ILI9163C_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);
+		SPI.begin();
+	}
+	digitalWriteFast(_cs, LOW);
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)
+	ILI9163C_SPI = SPISettings(30000000, MSBFIRST, SPI_MODE0);
+	if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
+        SPI.setMOSI(_mosi);
+        SPI.setSCK(_sclk);
+	} else {
+		return;
+	}
 	SPI.begin();
 	if (SPI.pinIsChipSelect(_cs, _rs)) {
 		pcs_data = SPI.setCS(_cs);
@@ -198,8 +336,20 @@ void TFT_ILI9163C::begin(void) {
 		pcs_command = 0;
 		return;
 	}
+#else//all the rest of possible boards
+	pinMode(_rs, OUTPUT);
+	pinMode(_cs, OUTPUT);
+	SPI.begin();
+	#if !defined(SPI_HAS_TRANSACTION)
+		SPI.setClockDivider(4);
+		SPI.setBitOrder(MSBFIRST);
+		SPI.setDataMode(SPI_MODE0);
+	#else
+		ILI9163C_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
+	#endif
+	digitalWrite(_cs, LOW);
 #endif
-	if (_rst != 0) {
+	if (_rst != 255) {
 		pinMode(_rst, OUTPUT);
 		digitalWrite(_rst, HIGH);
 		delay(500);
@@ -229,180 +379,189 @@ void TFT_ILI9163C::begin(void) {
 	 0 | 1 | 1 | 0 | 1 | 0 | 0 | 0	//XY exchange
 	 1 | 1 | 1 | 0 | 1 | 0 | 0 | 0
 */
-  _Mactrl_Data = 0b00000000;
-  _colorspaceData = __COLORSPC;//start with default data;
-  chipInit();
+	_Mactrl_Data = 0b00000000;
+	_colorspaceData = __COLORSPC;//start with default data;
+	chipInit();
 }
 
 
 
 void TFT_ILI9163C::chipInit() {
 	uint8_t i;
-	#if defined(__GAMMASET1)
-	const uint8_t pGammaSet[15]= {0x36,0x29,0x12,0x22,0x1C,0x15,0x42,0xB7,0x2F,0x13,0x12,0x0A,0x11,0x0B,0x06};
-	const uint8_t nGammaSet[15]= {0x09,0x16,0x2D,0x0D,0x13,0x15,0x40,0x48,0x53,0x0C,0x1D,0x25,0x2E,0x34,0x39};
-	#elif defined(__GAMMASET2)
-	const uint8_t pGammaSet[15]= {0x3F,0x21,0x12,0x22,0x1C,0x15,0x42,0xB7,0x2F,0x13,0x02,0x0A,0x01,0x00,0x00};
-	const uint8_t nGammaSet[15]= {0x09,0x18,0x2D,0x0D,0x13,0x15,0x40,0x48,0x53,0x0C,0x1D,0x25,0x2E,0x24,0x29};
-	#elif defined(__GAMMASET3)
-	const uint8_t pGammaSet[15]= {0x3F,0x26,0x23,0x30,0x28,0x10,0x55,0xB7,0x40,0x19,0x10,0x1E,0x02,0x01,0x00};
-	//&const uint8_t nGammaSet[15]= {0x00,0x19,0x1C,0x0F,0x14,0x0F,0x2A,0x48,0x3F,0x06,0x1D,0x21,0x3D,0x3F,0x3F};
-	const uint8_t nGammaSet[15]= {0x09,0x18,0x2D,0x0D,0x13,0x15,0x40,0x48,0x53,0x0C,0x1D,0x25,0x2E,0x24,0x29};
-	#else
-	const uint8_t pGammaSet[15]= {0x3F,0x25,0x1C,0x1E,0x20,0x12,0x2A,0x90,0x24,0x11,0x00,0x00,0x00,0x00,0x00};
-	const uint8_t nGammaSet[15]= {0x20,0x20,0x20,0x20,0x05,0x15,0x00,0xA7,0x3D,0x18,0x25,0x2A,0x2B,0x2B,0x3A};
-	#endif
-	
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-	SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-	writecommand_cont(CMD_SWRESET);//software reset
-	delay(500);
-	writecommand_cont(CMD_SLPOUT);//exit sleep
-	delay(5);
-	writecommand_cont(CMD_PIXFMT);//Set Color Format 16bit   
-	writedata8_cont(0x05);
-	delay(5);
-	writecommand_cont(CMD_GAMMASET);//default gamma curve 3
-	writedata8_cont(0x08);//0x04
-	delay(1);
-	writecommand_cont(CMD_GAMRSEL);//Enable Gamma adj    
-	writedata8_cont(0x01); 
-	delay(1);
-	writecommand_cont(CMD_NORML);
-	
-	
-	writecommand_cont(CMD_DFUNCTR);
-	writedata8_cont(0b11111111);//
-	writedata8_cont(0b00000110);//
-
-	writecommand_cont(CMD_PGAMMAC);//Positive Gamma Correction Setting
-	for (i=0;i<15;i++){
-		writedata8_cont(pGammaSet[i]);
-	}
-	writecommand_cont(CMD_NGAMMAC);//Negative Gamma Correction Setting
-	for (i=0;i<15;i++){
-		writedata8_cont(nGammaSet[i]);
-	}
-	
-	writecommand_cont(CMD_FRMCTR1);//Frame Rate Control (In normal mode/Full colors)
-	writedata8_cont(0x08);//0x0C//0x08
-	writedata8_cont(0x02);//0x14//0x08
-	delay(1);
-	
-	writecommand_cont(CMD_DINVCTR);//display inversion 
-	writedata8_cont(0x07);
-    delay(1);
-	
-	writecommand_cont(CMD_PWCTR1);//Set VRH1[4:0] & VC[2:0] for VCI1 & GVDD   
-	writedata8_cont(0x0A);//4.30 - 0x0A
-	writedata8_cont(0x02);//0x05
-	delay(1);
-	
-	writecommand_cont(CMD_PWCTR2);//Set BT[2:0] for AVDD & VCL & VGH & VGL   
-	writedata8_cont(0x02);
-	delay(1);
-	
-	writecommand_cont(CMD_VCOMCTR1);//Set VMH[6:0] & VML[6:0] for VOMH & VCOML   
-	writedata8_cont(0x50);//0x50
-	writedata8_cont(99);//0x5b
-	delay(1);
-	
-	writecommand_cont(CMD_VCOMOFFS);
-	writedata8_cont(0);//0x40
-	delay(1);
-  
-	writecommand_cont(CMD_CLMADRS);//Set Column Address  
-	writedata16_cont(0x00);
-	writedata16_cont(_GRAMWIDTH); 
-  
-	writecommand_cont(CMD_PGEADRS);//Set Page Address  
-	writedata16_cont(0x00);
-	writedata16_cont(_GRAMHEIGH); 
-	// set scroll area (thanks Masuda)
-    writecommand_cont(CMD_VSCLLDEF);
-    writedata16_cont(__OFFSET);
-    writedata16_cont(_GRAMHEIGH - __OFFSET);
-    writedata16_last(0);
+		SPI.beginTransaction(ILI9163C_SPI);
 		
-	endProc();
-	colorSpace(_colorspaceData);
-	setRotation(0);
-	SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-	writecommand_cont(CMD_DISPON);//display ON 
-	delay(1);
-	writecommand_last(CMD_RAMWR);//Memory Write
-	SPI.endTransaction();
-	delay(1);
-	#else
-	writecommand(CMD_SWRESET);//software reset
-	delay(500);
-	writecommand(CMD_SLPOUT);//exit sleep
-	delay(5);
-	writecommand(CMD_PIXFMT);//Set Color Format 16bit   
-	writedata(0x05);
-	delay(5);
-	writecommand(CMD_GAMMASET);//default gamma curve 3
-	writedata(0x04);//0x04
-	delay(1);
-	writecommand(CMD_GAMRSEL);//Enable Gamma adj    
-	writedata(0x01); 
-	delay(1);
-	writecommand(CMD_NORML);
+		writecommand_cont(CMD_SWRESET);//software reset
+		delay(500);
+		
+		writecommand_cont(CMD_SLPOUT);//exit sleep
+		delay(5);
+		
+		writecommand_cont(CMD_PIXFMT);//Set Color Format 16bit   
+		writedata8_cont(0x05);
+		delay(5);
+		
+		writecommand_cont(CMD_GAMMASET);//default gamma curve 3
+		writedata8_cont(0x08);//0x04
+		delay(1);
+		
+		writecommand_cont(CMD_GAMRSEL);//Enable Gamma adj    
+		writedata8_cont(0x01); 
+		delay(1);
+		
+		writecommand_cont(CMD_NORML);
 	
-	writecommand(CMD_DFUNCTR);
-	writedata(0b11111111);//
-	writedata(0b00000110);//
+		writecommand_cont(CMD_DFUNCTR);
+		writedata8_cont(0b11111111);//
+		writedata8_cont(0b00000110);//
 
-	writecommand(CMD_PGAMMAC);//Positive Gamma Correction Setting
-	for (i=0;i<15;i++){
-		writedata(pGammaSet[i]);
-	}
-	writecommand(CMD_NGAMMAC);//Negative Gamma Correction Setting
-	for (i=0;i<15;i++){
-		writedata(nGammaSet[i]);
-	}
-
-	writecommand(CMD_FRMCTR1);//Frame Rate Control (In normal mode/Full colors)
-	writedata(0x08);//0x0C//0x08
-	writedata(0x02);//0x14//0x08
-	delay(1);
-	writecommand(CMD_DINVCTR);//display inversion 
-	writedata(0x07);
-    delay(1);
-	writecommand(CMD_PWCTR1);//Set VRH1[4:0] & VC[2:0] for VCI1 & GVDD   
-	writedata(0x0A);//4.30 - 0x0A
-	writedata(0x02);//0x05
-	delay(1);
-	writecommand(CMD_PWCTR2);//Set BT[2:0] for AVDD & VCL & VGH & VGL   
-	writedata(0x02);
-	delay(1);
-	writecommand(CMD_VCOMCTR1);//Set VMH[6:0] & VML[6:0] for VOMH & VCOML   
-	writedata(0x50);//0x50
-	writedata(99);//0x5b
-	delay(1);
-	writecommand(CMD_VCOMOFFS);
-	writedata(0);//0x40
-	delay(1);
+		writecommand_cont(CMD_PGAMMAC);//Positive Gamma Correction Setting
+		for (i=0;i<15;i++){
+			writedata8_cont(pGammaSet[i]);
+		}
+		
+		writecommand_cont(CMD_NGAMMAC);//Negative Gamma Correction Setting
+		for (i=0;i<15;i++){
+			writedata8_cont(nGammaSet[i]);
+		}
+	
+		writecommand_cont(CMD_FRMCTR1);//Frame Rate Control (In normal mode/Full colors)
+		writedata8_cont(0x08);//0x0C//0x08
+		writedata8_cont(0x02);//0x14//0x08
+		delay(1);
+	
+		writecommand_cont(CMD_DINVCTR);//display inversion 
+		writedata8_cont(0x07);
+		delay(1);
+	
+		writecommand_cont(CMD_PWCTR1);//Set VRH1[4:0] & VC[2:0] for VCI1 & GVDD   
+		writedata8_cont(0x0A);//4.30 - 0x0A
+		writedata8_cont(0x02);//0x05
+		delay(1);
+	
+		writecommand_cont(CMD_PWCTR2);//Set BT[2:0] for AVDD & VCL & VGH & VGL   
+		writedata8_cont(0x02);
+		delay(1);
+	
+		writecommand_cont(CMD_VCOMCTR1);//Set VMH[6:0] & VML[6:0] for VOMH & VCOML   
+		writedata8_cont(0x50);//0x50
+		writedata8_cont(99);//0x5b
+		delay(1);
+	
+		writecommand_cont(CMD_VCOMOFFS);
+		writedata8_cont(0);//0x40
+		delay(1);
   
-	writecommand(CMD_CLMADRS);//Set Column Address  
-	writedata16(0x00); 
-	writedata16(_GRAMWIDTH); 
+		writecommand_cont(CMD_CLMADRS);//Set Column Address  
+		writedata16_cont(0x00);
+		writedata16_cont(_GRAMWIDTH); 
   
-	writecommand(CMD_PGEADRS);//Set Page Address  
-	writedata16(0X00); 
-	writedata16(_GRAMHEIGH);
-	// set scroll area (thanks Masuda)
-    writecommand(CMD_VSCLLDEF);
-    writedata16(__OFFSET);
-    writedata16(_GRAMHEIGH - __OFFSET);
-    writedata16(0);
-	colorSpace(_colorspaceData);
-	setRotation(0);
-	writecommand(CMD_DISPON);//display ON 
-	delay(1);
-	writecommand(CMD_RAMWR);//Memory Write
+		writecommand_cont(CMD_PGEADRS);//Set Page Address  
+		writedata16_cont(0x00);
+		writedata16_cont(_GRAMHEIGH); 
+		// set scroll area (thanks Masuda)
+		writecommand_cont(CMD_VSCLLDEF);
+		writedata16_cont(__OFFSET);
+		writedata16_cont(_GRAMHEIGH - __OFFSET);
+		writedata16_last(0);
+		
+		SPI.endTransaction();
+		
+		colorSpace(_colorspaceData);
+		
+		setRotation(0);
+		
+		SPI.beginTransaction(ILI9163C_SPI);
+		
+		writecommand_cont(CMD_DISPON);//display ON 
+		delay(1);
+		writecommand_last(CMD_RAMWR);//Memory Write
+		
+		SPI.endTransaction();
+		delay(1);
+	#else
+		writecommand(CMD_SWRESET);//software reset
+		delay(500);
+		
+		writecommand(CMD_SLPOUT);//exit sleep
+		delay(5);
+		
+		writecommand(CMD_PIXFMT);//Set Color Format 16bit   
+		writedata(0x05);
+		delay(5);
+		
+		writecommand(CMD_GAMMASET);//default gamma curve 3
+		writedata(0x04);//0x04
+		delay(1);
+		
+		writecommand(CMD_GAMRSEL);//Enable Gamma adj    
+		writedata(0x01); 
+		delay(1);
+		
+		writecommand(CMD_NORML);
+	
+		writecommand(CMD_DFUNCTR);
+		writedata(0b11111111);//
+		writedata(0b00000110);//
 
-	delay(1);
+		writecommand(CMD_PGAMMAC);//Positive Gamma Correction Setting
+		for (i=0;i<15;i++){
+			writedata(pGammaSet[i]);
+		}
+		
+		writecommand(CMD_NGAMMAC);//Negative Gamma Correction Setting
+		for (i=0;i<15;i++){
+			writedata(nGammaSet[i]);
+		}
+
+		writecommand(CMD_FRMCTR1);//Frame Rate Control (In normal mode/Full colors)
+		writedata(0x08);//0x0C//0x08
+		writedata(0x02);//0x14//0x08
+		delay(1);
+		
+		writecommand(CMD_DINVCTR);//display inversion 
+		writedata(0x07);
+		delay(1);
+		
+		writecommand(CMD_PWCTR1);//Set VRH1[4:0] & VC[2:0] for VCI1 & GVDD   
+		writedata(0x0A);//4.30 - 0x0A
+		writedata(0x02);//0x05
+		delay(1);
+		
+		writecommand(CMD_PWCTR2);//Set BT[2:0] for AVDD & VCL & VGH & VGL   
+		writedata(0x02);
+		delay(1);
+		
+		writecommand(CMD_VCOMCTR1);//Set VMH[6:0] & VML[6:0] for VOMH & VCOML   
+		writedata(0x50);//0x50
+		writedata(99);//0x5b
+		delay(1);
+		
+		writecommand(CMD_VCOMOFFS);
+		writedata(0);//0x40
+		delay(1);
+  
+		writecommand(CMD_CLMADRS);//Set Column Address  
+		writedata16(0x00); 
+		writedata16(_GRAMWIDTH); 
+  
+		writecommand(CMD_PGEADRS);//Set Page Address  
+		writedata16(0X00); 
+		writedata16(_GRAMHEIGH);
+		// set scroll area (thanks Masuda)
+		writecommand(CMD_VSCLLDEF);
+		writedata16(__OFFSET);
+		writedata16(_GRAMHEIGH - __OFFSET);
+		writedata16(0);
+		
+		colorSpace(_colorspaceData);
+		
+		setRotation(0);
+		writecommand(CMD_DISPON);//display ON 
+		delay(1);
+		writecommand(CMD_RAMWR);//Memory Write
+
+		delay(1);
 	#endif
 	fillScreen(BLACK);
 }
@@ -422,7 +581,7 @@ void TFT_ILI9163C::colorSpace(uint8_t cspace) {
 
 void TFT_ILI9163C::invertDisplay(boolean i) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		SPI.beginTransaction(ILI9163C_SPI);
 		writecommand_last(i ? CMD_DINVON : CMD_DINVOF);
 		SPI.endTransaction();
 	#else
@@ -433,17 +592,17 @@ void TFT_ILI9163C::invertDisplay(boolean i) {
 void TFT_ILI9163C::display(boolean onOff) {
 	if (onOff){
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			SPI.beginTransaction(ILI9163C_SPI);
 			writecommand_last(CMD_DISPON);
-			endProc();
+			SPI.endTransaction();
 		#else
 			writecommand(CMD_DISPON);
 		#endif
 	} else {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			SPI.beginTransaction(ILI9163C_SPI);
 			writecommand_last(CMD_DISPOFF);
-			endProc();
+			SPI.endTransaction();
 		#else
 			writecommand(CMD_DISPOFF);
 		#endif
@@ -453,17 +612,17 @@ void TFT_ILI9163C::display(boolean onOff) {
 void TFT_ILI9163C::idleMode(boolean onOff) {
 	if (onOff){
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			SPI.beginTransaction(ILI9163C_SPI);
 			writecommand_last(CMD_IDLEON);
-			endProc();
+			SPI.endTransaction();
 		#else
 			writecommand(CMD_IDLEON);
 		#endif
 	} else {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			SPI.beginTransaction(ILI9163C_SPI);
 			writecommand_last(CMD_IDLEOF);
-			endProc();
+			SPI.endTransaction();
 		#else
 			writecommand(CMD_IDLEOF);
 		#endif
@@ -475,9 +634,9 @@ void TFT_ILI9163C::sleepMode(boolean mode) {
 		if (sleep == 1) return;//already sleeping
 		sleep = 1;
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			SPI.beginTransaction(ILI9163C_SPI);
 			writecommand_last(CMD_SLPIN);
-			endProc();
+			SPI.endTransaction();
 		#else
 			writecommand(CMD_SLPIN);
 		#endif
@@ -486,9 +645,9 @@ void TFT_ILI9163C::sleepMode(boolean mode) {
 		if (sleep == 0) return; //Already awake
 		sleep = 0;
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+			SPI.beginTransaction(ILI9163C_SPI);
 			writecommand_last(CMD_SLPOUT);
-			endProc();
+			SPI.endTransaction();
 		#else
 			writecommand(CMD_SLPOUT);
 		#endif
@@ -501,17 +660,17 @@ void TFT_ILI9163C::defineScrollArea(uint16_t tfa, uint16_t bfa){
     int16_t vsa = _GRAMHEIGH - tfa - bfa;
     if (vsa >= 0) {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-        writecommand_cont(CMD_VSCLLDEF);
-        writedata16_cont(tfa);
-        writedata16_cont(vsa);
-        writedata16_last(bfa);
-		endProc();
+			SPI.beginTransaction(ILI9163C_SPI);
+			writecommand_cont(CMD_VSCLLDEF);
+			writedata16_cont(tfa);
+			writedata16_cont(vsa);
+			writedata16_last(bfa);
+			SPI.endTransaction();
 		#else
-        writecommand(CMD_VSCLLDEF);
-        writedata16(tfa);
-        writedata16(vsa);
-        writedata16(bfa);
+			writecommand(CMD_VSCLLDEF);
+			writedata16(tfa);
+			writedata16(vsa);
+			writedata16(bfa);
 		#endif
     }
 }
@@ -519,10 +678,10 @@ void TFT_ILI9163C::defineScrollArea(uint16_t tfa, uint16_t bfa){
 void TFT_ILI9163C::scroll(uint16_t adrs) {
 	if (adrs <= _GRAMHEIGH) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		SPI.beginTransaction(ILI9163C_SPI);
 		writecommand_cont(CMD_VSSTADRS);
 		writedata16_last(adrs + __OFFSET);
-		endProc();
+		SPI.endTransaction();
 	#else
 		writecommand(CMD_VSSTADRS);
 		writedata16(adrs + __OFFSET);
@@ -535,16 +694,14 @@ void TFT_ILI9163C::scroll(uint16_t adrs) {
 void TFT_ILI9163C::clearScreen(uint16_t color) {
 	int px;
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		//writecommand_cont(CMD_RAMWR);
+		SPI.beginTransaction(ILI9163C_SPI);
 		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16_cont(color);
 		}
 		writecommand_last(CMD_NOP);
-		endProc();
+		SPI.endTransaction();
 	#else
-		//writecommand(CMD_RAMWR);
 		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16(color);
@@ -568,16 +725,16 @@ void TFT_ILI9163C::pushData(uint16_t color) {
 void TFT_ILI9163C::endPushData() {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_last(CMD_NOP);
-		endProc();
+		SPI.endTransaction();
 	#endif
 }
 
 
 void TFT_ILI9163C::pushColor(uint16_t color) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		SPI.beginTransaction(ILI9163C_SPI);
 		writedata16_last(color);
-		endProc();
+		SPI.endTransaction();
 	#else
 		writedata16(color);
 	#endif
@@ -585,7 +742,7 @@ void TFT_ILI9163C::pushColor(uint16_t color) {
 	
 void TFT_ILI9163C::writeScreen24(const uint32_t *bitmap,uint16_t size) {
 	uint16_t color;
-	int px;
+	uint16_t px;
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_cont(CMD_RAMWR);
 		for (px = 0;px < size; px++){//16384
@@ -593,7 +750,7 @@ void TFT_ILI9163C::writeScreen24(const uint32_t *bitmap,uint16_t size) {
 			writedata16_cont(color);
 		}
 		_setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//home
-		endProc();
+		SPI.endTransaction();
 	#else
 		writecommand(CMD_RAMWR);
 		for (px = 0;px < size; px++){
@@ -627,19 +784,12 @@ void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color) {
 	setAddr(x,y,x+1,y+1);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writedata16_last(color);
-		endProc();
+		SPI.endTransaction();
 	#else
 		writedata16(color);
 	#endif
 }
 
-
-
-void TFT_ILI9163C::endProc(void){
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.endTransaction();
-	#endif
-}
 
 
 void TFT_ILI9163C::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
@@ -658,7 +808,9 @@ void TFT_ILI9163C::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color
 			writedata16(color);
 		#endif
 	}
-	endProc();
+	#if defined(SPI_HAS_TRANSACTION)
+		SPI.endTransaction();
+	#endif
 }
 
 bool TFT_ILI9163C::boundaryCheck(int16_t x,int16_t y){
@@ -682,7 +834,9 @@ void TFT_ILI9163C::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color
 			writedata16(color);
 		#endif
 	}
-	endProc();
+	#if defined(SPI_HAS_TRANSACTION)
+		SPI.endTransaction();
+	#endif
 }
 
 void TFT_ILI9163C::fillScreen(uint16_t color) {
@@ -704,10 +858,12 @@ void TFT_ILI9163C::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 			#endif
 		}
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		writedata16_last(color);
+			writedata16_last(color);
 		#endif
 	}
-	endProc();
+	#if defined(SPI_HAS_TRANSACTION)
+		SPI.endTransaction();
+	#endif
 }
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
@@ -753,7 +909,8 @@ void TFT_ILI9163C::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint1
 		ystep = -1;
 	}
 
-	SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+	SPI.beginTransaction(ILI9163C_SPI);
+	
 	int16_t xbegin = x0;
 	if (steep) {
 		for (; x0<=x1; x0++) {
@@ -798,7 +955,7 @@ void TFT_ILI9163C::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint1
 }
 
 void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color){
-	SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+	SPI.beginTransaction(ILI9163C_SPI);
 	HLine(x, y, w, color);
 	HLine(x, y+h-1, w, color);
 	VLine(x, y, h, color);
@@ -812,7 +969,7 @@ void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 
 void TFT_ILI9163C::setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1){
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		SPI.beginTransaction(ILI9163C_SPI);
 		_setAddrWindow(x0,y0,x1,y1);
 	#else
 		setAddrWindow(x0,y0,x1,y1);
@@ -821,7 +978,7 @@ void TFT_ILI9163C::setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1){
 
 void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		SPI.beginTransaction(ILI9163C_SPI);
 		_setAddrWindow(x0,y0,x1,y1);
 		SPI.endTransaction();
 	#else
@@ -894,10 +1051,10 @@ void TFT_ILI9163C::setRotation(uint8_t m) {
 	}
 	colorSpace(_colorspaceData);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
+		SPI.beginTransaction(ILI9163C_SPI);
 		writecommand_cont(CMD_MADCTL);
 		writedata8_last(_Mactrl_Data);
-		endProc();
+		SPI.endTransaction();
 	#else
 		writecommand(CMD_MADCTL);
 		writedata(_Mactrl_Data);
