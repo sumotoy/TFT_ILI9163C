@@ -2,9 +2,9 @@ TFT_ILI9163C
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's Teensy's and more...
 
-Actual release: 0.8
+Actual release: 0.9
 
-Can be used with IDE 1.0.6 (Teensyduino 1.20) or IDE 1.6.x (Teensyduino 1.21b)
+Can be used with IDE 1.0.6 (Teensyduino 1.20) or IDE 1.6.x (Teensyduino 1.21b or better)
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
@@ -132,7 +132,7 @@ https://github.com/greiman/SdFat
 	- Vcc		-->		+3V3V(!!!!)
 	- Gnd		-->		Gnd
 	- CS		-->		CS pin (3v3 level!)
-	- RST		-->		connect to a MCU pin or tie to +3V3
+	- RST		-->		connect to a MCU pin or tie to +3V3 (do NOT leave float!)
 	- A0		-->		DC or RS pin (3v3 level!)
 	- SDA		-->		Mosi (3v3 level!)
 	- SCK		-->		Sclk (3v3 level!)
@@ -181,6 +181,7 @@ https://github.com/riuson/lcd-image-converter
 	0.7:   Gold release candidate. Fixed initialization (thanks Masuda)
 	0.75:  SPI transactions for Arduino's (beta) please report if troubles (not tested)
 	0.8:   Added compatibility with IDE 1.6.x (Teensyduino 1.21b)
+	0.9:   Support for more CPU, alt pin for Teesny's, small fixes.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
