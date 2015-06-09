@@ -19,6 +19,8 @@
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
 
+uint8_t errorCode = 0;
+
 /*
 Teensy3.x and Arduino's
 You are using 4 wire SPI here, so:
@@ -28,77 +30,87 @@ You are using 4 wire SPI here, so:
  the rest of pin below:
  */
 #define __CS 10
-#define __DC 9
+#define __DC 6
 /*
 Teensy 3.x can use: 2,6,9,10,15,20,21,22,23
 Arduino's 8 bit: any
 DUE: check arduino site
-IMPORTANT!!!
-If you do not use reset pin, tie it to +3V3!! Do not leave floating!
+If you do not use reset, tie it to +3V3
 */
 
 
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, 23);
 
 void setup() {
   Serial.begin(38400);
   long unsigned debug_start = millis ();
   while (!Serial && ((millis () - debug_start) <= 5000)) ;
   tft.begin();
+  //the following it's mainly for Teensy
+  //it will help you to understand if you have choosed the 
+  //wrong combination of pins!
+  errorCode = tft.errorCode();
+  if (errorCode != 0) {
+    Serial.print("Init error! ");
+    if (bitRead(errorCode, 0)) Serial.print("MOSI or SCLK pin mismach!\n");
+    if (bitRead(errorCode, 1)) Serial.print("CS or DC pin mismach!\n");
+  } else {
+    Serial.println(F("Benchmark                Time (microseconds)"));
+  }
+  if (errorCode == 0) {
+    Serial.print(F("Screen fill              "));
+    Serial.println(testFillScreen());
+    delay(500);
 
-  Serial.println(F("Benchmark                Time (microseconds)"));
-  Serial.print(F("Screen fill              "));
-  Serial.println(testFillScreen());
-  delay(500);
+    Serial.print(F("Text                     "));
+    Serial.println(testText());
+    delay(3000);
 
-  Serial.print(F("Text                     "));
-  Serial.println(testText());
-  delay(3000);
-  
-  Serial.print(F("Text2                    "));
-  Serial.println(testText2());
-  delay(3000);
+    Serial.print(F("Text2                    "));
+    Serial.println(testText2());
+    delay(3000);
 
-  Serial.print(F("Lines                    "));
-  Serial.println(testLines(CYAN));
-  delay(500);
+    Serial.print(F("Lines                    "));
+    Serial.println(testLines(CYAN));
+    delay(500);
 
-  Serial.print(F("Horiz/Vert Lines         "));
-  Serial.println(testFastLines(RED, BLUE));
-  delay(500);
+    Serial.print(F("Horiz/Vert Lines         "));
+    Serial.println(testFastLines(RED, BLUE));
+    delay(500);
 
-  Serial.print(F("Rectangles (outline)     "));
-  Serial.println(testRects(GREEN));
-  delay(500);
+    Serial.print(F("Rectangles (outline)     "));
+    Serial.println(testRects(GREEN));
+    delay(500);
 
-  Serial.print(F("Rectangles (filled)      "));
-  Serial.println(testFilledRects(YELLOW, MAGENTA));
-  delay(500);
+    Serial.print(F("Rectangles (filled)      "));
+    Serial.println(testFilledRects(YELLOW, MAGENTA));
+    delay(500);
 
-  Serial.print(F("Circles (filled)         "));
-  Serial.println(testFilledCircles(10, MAGENTA));
+    Serial.print(F("Circles (filled)         "));
+    Serial.println(testFilledCircles(10, MAGENTA));
 
-  Serial.print(F("Circles (outline)        "));
-  Serial.println(testCircles(10, WHITE));
-  delay(500);
+    Serial.print(F("Circles (outline)        "));
+    Serial.println(testCircles(10, WHITE));
+    delay(500);
 
-  Serial.print(F("Triangles (outline)      "));
-  Serial.println(testTriangles());
-  delay(500);
+    Serial.print(F("Triangles (outline)      "));
+    Serial.println(testTriangles());
+    delay(500);
 
-  Serial.print(F("Triangles (filled)       "));
-  Serial.println(testFilledTriangles());
-  delay(500);
+    Serial.print(F("Triangles (filled)       "));
+    Serial.println(testFilledTriangles());
+    delay(500);
 
-  Serial.print(F("Rounded rects (outline)  "));
-  Serial.println(testRoundRects());
-  delay(500);
+    Serial.print(F("Rounded rects (outline)  "));
+    Serial.println(testRoundRects());
+    delay(500);
 
-  Serial.print(F("Rounded rects (filled)   "));
-  Serial.println(testFilledRoundRects());
-  delay(500);
+    Serial.print(F("Rounded rects (filled)   "));
+    Serial.println(testFilledRoundRects());
+    delay(500);
 
-  Serial.println(F("Done!"));
+    Serial.println(F("Done!"));
+  }
 }
 
 void loop(void) {

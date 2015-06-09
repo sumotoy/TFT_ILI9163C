@@ -165,6 +165,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color),
 				setRotation(uint8_t r),
 				invertDisplay(boolean i);
+	uint8_t 	errorCode(void);			
 	void		idleMode(boolean onOff);
 	void		display(boolean onOff);	
 	void		sleepMode(boolean mode);
@@ -447,5 +448,6 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	void 		chipInit();
 	bool 		boundaryCheck(int16_t x,int16_t y);
 	void 		homeAddress();
+	uint8_t		_initError;
 };
 #endif

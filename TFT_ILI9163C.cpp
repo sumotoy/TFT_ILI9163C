@@ -274,7 +274,7 @@
 void TFT_ILI9163C::begin(void) 
 {
 	sleep = 0;
-
+	_initError = 0b00000000;
 #if defined(__AVR__)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
@@ -325,6 +325,7 @@ void TFT_ILI9163C::begin(void)
         SPI.setMOSI(_mosi);
         SPI.setSCK(_sclk);
 	} else {
+		bitSet(_initError,1);
 		return;
 	}
 	SPI.begin();
@@ -334,6 +335,7 @@ void TFT_ILI9163C::begin(void)
 	} else {
 		pcs_data = 0;
 		pcs_command = 0;
+		bitSet(_initError,0);
 		return;
 	}
 #else//all the rest of possible boards
@@ -384,7 +386,10 @@ void TFT_ILI9163C::begin(void)
 	chipInit();
 }
 
-
+uint8_t TFT_ILI9163C::errorCode(void) 
+{
+	return _initError;
+}
 
 void TFT_ILI9163C::chipInit() {
 	uint8_t i;
