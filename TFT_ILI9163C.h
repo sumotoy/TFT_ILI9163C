@@ -143,7 +143,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,uint8_t mosi=11,uint8_t sclk=13);
 	#elif defined(__MKL26Z64__)
-		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,bool useSPI1=false);
+		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,uint8_t mosi=11,uint8_t sclk=13);
 	#else
 		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255);
 	#endif
@@ -182,43 +182,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
  protected:
 	volatile uint8_t		_Mactrl_Data;//container for the memory access control data
 	uint8_t					_colorspaceData;
-	
-/* 	inline void startTransaction(void){
-	//__attribute__((always_inline)) {
-		#if defined(SPI_HAS_TRANSACTION)
-			SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-		#endif
-		#if defined(__AVR__)
-			*csport &= ~cspinmask;//low
-		#elif defined(__SAM3X8E__)
-			csport->PIO_CODR  |=  cspinmask;//LO
-		#elif defined(__MK20DX128__) || defined(__MK20DX256__)
-			//nop
-		#elif defined(__MKL26Z64__)
-			digitalWriteFast(_cs,LOW);
-		#else
-			digitalWrite(_cs,LOW);
-		#endif
-	} */
-	
-/* 	inline void stopTransaction(void){
-	//__attribute__((always_inline)) {
-		#if defined(__AVR__)
-			*csport |= cspinmask;//hi
-		#elif defined(__SAM3X8E__)
-			csport->PIO_SODR  |=  cspinmask;//HI
-		#elif defined(__MK20DX128__) || defined(__MK20DX256__)
-			//nop
-		#elif defined(__MKL26Z64__)
-			digitalWriteFast(_cs,HIGH);
-		#else
-			digitalWrite(_cs,HIGH);
-		#endif
-		#if defined(SPI_HAS_TRANSACTION)
-			SPI.endTransaction();
-		#endif
-	}
-		 */
+
 	#if defined(__AVR__)
 		void				spiwrite(uint8_t);
 		volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
@@ -231,11 +195,12 @@ class TFT_ILI9163C : public Adafruit_GFX {
 		uint32_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
 	#elif defined(__MKL26Z64__)
 		uint8_t 			_cs,_rs,_rst;
+		uint8_t 			_mosi, _sclk;
 		bool				_useSPI1;
 	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
 		uint8_t 			_cs, _rs, _rst;
 		uint8_t 			pcs_data, pcs_command;
-		uint8_t 			_miso, _mosi, _sclk;
+		uint8_t 			_mosi, _sclk;
 	
 		void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing for Teensy
 		

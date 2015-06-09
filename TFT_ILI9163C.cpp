@@ -21,12 +21,15 @@
 		_sclk = sclk;
 	}
 #elif defined(__MKL26Z64__)
-	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,bool useSPI1) : Adafruit_GFX(_TFTWIDTH,_TFTHEIGHT)
+	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk) : Adafruit_GFX(_TFTWIDTH,_TFTHEIGHT)
 	{
 		_cs   = cspin;
 		_rs   = dcpin;
 		_rst  = rstpin;
-		_useSPI1 = useSPI1;
+		_mosi = mosi;
+		_sclk = sclk;
+		_useSPI1 = false;
+		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) _useSPI1 = true;
 	}
 #else
 	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin) : Adafruit_GFX(_TFTWIDTH,_TFTHEIGHT)
@@ -169,44 +172,59 @@
 
 	void TFT_ILI9163C::writecommand(uint8_t c)
 	{
-		SPI.beginTransaction(ILI9163C_SPI);
-		digitalWriteFast(_rs,LOW);
-		digitalWriteFast(_cs,LOW);
 		if (_useSPI1){
+			SPI1.beginTransaction(ILI9163C_SPI);
+			digitalWriteFast(_rs,LOW);
+			digitalWriteFast(_cs,LOW);
 			SPI1.transfer(c);
+			digitalWriteFast(_cs,HIGH);
+			SPI1.endTransaction();
 		} else {
+			SPI.beginTransaction(ILI9163C_SPI);
+			digitalWriteFast(_rs,LOW);
+			digitalWriteFast(_cs,LOW);
 			SPI.transfer(c);
+			digitalWriteFast(_cs,HIGH);
+			SPI.endTransaction();
 		}
-		digitalWriteFast(_cs,HIGH);
-		SPI.endTransaction();
 	}
 
 	void TFT_ILI9163C::writedata(uint8_t c)
 	{
-		SPI.beginTransaction(ILI9163C_SPI);
-		digitalWriteFast(_rs,HIGH);
-		digitalWriteFast(_cs,LOW);
 		if (_useSPI1){
+			SPI1.beginTransaction(ILI9163C_SPI);
+			digitalWriteFast(_rs,HIGH);
+			digitalWriteFast(_cs,LOW);
 			SPI1.transfer(c);
+			digitalWriteFast(_cs,HIGH);
+			SPI1.endTransaction();
 		} else {
+			SPI.beginTransaction(ILI9163C_SPI);
+			digitalWriteFast(_rs,HIGH);
+			digitalWriteFast(_cs,LOW);
 			SPI.transfer(c);
+			digitalWriteFast(_cs,HIGH);
+			SPI.endTransaction();
 		}
-		digitalWriteFast(_cs,HIGH);
-		SPI.endTransaction();
 	} 
 
 	void TFT_ILI9163C::writedata16(uint16_t d)
 	{
-		SPI.beginTransaction(ILI9163C_SPI);
-		digitalWriteFast(_rs,HIGH);
-		digitalWriteFast(_cs,LOW);
 		if (_useSPI1){
+			SPI1.beginTransaction(ILI9163C_SPI);
+			digitalWriteFast(_rs,HIGH);
+			digitalWriteFast(_cs,LOW);
 			SPI1.transfer16(d);
+			digitalWriteFast(_cs,HIGH);
+			SPI1.endTransaction();
 		} else {
+			SPI.beginTransaction(ILI9163C_SPI);
+			digitalWriteFast(_rs,HIGH);
+			digitalWriteFast(_cs,LOW);
 			SPI.transfer16(d);
+			digitalWriteFast(_cs,HIGH);
+			SPI.endTransaction();
 		}
-		digitalWriteFast(_cs,HIGH);
-		SPI.endTransaction();
 	} 
 
 	void TFT_ILI9163C::setBitrate(uint32_t n)
@@ -310,13 +328,36 @@ void TFT_ILI9163C::begin(void)
 #elif defined(__MKL26Z64__)//Teensy LC (preliminary)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
-	
 	if (_useSPI1){
-		ILI9163C_SPI = SPISettings(12000000, MSBFIRST, SPI_MODE0);
-		SPI1.begin();
+		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) {//identify alternate SPI channel 1 (24Mhz)
+			ILI9163C_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);
+			SPI1.setMOSI(_mosi);
+			SPI1.setSCK(_sclk);
+			SPI1.begin();
+			_useSPI1 = true; //confirm
+		} else {
+			bitSet(_initError,0);
+			return;
+		}
+		if (!SPI.pinIsChipSelect(_cs)) {//ERROR
+			bitSet(_initError,1);
+			return;
+		}
 	} else {
-		ILI9163C_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);
-		SPI.begin();
+		if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {//valid SPI pins?
+			ILI9163C_SPI = SPISettings(12000000, MSBFIRST, SPI_MODE0);
+			SPI.setMOSI(_mosi);
+			SPI.setSCK(_sclk);
+			SPI.begin();
+			_useSPI1 = false; //confirm
+		} else {
+			bitSet(_initError,0);
+			return;
+		}
+		if (!SPI.pinIsChipSelect(_cs)) {//ERROR
+			bitSet(_initError,1);
+			return;
+		}
 	}
 	digitalWriteFast(_cs, LOW);
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)
@@ -325,7 +366,7 @@ void TFT_ILI9163C::begin(void)
         SPI.setMOSI(_mosi);
         SPI.setSCK(_sclk);
 	} else {
-		bitSet(_initError,1);
+		bitSet(_initError,0);
 		return;
 	}
 	SPI.begin();
@@ -335,7 +376,7 @@ void TFT_ILI9163C::begin(void)
 	} else {
 		pcs_data = 0;
 		pcs_command = 0;
-		bitSet(_initError,0);
+		bitSet(_initError,1);
 		return;
 	}
 #else//all the rest of possible boards
