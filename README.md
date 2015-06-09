@@ -50,6 +50,7 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 
 	- Teensy 3 and LC cannot use any pin for CS and RS(DC) but should be choosen as follow:
 	pins:2,6,9 or 10,15 or 20,13 for CS and RS.
+	The benchmark.ino example has a routine that can help you to understand if you have choosed the right pin for your Teensy.
 	For reset you can use any pin, if you want to save a wire and not use reset, YOU SHOULD CONNECT TO 3V3 OR USE
 	A PULLUP RESISTOR (10K to 3V3) BUT NOT LEAVE FLOATING!
 
