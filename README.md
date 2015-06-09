@@ -18,7 +18,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	
 	- Very FAST!, expecially with Teensy 3.x where uses hyper fast SPI.
 	- Tons of examples !!!
-	- It uses just 4 or 5 wires.
+	- It uses just 4 wires (2 shared with other devices).
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
 	- SPI transaction compatible (only where supported, actually only Teensy3 but soon more)
@@ -39,8 +39,10 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
 	the reset pin. The initialization routine will automatically use the software reset.
 
-	- People using Teensy3 should remember that have to choose for CS and DC a pin that should be:
-	pins:2,6,9 or 10,15 or 20,13 for CS and DC, any for RST (but you can connect RST to +3v3 and forget it.
+	- Teensy 3 and LC cannot use any pin for CS and RS(DC) but should be choosen as follow:
+	pins:2,6,9 or 10,15 or 20,13 for CS and RS.
+	For reset you can use any pin, if you want to save a wire and not use reset, YOU SHOULD CONNECT TO 3V3 OR USE
+	A PULLUP RESISTOR (10K to 3V3) BUT NOT LEAVE FLOATING!
 
 <b>Backgrounds:</b>
 	
@@ -132,7 +134,7 @@ https://github.com/greiman/SdFat
 	- Vcc		-->		+3V3V(!!!!)
 	- Gnd		-->		Gnd
 	- CS		-->		CS pin (3v3 level!)
-	- RST		-->		connect to a MCU pin or tie to +3V3 (do NOT leave float!)
+	- RST		-->		connect to a MCU pin or tie to +3V3 or 10K to 3V3 (do NOT leave float!)
 	- A0		-->		DC or RS pin (3v3 level!)
 	- SDA		-->		Mosi (3v3 level!)
 	- SCK		-->		Sclk (3v3 level!)
@@ -158,6 +160,7 @@ https://github.com/riuson/lcd-image-converter
 	
 	Thanks Adafruit for his Adafruit_GFX!
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and high speed SPI magic.
+	Thanks to riuson https://github.com/riuson for kindly provide lcd tool
 	
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -181,7 +184,8 @@ https://github.com/riuson/lcd-image-converter
 	0.7:   Gold release candidate. Fixed initialization (thanks Masuda)
 	0.75:  SPI transactions for Arduino's (beta) please report if troubles (not tested)
 	0.8:   Added compatibility with IDE 1.6.x (Teensyduino 1.21b)
-	0.9:   Support for more CPU, alt pin for Teesny's, small fixes.
+	0.9:   Big changes, support for Teensy LC, alt pin for Teensy's, more CPU, faster DUE, separate setting file,
+	etc., etc.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
