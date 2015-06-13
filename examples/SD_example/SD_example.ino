@@ -12,7 +12,6 @@ An SD bmp image load example. (extracted and modded by Adafruit old library http
 
 #include <SPI.h>
 #include <SdFat.h>
-#include <Adafruit_GFX.h>
 #include <TFT_ILI9163C.h>
 
 //PINS
@@ -36,7 +35,9 @@ SdFat SD;
 SdFile myFile;
 
 void setup(void) {
-  Serial.begin(9600);
+  Serial.begin(38400);
+  long unsigned debug_start = millis ();
+  while (!Serial && ((millis () - debug_start) <= 5000)) ;
 
   tft.begin();
   //tft.setRotation(2);

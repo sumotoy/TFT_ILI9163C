@@ -1,15 +1,53 @@
 #ifndef _TFT_ILI9163C_USETT_H_
 #define _TFT_ILI9163C_USETT_H_
 
+/*--------------------------------------------------------------------------------
+Here you have to select the display you own..........................
+You have a RED PCB, BLACK PCB or what?
+(uncomment just one below...)
+Default:__144_RED_PCB__
+----------------------------------------------------------------------------------*/
 
-//DID YOU HAVE A RED PCB, BLACk PCB or WHAT DISPLAY TYPE???????????? 
-//  ---> SELECT HERE <----
 #define __144_RED_PCB__//128x128
 //#define __144_BLACK_PCB__//128x128
 //#define __22_RED_PCB__//240x320
-//---------------------------------------
+
+/*--------------------------------------------------------------------------------
+Teensy LC optional Direct Port vs digitalWriteFast methods
+If you have any issues ONLY with Teensy LC and other SPI devices that share
+the same SPI lines try to comment the line nelow...
+The library default uses Direct Port Manipulation (that it's slight faster)
+Default:uncommented
+----------------------------------------------------------------------------------*/
+#define _TEENSYLC_FASTPORT
+
+/*--------------------------------------------------------------------------------
+Teesny 3.0 and Teensy 3.1 force compatibility issue flag.
+The following option will force SPI to acknoledge for trasmitted data.
+This will slow down the SPI speed a bit but can be helpful if you have other devices
+that uses very high SPI speed that share the same SPI lines of your display.
+If you have troubles, try to uncomment the following line, but REMEMBER tha it will
+slow down speed!
+Default:commented
+----------------------------------------------------------------------------------*/
+//#define __FORCECOMPAT_SPI
+
+/*--------------------------------------------------------------------------------
+Default Background Color & default Foreground Color.
+When display turns on, it will set the defaul background and foreground.
+the default background and foreground affects several other function
+when you forget to assign color, for example clearScreen() will clear screen to black
+Assigning setBackground(0xF800), red, will result in a red screen when cleared.
+Default:0x0000 (black)
+----------------------------------------------------------------------------------*/
+#define _ILI9163C_BACKGROUND		BLACK
+#define _ILI9163C_FOREGROUND		WHITE
 
 
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*---------------------------------------------------------------------------------*/
+//								 END OF USER SETTINGS
 #if defined(__144_RED_PCB__)
 /*
 This display:
@@ -64,7 +102,10 @@ Not tested!
 	#define __GAMMASET1
 	#define __OFFSET		0
 #endif
-
+#if (_TFTWIDTH != _TFTHEIGHT)
+	#define ILI9163C_NEEDSWAP
+#endif
+/* GAMMA SET DEFINITIONS ----------------------------------------------------------*/
 	#if defined(__GAMMASET1)
 		const uint8_t pGammaSet[15]= {0x36,0x29,0x12,0x22,0x1C,0x15,0x42,0xB7,0x2F,0x13,0x12,0x0A,0x11,0x0B,0x06};
 		const uint8_t nGammaSet[15]= {0x09,0x16,0x2D,0x0D,0x13,0x15,0x40,0x48,0x53,0x0C,0x1D,0x25,0x2E,0x34,0x39};
@@ -85,23 +126,3 @@ Not tested!
 	Note 2: This is the offset between image in RAM and TFT. In that case 160 - 128 = 32;
 */
 #endif
-
-/*
-
-Benchmark                Time (microseconds)
-Screen fill              74698
-Text                     4253
-Text2                    15366
-Lines                    16034
-Horiz/Vert Lines         5028
-Rectangles (outline)     4183
-Rectangles (filled)      91226
-Circles (filled)         14436
-Circles (outline)        14910
-Triangles (outline)      5069
-Triangles (filled)       30717
-Rounded rects (outline)  9910
-Rounded rects (filled)   99550
-Done!
-
-*/

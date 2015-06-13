@@ -1,27 +1,18 @@
-/*
-From ucg, modified for use with all my libraries.
-IMPORTANT! You need my modified Adafruit_GFX library!
-https://github.com/sumotoy/Adafruit_GFX/
-*/
-
-
-
 #include <SPI.h>
-#include <Adafruit_GFX.h>
 #include <TFT_ILI9163C.h>
 
-#ifndef _ADAFRUIT_GFX_VARIANT
-#error you need the modified Adafruit_GFX library!
-#endif
+//uncomment for wireframe
+//#define _WIREFRAME
 
-#define __CS 10
-#define __DC 6
+#define __CS  10
+#define __DC  6
+#define __RST 23
 
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
 
 struct pt3d
 {
-  int x, y, z;
+  int16_t x, y, z;
 };
 
 struct surface
@@ -32,14 +23,10 @@ struct surface
 
 struct pt2d
 {
-  int x, y;
+  int16_t x, y;
   unsigned is_visible;
 };
 
-
-// define the point at which the observer looks, 3d box will be centered there
-#define MX (tft.width()/2)
-#define MY (tft.height()/2)
 
 // define a value that corresponds to "1"
 #define U 100
@@ -77,8 +64,8 @@ struct pt3d cube2[8];
 struct pt2d cube_pt[8];
 
 // will contain a rectangle border of the box projection into 2d plane
-int x_min, x_max;
-int y_min, y_max;
+int16_t x_min, x_max;
+int16_t y_min, y_max;
 
 const int16_t sin_tbl[65] = {
   0, 1606, 3196, 4756, 6270, 7723, 9102, 10394, 11585, 12665, 13623, 14449, 15137, 15679, 16069, 16305, 16384, 16305, 16069, 15679,
@@ -163,9 +150,9 @@ void convert_3d_to_2d(struct pt3d *p3, struct pt2d *p2)
     t *= p3->x;
     t <<= 1;
     t /= p3->z;
-    if (t >= -MX && t <= MX - 1)
+    if (t >= -(tft.width()/2) && t <= (tft.width()/2) - 1)
     {
-      t += MX;
+      t += (tft.width()/2);
       p2->x = t;
 
       if (x_min > t) x_min = t;
@@ -175,9 +162,9 @@ void convert_3d_to_2d(struct pt3d *p3, struct pt2d *p2)
       t *= p3->y;
       t <<= 1;
       t /= p3->z;
-      if (t >= -MY && t <= MY - 1)
+      if (t >= -(tft.height()/2) && t <= (tft.height()/2) - 1)
       {
-        t += MY;
+        t += (tft.height()/2);
         p2->y = t;
         if (y_min > t) y_min = t;
         if (y_max < t) y_max = t;
@@ -259,20 +246,25 @@ void draw_cube(void)
     }
     else
     {
-      color = tft.Color565(((ii + 1) & 1) * 255, (((ii + 1) >> 1) & 1) * 255, (((ii + 1) >> 2) & 1) * 255);
+      color = tft.Color565((uint8_t)(((ii + 1) & 1) * 255), (uint8_t)((((ii + 1) >> 1) & 1) * 255), (uint8_t)((((ii + 1) >> 2) & 1) * 255));
+      #if defined(_WIREFRAME)
+      tft.drawQuad(
+        cube_pt[cube_surface[ii].p[0]].x, cube_pt[cube_surface[ii].p[0]].y,
+        cube_pt[cube_surface[ii].p[1]].x, cube_pt[cube_surface[ii].p[1]].y,
+        cube_pt[cube_surface[ii].p[2]].x, cube_pt[cube_surface[ii].p[2]].y,
+        cube_pt[cube_surface[ii].p[3]].x, cube_pt[cube_surface[ii].p[3]].y, color);
+      #else
       tft.fillQuad(
         cube_pt[cube_surface[ii].p[0]].x, cube_pt[cube_surface[ii].p[0]].y,
         cube_pt[cube_surface[ii].p[1]].x, cube_pt[cube_surface[ii].p[1]].y,
         cube_pt[cube_surface[ii].p[2]].x, cube_pt[cube_surface[ii].p[2]].y,
         cube_pt[cube_surface[ii].p[3]].x, cube_pt[cube_surface[ii].p[3]].y, color);
-
+       #endif
     }
   }
 }
 
-
-
-void calc_and_draw(uint16_t w, uint16_t v)
+void calc_and_draw(int16_t w, int16_t v)
 {
 
   copy_cube();
@@ -290,8 +282,8 @@ void setup(void)
   tft.begin();
 }
 
-uint16_t w = 0;
-uint16_t v = 0;
+int16_t w = 0;
+int16_t v = 0;
 
 void loop(void)
 {
@@ -303,4 +295,3 @@ void loop(void)
   delay(10);
   tft.fillRect(x_min, y_min, x_max - x_min + 3, y_max - y_min + 3, 0x0000);
 }
-

@@ -10,6 +10,9 @@
 #define sinf sin
 #endif
 
+#include <SPI.h>
+#include <TFT_ILI9163C.h>
+
 #define	BLACK   0x0000
 #define	BLUE    0x001F
 #define	RED     0xF800
@@ -26,10 +29,6 @@
 #define GREEN_COLORS (64)
 #define BLUE_COLORS (32)
 
-#include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <TFT_ILI9163C.h>
-
 /*
 Teensy3.x and Arduino's
 You are using 4 wire SPI here, so:
@@ -38,7 +37,7 @@ You are using 4 wire SPI here, so:
  SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
  the rest of pin below:
  */
-TFT_ILI9163C tft = TFT_ILI9163C(10, 9);
+TFT_ILI9163C tft = TFT_ILI9163C(10, 6);
 
 int16_t sine[SCALE+(SCALE/4)];
 int16_t *cosi = &sine[SCALE/4];
@@ -63,9 +62,7 @@ void initialize (void){
 
 void setup() 
 {
-
   tft.begin();
-  
   initialize();
 }
 

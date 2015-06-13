@@ -21,13 +21,14 @@
 	Pay attention that   can drive different resolutions and your display can be
 	160*128 or whatever, also there's a strain of this display with a black PCB that a friend of mine
 	got some weeks ago and need some small changes in library to get working.
-	If you look at TFT_ILI9163C.h file you can add your modifications and let me know so I
+	If you look at TFT_ILI9163C_settings.h file you can add your modifications and let me know so I
 	can include for future versions.
 	
 	Code Optimizations:
-	The purpose of this library it's SPEED. I have tried to use hardware optimized calls
-	where was possible and results are quite good for most applications, actually nly filled circles
-    are still a bit slow. Many SPI call has been optimized by reduce un-needed triggers to RS and CS
+	The purpose of this library it's SPEED and COMPATIBILITY. 
+	I have tried to use hardware optimized calls where was possible and results are quite good for 
+	most applications,without sacrifice compatibility when other SPI devices are sharing same lines.
+	Many SPI call has been optimized by reduce un-needed triggers to RS and CS
 	lines. Of course it can be improved so feel free to add suggestions.
 	-------------------------------------------------------------------------------
     Copyright (c) 2014, .S.U.M.O.T.O.Y., coded by Max MC Costa.    
@@ -45,72 +46,68 @@
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 	++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    This file needs the following Libraries:
- 
-    Adafruit_GFX by Adafruit:
-    https://github.com/adafruit/Adafruit-GFX-Library
-	Remember to update GFX library often to have more features with this library!
-	From this version I'm using my version of Adafruit_GFX library:
-	https://github.com/sumotoy/Adafruit-GFX-Library
-	It has faster char rendering and some small little optimizations but you can
-	choose one of the two freely since are both fully compatible.
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Special Thanks:
-	Thanks Adafruit for his Adafruit_GFX!
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and DMA SPI.
-	
+	Thanks to Jnmattern & Marek Buriak for drawArc!
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Version:
-	0.1a1: First release, compile correctly. Altrough not fully working!
-	0.1a3: Better but still some addressing problems.
-	0.1b1: Beta! Addressing solved, now rotation works and boundaries ok.
-	0.2b1: Cleaned up.
-	0.2b3: Added 2.2" Red PCB parameters
-	0.2b4: Bug fixes, added colorSpace (for future send image)
-	0.2b5: Cleaning
-	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
-	SPI transaction,added BLACK TAG 2.2 display
-	0.3b2: Minor fix, load 24bit image, Added conversion utility
-	0.4:	some improvement, new ballistic gauge example!
-	0.5:	Added scroll and more commands, optimizations
-	0.6:	Small fix, added SD example and subroutines
-	0.6b1:  Fix clearscreen, missed a parameter.
-	0.6b2:  Scroll completed. (thanks Masuda)
-	0.6b3:	Clear Screen fix v2. Added Idle mode.
-	0.7:    Init correction.Clear Screen fix v3 (last time?)
-	0.75:   SPI transactions for arduino's (beta)
-	0.8:	Compatiblke with IDE 1.0.6 (teensyduino 1.20) and IDE 1.6.x (teensyduino 1.21b)
-	0.9:    Many changes! Now works with more CPU's, alternative pins for Teensy and Teensy LC
-	Works (in standard SPI) with Teensy LC.
+	1.0r1:   Completely recoded, dropped adafruitGFX, much faster.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
 	Please report any!
 
-	
-Here's the speed test between 0.2b5 and 0.3b1 on Teensy3.1 (major SPI changes)
-------------------------------------------------------------------------
-Lines                    17024  	16115	BETTER
-Horiz/Vert Lines         5360		5080	BETTER
-Rectangles (outline)     4384		4217	BETTER
-Rectangles (filled)      96315		91265	BETTER
-Circles (filled)         16053		15829	LITTLE BETTER
-Circles (outline)        11540		20320	WORST!
-Triangles (outline)      5359		5143	BETTER
-Triangles (filled)       19088		18741	BETTER
-Rounded rects (outline)  8681		12498	LITTLE WORST
-Rounded rects (filled)   105453		100213	BETTER
+
+--- Teensy LC ------------------------------------------
+Benchmark                Time (microseconds)
+Screen fill              201882
+Text                     11101
+Text2                    44071
+Lines                    58376
+Horiz/Vert Lines         14120
+Arc                      692871
+Rectangles (outline)     12126
+Rectangles (filled)      246551
+Circles (filled)         45721
+Circles (outline)        45853
+Triangles (outline)      17179
+Triangles (filled)       98161
+Rounded rects (outline)  27568
+Rounded rects (filled)   274337
 Done!
+
+--- Teensy 3.0 ------------------------------------------
+Screen fill              81301
+Text                     5835
+Text2                    19210
+Lines                    22036
+Horiz/Vert Lines         5627
+Arc                      446888
+Rectangles (outline)     4725
+Rectangles (filled)      100974
+Circles (filled)         18898
+Circles (outline)        16177
+Triangles (outline)      6940
+Triangles (filled)       38338
+Rounded rects (outline)  10307
+Rounded rects (filled)   114324
+Done!
+
 
 
 */
 #ifndef _TFT_ILI9163CLIB_H_
 #define _TFT_ILI9163CLIB_H_
 
-//defined(__MKL26Z64__)
 #include "Arduino.h"
 #include "Print.h"
-#include <Adafruit_GFX.h>
+#include "fonts.h"
+#include <limits.h>
+#include "pins_arduino.h"
+#include "wiring_private.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <SPI.h>
 
 #include "_settings/TFT_ILI9163C_settings.h"
 
@@ -133,10 +130,11 @@ Done!
 #define WHITE   		0xFFFF
 
 #include "_settings/TFT_ILI9163C_registers.h"
+#if defined(SPI_HAS_TRANSACTION)
+	static SPISettings ILI9163C_SPI;
+#endif
 
-
-
-class TFT_ILI9163C : public Adafruit_GFX {
+class TFT_ILI9163C : public Print {
 
  public:
 
@@ -147,74 +145,442 @@ class TFT_ILI9163C : public Adafruit_GFX {
 	#else
 		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255);
 	#endif
-	//TFT_ILI9163C(uint8_t CS, uint8_t DC);//connect rst pin to VDD
 	
-	void     	begin(void),
-				setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),//graphic Addressing
-				setCursor(int16_t x,int16_t y),//char addressing
-				pushColor(uint16_t color),
-				fillScreen(uint16_t color=0x0000),
-				clearScreen(uint16_t color=0x0000),//same as fillScreen
+	void     	begin(void);
+	void		setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	int16_t		height(void) const;
+	int16_t 	width(void) const;
+	void		setRotation(uint8_t r);
+	uint8_t 	getRotation(void);
+	void		invertDisplay(boolean i);
+	void 		setBackground(uint16_t color);
+	void 		setForeground(uint16_t color);
+	uint16_t 	getBackground(void);
+	uint16_t 	getForeground(void);
+	//---------------------------- GEOMETRIC ------------------------------------------------
+	void		fillScreen(uint16_t color),
+				clearScreen(void),//fill with color choosed in setBackground
 				drawPixel(int16_t x, int16_t y, uint16_t color),
 				drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
 				drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
-				#if defined(__MK20DX128__) || defined(__MK20DX256__)//workaround to get more speed from Teensy
-					drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
-					drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
-				#endif
+				drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
+				drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
 				fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color),
-				setRotation(uint8_t r),
-				invertDisplay(boolean i);
-	uint8_t 	errorCode(void);			
+				drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color),
+				fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color),
+				drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
+				fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
+				drawRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,int16_t radius, uint16_t color),
+				fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,int16_t radius, uint16_t color),
+				drawQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color),
+				fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color),
+				drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t diameter, float rot, uint16_t color);
+	void 		drawArc(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color) {
+					if (start == 0 && end == _arcAngleMax) {
+						drawArcHelper(cx, cy, radius, thickness, 0, _arcAngleMax, color);
+					} else {
+						drawArcHelper(cx, cy, radius, thickness, start + (_arcAngleOffset / (float)360)*_arcAngleMax, end + (_arcAngleOffset / (float)360)*_arcAngleMax, color);
+					}	
+				}
+	//void		drawPie(int16_t x, int16_t y, int16_t r, int16_t rs, int16_t re,uint16_t color);
+	void 		drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t radiusH,uint16_t color);
+	//void		drawBezier(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color);
+	//------------------------------- BITMAP --------------------------------------------------
+	void		drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
+	void		drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color, uint16_t bg);
+	//void		drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
+	void		pushColor(uint16_t color);
+	void 		startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	void 		pushData(uint16_t color);
+	void 		endPushData();
+	void 		drawColorBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint32_t *bitmap,bool true24=true); 
+	//------------------------------- TEXT ----------------------------------------------------
+    void		setTextColor(uint16_t color);
+    void		setTextColor(uint16_t frgrnd, uint16_t bckgnd);
+    void		setTextSize(uint8_t s);
+    void		setTextWrap(boolean w);
+    void		setFont(uint8_t f);
+	void		setCursor(int16_t x,int16_t y);
+	void		getCursor(int16_t &x,int16_t &y);
+	uint8_t 	getErrorCode(void);
 	void		idleMode(boolean onOff);
 	void		display(boolean onOff);	
 	void		sleepMode(boolean mode);
 	void 		defineScrollArea(uint16_t tfa, uint16_t bfa);
 	void		scroll(uint16_t adrs);
-	void 		startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-	void 		pushData(uint16_t color);
-	void 		endPushData();
-	void		writeScreen24(const uint32_t *bitmap,uint16_t size=_TFTWIDTH*_TFTHEIGHT);
 	inline uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);};
-  //convert 24bit color into packet 16 bit one (credits for this are all mine)
 	inline uint16_t Color24To565(int32_t color_) { return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) &  0xFF) / 8);}
+	inline uint16_t htmlTo565(int32_t color_) { return (uint16_t)(((color_ & 0xF80000) >> 8) | ((color_ & 0x00FC00) >> 5) | ((color_ & 0x0000F8) >> 3));}
 	void 		setBitrate(uint32_t n);	
+	virtual size_t write(uint8_t);
+	
  protected:
-	volatile uint8_t		_Mactrl_Data;//container for the memory access control data
+	int16_t 				_width, _height;
+	int16_t 				cursor_x, cursor_y;
+	uint16_t 				textcolor, textbgcolor;
+	uint8_t 				textsize, rotation, font, fontWidth, fontHeight, fontStart, fontLength;
+	int8_t  				fontKern;
+	boolean					_portrait;
+	const unsigned char *	fontData;
+	boolean 				wrap; // If set, 'wrap' text at right edge of display
+	volatile uint8_t		_Mactrl_Data;
 	uint8_t					_colorspaceData;
-
-	#if defined(__AVR__)
-		void				spiwrite(uint8_t);
+	void 					setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	uint16_t				_defaultBackground;
+	uint16_t				_defaultForeground;
+	uint8_t 				_cs,_rs,_rst;
+	#if defined(__AVR__)//--------------------------------UNO, Etc.
 		volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
-		uint8_t 			_cs,_rs,_rst;
 		uint8_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
-	#elif defined(__SAM3X8E__)
-		void				spiwrite(uint8_t);
+		volatile uint8_t	_dcState;
+		volatile uint8_t	_csState;
+		
+		void spiwrite(uint8_t c)
+		__attribute__((always_inline)) {
+			SPDR = c;
+			while(!(SPSR & _BV(SPIF)));
+		}
+	
+		void spiwrite16(uint16_t c)
+		__attribute__((always_inline)) {
+			SPDR = c;
+			while(!(SPSR & _BV(SPIF)));
+		}
+		
+		void enableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (_csState){
+				*csport &= ~cspinmask;//low
+				_csState = 0;
+			}
+		}
+	
+		void disableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (!_csState){
+				*csport |= cspinmask;//hi
+				_csState = 1;
+			}
+		}
+		
+		void enableCommandStream(void)
+		__attribute__((always_inline)) {
+			if (_dcState){
+				*rsport &= ~rspinmask;//low
+				_dcState = 0;
+			}
+		}
+	
+		void enableDataStream(void)
+		__attribute__((always_inline)) {
+			if (!_dcState){
+				*rsport |=  rspinmask;//hi
+				_dcState = 1;
+			}
+		}
+		
+		void startTransaction(void)
+		__attribute__((always_inline)) {
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.beginTransaction(ILI9163C_SPI);
+			#endif
+			enableSpiStream();
+		}
+
+		void endTransaction(void)
+		__attribute__((always_inline)) {
+			disableSpiStream();
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.endTransaction();
+			#endif
+		}
+		
+	#elif defined(__SAM3X8E__)//-------------------------- DUE
 		Pio 				*dataport, *clkport, *csport, *rsport;
-		uint8_t 			_cs,_rs,_rst;
 		uint32_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
-	#elif defined(__MKL26Z64__)
-		uint8_t 			_cs,_rs,_rst;
+		volatile uint8_t	_dcState;
+		volatile uint8_t	_csState;
+		
+		void spiwrite(uint8_t c)
+		__attribute__((always_inline)) {
+			SPI.transfer(c);
+		}
+	
+		void spiwrite16(uint16_t c)
+		__attribute__((always_inline)) {
+			SPI.transfer(c >> 8);
+			SPI.transfer(c);
+		}
+	
+		void enableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (_csState){
+				csport->PIO_CODR  |=  cspinmask;//LO
+				_csState = 0;
+			}
+		}
+	
+		void disableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (!_csState){
+				csport->PIO_SODR  |=  cspinmask;//HI
+				_csState = 1;
+			}
+		}
+		
+		void enableCommandStream(void)
+		__attribute__((always_inline)) {
+			if (_dcState){
+				rsport->PIO_CODR |=  rspinmask;//LO
+				_dcState = 0;
+			}
+		}
+	
+		void enableDataStream(void)
+		__attribute__((always_inline)) {
+			if (!_dcState){
+				rsport->PIO_SODR |=  rspinmask;//HI
+				_dcState = 1;
+			}
+		}
+		
+		void startTransaction(void)
+		__attribute__((always_inline)) {
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.beginTransaction(ILI9163C_SPI);
+			#endif
+			enableSpiStream();
+		}
+
+
+		void endTransaction(void)
+		__attribute__((always_inline)) {
+			disableSpiStream();
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.endTransaction();
+			#endif
+		}
+	
+	#elif defined(__MKL26Z64__)//------------------------ Teensy LC
 		uint8_t 			_mosi, _sclk;
 		bool				_useSPI1;
-	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
-		uint8_t 			_cs, _rs, _rst;
-		uint8_t 			pcs_data, pcs_command;
-		uint8_t 			_mosi, _sclk;
-	
-		void _setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);//graphic Addressing for Teensy
+		volatile uint8_t	_dcState;
+		volatile uint8_t	_csState;
+		#if defined(_TEENSYLC_FASTPORT)
+		    volatile uint8_t *dcportSet, *dcportClear, *csportSet, *csportClear;
+			uint8_t  cspinmask, dcpinmask;
+		#endif
 		
+		void spiwrite(uint8_t c)
+		__attribute__((always_inline)) {
+			if (_useSPI1){
+				SPI1.transfer(c);
+			} else {
+				SPI.transfer(c);
+			}
+		}
+	
+		void spiwrite16(uint16_t c)
+		__attribute__((always_inline)) {
+			if (_useSPI1){
+				SPI1.transfer16(c);
+			} else {
+				SPI.transfer16(c);
+			}
+		}
+	
+		void enableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (_csState){
+				#if !defined(_TEENSYLC_FASTPORT)
+					digitalWriteFast(_cs,LOW);
+				#else
+					*csportClear = cspinmask;
+				#endif
+				_csState = 0;
+			}
+		}
+	
+		void disableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (!_csState){
+				#if !defined(_TEENSYLC_FASTPORT)
+					digitalWriteFast(_cs,HIGH);
+				#else
+					*csportSet = cspinmask;
+				#endif
+				_csState = 1;
+			}
+		}
+		
+		void enableCommandStream(void)
+		__attribute__((always_inline)) {
+			if (_dcState){
+				#if !defined(_TEENSYLC_FASTPORT)
+					digitalWriteFast(_rs,LOW);
+				#else
+					*dcportClear = dcpinmask;
+				#endif
+				_dcState = 0;
+			}
+		}
+	
+		void enableDataStream(void)
+		__attribute__((always_inline)) {
+			if (!_dcState){
+				#if !defined(_TEENSYLC_FASTPORT)
+					digitalWriteFast(_rs,HIGH);
+				#else
+					*dcportSet = dcpinmask;
+				#endif
+				_dcState = 1;
+			}
+		}
+	
+		void startTransaction(void)
+		__attribute__((always_inline)) {
+			#if defined(SPI_HAS_TRANSACTION)
+				if (_useSPI1){
+					SPI1.beginTransaction(ILI9163C_SPI);
+				} else {
+					SPI.beginTransaction(ILI9163C_SPI);
+				}
+			#endif
+			enableSpiStream();
+		}
 
+
+		void endTransaction(void)
+		__attribute__((always_inline)) {
+			disableSpiStream();
+			#if defined(SPI_HAS_TRANSACTION)
+				if (_useSPI1){
+					SPI1.endTransaction();
+				} else {
+					SPI.endTransaction();
+				}
+			#endif
+		}
+		
+	#elif defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3, Teensy 3.1
+
+		
+	#else//unknown CPU, use legacy native SPI
+		volatile uint8_t	_dcState;
+		volatile uint8_t	_csState;
+		
+		void spiwrite(uint8_t c)
+		__attribute__((always_inline)) {
+			SPI.transfer(c);
+		}
+	
+		void spiwrite16(uint16_t c)
+		__attribute__((always_inline)) {
+			SPI.transfer(d >> 8);
+			SPI.transfer(d);
+		}
+		
+		void enableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (_csState){
+				digitalWrite(_cs,LOW);
+				_csState = 0;
+			}
+		}
+	
+		void disableSpiStream(void)
+		__attribute__((always_inline)) {
+			if (!_csState)
+				digitalWrite(_cs,HIGH);
+				_csState = 1;
+			}
+		}
+		
+		void enableCommandStream(void)
+		__attribute__((always_inline)) {
+			if (_dcState){
+				digitalWrite(_rs,LOW);
+				_dcState = 0;
+			}
+		}
+	
+		void enableDataStream(void)
+		__attribute__((always_inline)) {
+			if (!_dcState){
+				digitalWrite(_rs,HIGH);
+				__dcState = 1;
+			}
+		}
+		
+		void startTransaction(void)
+		__attribute__((always_inline)) {
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.beginTransaction(ILI9163C_SPI);
+			#endif
+			enableSpiStream();
+		}
+
+
+		void endTransaction(void)
+		__attribute__((always_inline)) {
+			disableSpiStream();
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.endTransaction();
+			#endif
+		}
+		
+	#endif
+	
+	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
+		void		writecommand(uint8_t c);
+		void		writedata(uint8_t d);
+		void		writedata16(uint16_t d);
+		
+		void drawFastVLine_cont(int16_t x, int16_t y, int16_t h, uint16_t color)
+		__attribute__((always_inline)) {
+			setAddrWindow_cont(x, y, x, y + h - 1);
+			enableDataStream();
+			while (h-- > 1) { spiwrite16(color);}
+		}
+
+		void drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color) 
+		__attribute__((always_inline)) {
+			//if ((x >= _width) || (y >= _height)) return;
+			setAddrWindow_cont(x, y, x+w-1, y);
+			enableDataStream();
+			do { spiwrite16(color); } while (--w > 0);
+		}
+
+		void drawPixel_cont(int16_t x, int16_t y, uint16_t color) 
+		__attribute__((always_inline)) {
+			setAddrWindow_cont(x, y, x, y);
+			enableDataStream();
+			spiwrite16(color);
+		}
+	#else //Teensy 3, Teensy 3.1
+		uint8_t 			pcs_data, pcs_command;
+		uint8_t 			_mosi, _sclk;		
+		
+		void startTransaction(void)
+		__attribute__((always_inline)) {
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.beginTransaction(ILI9163C_SPI);
+			#endif
+		}
+
+		void endTransaction(void)
+		__attribute__((always_inline)) {
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.endTransaction();
+			#endif
+		}
+		
 		//Here's Paul Stoffregen magic in action...
 		void waitFifoNotFull(void) {
 			uint32_t sr;
 			uint32_t tmp __attribute__((unused));
 			do {
-				#if ARDUINO >= 160
-					sr = KINETISK_SPI0.SR;
-				#else
-					sr = SPI0.SR;
-				#endif
+				sr = KINETISK_SPI0.SR;
 				if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
 			} while ((sr & (15 << 12)) > (3 << 12));
 		}
@@ -223,13 +589,8 @@ class TFT_ILI9163C : public Adafruit_GFX {
 			uint32_t sr;
 			uint32_t tmp __attribute__((unused));
 			do {
-				#if ARDUINO >= 160
-					sr = KINETISK_SPI0.SR;
-					if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
-				#else
-					sr = SPI0.SR;
-					if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
-				#endif
+				sr = KINETISK_SPI0.SR;
+				if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
 			} while ((sr & 0xF0F0) > 0);             // wait both RX & TX empty
 		}
 		
@@ -237,70 +598,39 @@ class TFT_ILI9163C : public Adafruit_GFX {
 			void waitTransmitComplete(void) 
 			__attribute__((always_inline)) {
 				uint32_t tmp __attribute__((unused));
-				#if ARDUINO >= 160
-					while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-				#else
-					while (!(SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-				#endif
+				while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
 				tmp = SPI0_POPR;                  // drain the final RX FIFO word
 			}
 		#else
 			void waitTransmitComplete(uint32_t mcr)
 			__attribute__((always_inline)) {
 				uint32_t tmp __attribute__((unused));
-				#if ARDUINO >= 160
-					while (1) {
-						uint32_t sr = KINETISK_SPI0.SR;
-						if (sr & SPI_SR_EOQF) break;  // wait for last transmit
-						if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
-					}
-					KINETISK_SPI0.SR = SPI_SR_EOQF;
-					SPI0_MCR = mcr;
-					while (KINETISK_SPI0.SR & 0xF0) {
-						tmp = KINETISK_SPI0.POPR;
-					}
-				#else
-					while (1) {
-						uint32_t sr = SPI0.SR;
-						if (sr & SPI_SR_EOQF) break;  // wait for last transmit
-						if (sr &  0xF0) tmp = SPI0_POPR;
-					}
-					SPI0.SR = SPI_SR_EOQF;
-					SPI0_MCR = mcr;
-					while (SPI0.SR & 0xF0) {
-						tmp = SPI0_POPR;
-					}
-				#endif
+				while (1) {
+					uint32_t sr = KINETISK_SPI0.SR;
+					if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+					if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
+				}
+				KINETISK_SPI0.SR = SPI_SR_EOQF;
+				SPI0_MCR = mcr;
+				while (KINETISK_SPI0.SR & 0xF0) { tmp = KINETISK_SPI0.POPR; }
 			}
 		#endif
 	
 		void writecommand_cont(uint8_t c) 
 		__attribute__((always_inline)) {
-			#if ARDUINO >= 160
-				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-			#else
-				SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-			#endif
+			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 	
 		void writedata8_cont(uint8_t c) 
 		__attribute__((always_inline)) {
-			#if ARDUINO >= 160
-				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-			#else
-				SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-			#endif
+			KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 	
 		void writedata16_cont(uint16_t d) 
 		__attribute__((always_inline)) {
-			#if ARDUINO >= 160
-				KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
-			#else
-				SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
-			#endif
+			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 
@@ -308,13 +638,8 @@ class TFT_ILI9163C : public Adafruit_GFX {
 			void writecommand_last(uint8_t c) 
 			__attribute__((always_inline)) {
 				waitFifoEmpty();
-				#if ARDUINO >= 160
-					KINETISK_SPI0.SR = SPI_SR_TCF;
-					KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
-				#else
-					SPI0.SR = SPI_SR_TCF;
-					SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
-				#endif
+				KINETISK_SPI0.SR = SPI_SR_TCF;
+				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
 				waitTransmitComplete();
 			}
 			
@@ -322,37 +647,23 @@ class TFT_ILI9163C : public Adafruit_GFX {
 			void writedata8_last(uint8_t c) 
 			__attribute__((always_inline)) {
 				waitFifoEmpty();
-				#if ARDUINO >= 160
-					KINETISK_SPI0.SR = SPI_SR_TCF;
-					KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
-				#else
-					SPI0.SR = SPI_SR_TCF;
-					SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
-				#endif
+				KINETISK_SPI0.SR = SPI_SR_TCF;
+				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
 				waitTransmitComplete();
 			}	
 	
 			void writedata16_last(uint16_t d) 
 			__attribute__((always_inline)) {
 				waitFifoEmpty();
-				#if ARDUINO >= 160
 					KINETISK_SPI0.SR = SPI_SR_TCF;
 					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
-				#else
-					SPI0.SR = SPI_SR_TCF;
-					SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
-				#endif
 				waitTransmitComplete();
 			}
 		#else
 			void writecommand_last(uint8_t c) 
 			__attribute__((always_inline)) {
 				uint32_t mcr = SPI0_MCR;
-				#if ARDUINO >= 160
-					KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				#else
-					SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				#endif
+				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
 				waitTransmitComplete(mcr);
 			}
 
@@ -360,11 +671,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 			void writedata8_last(uint8_t c) 
 			__attribute__((always_inline)) {
 				uint32_t mcr = SPI0_MCR;
-				#if ARDUINO >= 160
-					KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				#else
-					SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				#endif
+				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
 				waitTransmitComplete(mcr);
 			}	
 
@@ -372,47 +679,51 @@ class TFT_ILI9163C : public Adafruit_GFX {
 			void writedata16_last(uint16_t d) 
 			__attribute__((always_inline)) {
 				uint32_t mcr = SPI0_MCR;
-				#if ARDUINO >= 160
-					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
-				#else
-					SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
-				#endif
+				KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
 				waitTransmitComplete(mcr);
 			}
 		#endif
-		void HLine(int16_t x, int16_t y, int16_t w, uint16_t color) 
+		void drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color) 
 		__attribute__((always_inline)) {
-			_setAddrWindow(x, y, x+w-1, y);
+			setAddrWindow_cont(x, y, x+w-1, y);
 			do { writedata16_cont(color); } while (--w > 0);
 		}
 
-		void VLine(int16_t x, int16_t y, int16_t h, uint16_t color) 
+		void drawFastVLine_cont(int16_t x, int16_t y, int16_t h, uint16_t color) 
 		__attribute__((always_inline)) {
-			_setAddrWindow(x, y, x, y+h-1);
+			setAddrWindow_cont(x, y, x, y+h-1);
 			do { writedata16_cont(color); } while (--h > 0);
 		}
 		
-		void Pixel(int16_t x, int16_t y, uint16_t color) 
+		void drawPixel_cont(int16_t x, int16_t y, uint16_t color) 
 		__attribute__((always_inline)) {
-			_setAddrWindow(x, y, x, y);
+			setAddrWindow_cont(x, y, x, y);
 			writedata16_cont(color);
 		}
-	#else
-		uint8_t 			_cs,_rs,_rst;	
 	#endif
-	
-	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
-		void		writecommand(uint8_t c);
-		void		writedata(uint8_t d);
-		void		writedata16(uint16_t d);
-	#endif
+
  private:
+	inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
 	void 		colorSpace(uint8_t cspace);
-	void 		setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	//void 		setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 	uint8_t		sleep;
 	void 		chipInit();
 	bool 		boundaryCheck(int16_t x,int16_t y);
 	void 		homeAddress();
+	
 	uint8_t		_initError;
+	float 		_arcAngleMax;
+	int 		_arcAngleOffset;
+	//HELPERS--------------------------------------------------------------------------------------
+	void		drawChar_cont(int16_t x, int16_t y, unsigned char c, uint16_t color,uint16_t bg, uint8_t size);
+	void 		plot4points_cont(uint16_t cx, uint16_t cy, uint16_t x, uint16_t y, uint16_t color);
+	void		drawCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,uint16_t color);
+	void		fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,int16_t delta, uint16_t color);
+	void 		drawArcHelper(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color);
+	void 		fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+	float 		cosDegrees(float angle);
+	float 		sinDegrees(float angle);
+	void 		setArcParams(float arcAngleMax, int arcAngleOffset);
+
 };
 #endif
