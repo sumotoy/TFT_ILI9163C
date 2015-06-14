@@ -170,6 +170,7 @@ class TFT_ILI9163C : public Print {
 	void 		setForeground(uint16_t color);
 	uint16_t 	getBackground(void);
 	uint16_t 	getForeground(void);
+	void		useBacklight(const uint8_t pin);
 	//---------------------------- GEOMETRIC ------------------------------------------------
 	void		fillScreen(uint16_t color),
 				clearScreen(void),//fill with color choosed in setBackground
@@ -241,6 +242,7 @@ class TFT_ILI9163C : public Print {
 	uint16_t				_defaultBackground;
 	uint16_t				_defaultForeground;
 	uint8_t 				_cs,_rs,_rst;
+	uint8_t					_bklPin;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
 //-------------------------- UNO,DUEMILANOVE,MEGA,LEONARDO,YUN,Etc.----------------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	

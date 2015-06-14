@@ -44,7 +44,12 @@
 #endif
 
 
-
+void TFT_ILI9163C::useBacklight(const uint8_t pin)
+{
+	_bklPin = pin;
+	pinMode(_bklPin, OUTPUT);
+	digitalWrite(_bklPin,LOW);
+}
 
 //Arduino Uno, Leonardo, Mega, Teensy 2.0, etc
 #if defined(__AVR__)
@@ -224,6 +229,7 @@ void TFT_ILI9163C::begin(void)
 	setFont(GFXFONT_GLCD);
 	_arcAngleMax = 360;
 	_arcAngleOffset = -90;
+	_bklPin = 255;
 #if defined(__AVR__)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
@@ -554,9 +560,10 @@ void TFT_ILI9163C::chipInit() {
 		writecommand(CMD_DISPON);//display ON 
 		delay(1);
 		writecommand(CMD_RAMWR);//Memory Write
-
+		
 		delay(1);
 	#endif
+	if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
 	fillScreen(_defaultBackground);
 }
 
@@ -592,6 +599,7 @@ void TFT_ILI9163C::display(boolean onOff) {
 		#else
 			writecommand(CMD_DISPON);
 		#endif
+		if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
 	} else {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			startTransaction();
@@ -600,6 +608,7 @@ void TFT_ILI9163C::display(boolean onOff) {
 		#else
 			writecommand(CMD_DISPOFF);
 		#endif
+		if (_bklPin != 255) digitalWrite(_bklPin,LOW);
 	}
 }
 
@@ -612,6 +621,7 @@ void TFT_ILI9163C::idleMode(boolean onOff) {
 		#else
 			writecommand(CMD_IDLEON);
 		#endif
+		if (_bklPin != 255) digitalWrite(_bklPin,LOW);
 	} else {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			startTransaction();
@@ -620,6 +630,7 @@ void TFT_ILI9163C::idleMode(boolean onOff) {
 		#else
 			writecommand(CMD_IDLEOF);
 		#endif
+		if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
 	}
 }
 
@@ -634,6 +645,7 @@ void TFT_ILI9163C::sleepMode(boolean mode) {
 		#else
 			writecommand(CMD_SLPIN);
 		#endif
+		if (_bklPin != 255) digitalWrite(_bklPin,LOW);
 		delay(5);//needed
 	} else {
 		if (sleep == 0) return; //Already awake
@@ -645,6 +657,7 @@ void TFT_ILI9163C::sleepMode(boolean mode) {
 		#else
 			writecommand(CMD_SLPOUT);
 		#endif
+		if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
 		delay(120);//needed
 	}
 }
@@ -1721,6 +1734,7 @@ void TFT_ILI9163C::pushColor(uint16_t color) {
 		writedata16(color);
 	#endif
 }
+
 
 
 //fast

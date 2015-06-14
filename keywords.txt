@@ -28,14 +28,11 @@ drawQuad	KEYWORD2
 fillQuad	KEYWORD2
 drawPolygon	KEYWORD2
 drawArc	KEYWORD2
-drawPie	KEYWORD2
 drawEllipse	KEYWORD2
-drawBezier	KEYWORD2
 drawBitmap	KEYWORD2
-drawXBitmap	KEYWORD2
 pushColor	KEYWORD2
 drawColorBitmap	KEYWORD2
-writeScreen24	KEYWORD2
+useBacklight	KEYWORD2
 setTextColor	KEYWORD2
 setTextSize	KEYWORD2
 setCursor	KEYWORD2
