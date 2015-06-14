@@ -698,7 +698,7 @@ void TFT_ILI9163C::scroll(uint16_t adrs) {
 
 //fast
 void TFT_ILI9163C::fillScreen(uint16_t color) {
-	int px;
+	int16_t px;
 	
 	startTransaction();
 	
@@ -712,7 +712,12 @@ void TFT_ILI9163C::fillScreen(uint16_t color) {
 		enableDataStream();
 		for (px = 0;px < _GRAMSIZE; px++){ spiwrite16(color); }
 	#endif
-	
+	//set cursor to 0
+	/*
+	setAddrWindow_cont(0,0,0,0);
+	cursor_x = 0;
+	cursor_y = 0;
+	*/
 	endTransaction();
 }
 
@@ -965,13 +970,11 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 				spiwrite16(color);
 			#endif
 		}
-		
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			writedata16_last(color);
 		#else
 			spiwrite16(color);
 		#endif
-		
 	}
 }
 
@@ -1000,14 +1003,8 @@ void TFT_ILI9163C::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint1
 	}
 
 	bool steep = abs(y1 - y0) > abs(x1 - x0);
-	if (steep) {
-		swap(x0, y0);
-		swap(x1, y1);
-	}
-	if (x0 > x1) {
-		swap(x0, x1);
-		swap(y0, y1);
-	}
+	if (steep) {swap(x0, y0); swap(x1, y1);}
+	if (x0 > x1) {swap(x0, x1); swap(y0, y1);}
 
 	int16_t dx, dy;
 	dx = x1 - x0;
@@ -1502,18 +1499,9 @@ void TFT_ILI9163C::fillTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,in
 {
 	int16_t a, b, y, last;
 
-	if (y0 > y1) {
-		swap(y0, y1); 
-		swap(x0, x1);
-	}
-	if (y1 > y2) {
-		swap(y2, y1); 
-		swap(x2, x1);
-	}
-	if (y0 > y1) {
-		swap(y0, y1); 
-		swap(x0, x1);
-	}
+	if (y0 > y1) {swap(y0, y1); swap(x0, x1);}
+	if (y1 > y2) {swap(y2, y1); swap(x2, x1);}
+	if (y0 > y1) {swap(y0, y1); swap(x0, x1);}
 
 	if (y0 == y2) {
 		a = b = x0;

@@ -620,7 +620,7 @@ class TFT_ILI9163C : public Print {
 		
 		void drawPixel_cont(int16_t x, int16_t y, uint16_t color) 
 		__attribute__((always_inline)) {
-			setAddrWindow_cont(x, y, x, y);
+			setAddrWindow_cont(x, y, x+1, y+1);
 			writedata16_cont(color);
 		}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
@@ -719,7 +719,7 @@ class TFT_ILI9163C : public Print {
 		__attribute__((always_inline)) {
 			setAddrWindow_cont(x, y, x, y + h - 1);
 			enableDataStream();
-			while (h-- > 1) { spiwrite16(color);}
+			do { spiwrite16(color); } while (--h > 0);
 		}
 
 		void drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color) 
@@ -731,7 +731,7 @@ class TFT_ILI9163C : public Print {
 
 		void drawPixel_cont(int16_t x, int16_t y, uint16_t color) 
 		__attribute__((always_inline)) {
-			setAddrWindow_cont(x, y, x, y);
+			setAddrWindow_cont(x, y, x+1, y+1);
 			enableDataStream();
 			spiwrite16(color);
 		}
