@@ -6,8 +6,9 @@ Current release: 0.9
 
 Can be used with IDE 1.0.6 (Teensyduino 1.20) or IDE 1.6.x (Teensyduino 1.21b or better)
 
-Version 1.0 it's one the corner! New version doesn't use the adafruit_GFX and have all the drawing incorporated, this because I've speedup a lot with all processors and uses less resources. 
-Stay Tuned!
+Version 1.0 it's one the corner! New version doesn't use the adafruit_GFX and have all the drawing incorporated, this because I've speedup a lot with all processors and uses less resources. <br>
+Here's the link to the pre-release:<br>
+https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
