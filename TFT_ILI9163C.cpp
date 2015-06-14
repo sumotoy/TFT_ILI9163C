@@ -803,6 +803,98 @@ bool TFT_ILI9163C::boundaryCheck(int16_t x,int16_t y){
 	return false;
 }
 
+
+
+void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+	startTransaction();
+	setAddrWindow_cont(x0,y0,x1,y1);
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+		writecommand_last(CMD_NOP);//bogus command to set HI the CS
+	#endif
+	endTransaction();
+}
+
+
+void TFT_ILI9163C::setRotation(uint8_t m) {
+	rotation = m % 4; // can't be higher than 3
+	_Mactrl_Data &= ~(0xF0);//clear bit 4...7
+	if (rotation == 0){
+		_width  = _TFTWIDTH;
+		_height = _TFTHEIGHT;//-__OFFSET;
+		_portrait = false;
+	} else if (rotation == 1){
+		bitSet(_Mactrl_Data,6);
+		bitSet(_Mactrl_Data,5);
+		_width  = _TFTHEIGHT;//-__OFFSET;
+		_height = _TFTWIDTH;
+		_portrait = true;
+	} else if (rotation == 2){
+		bitSet(_Mactrl_Data,7);
+		bitSet(_Mactrl_Data,6);
+		_width  = _TFTWIDTH;
+		_height = _TFTHEIGHT;//-__OFFSET;
+		_portrait = false;
+	} else {
+		bitSet(_Mactrl_Data,7);
+		bitSet(_Mactrl_Data,5);
+		_width  = _TFTHEIGHT;
+		_height = _TFTWIDTH;//-__OFFSET;
+		_portrait = true;
+	}
+	colorSpace(_colorspaceData);
+	
+	startTransaction();
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		writecommand_cont(CMD_MADCTL);
+		writedata8_last(_Mactrl_Data);
+	#else
+		enableCommandStream();
+		spiwrite(CMD_MADCTL);
+		enableDataStream();
+		spiwrite(_Mactrl_Data);
+	#endif
+	endTransaction();
+}
+
+
+int16_t TFT_ILI9163C::width(void) const {
+	return _width;
+}
+ 
+int16_t TFT_ILI9163C::height(void) const {
+	return _height;
+}
+
+/* --------------------------------------------------------------------------------------------------
+										GRAPHIC SUBS
+-----------------------------------------------------------------------------------------------------*/
+
+
+void TFT_ILI9163C::setFont(uint8_t f) 
+{
+	font = f;
+	switch(font) {
+		case GFXFONT_GLCD:
+			fontData = glcdFont;
+			fontKern = 1;
+		break;
+		case GFXFONT_GLCD_ASCII:
+			fontData = glcdFont_ascii;
+			fontKern = 1;
+		break;
+		default:
+			font = GFXFONT_GLCD;
+			fontData = glcdFont;
+			fontKern = 1;
+		break;
+	}
+	fontWidth = pgm_read_byte(fontData+FONT_WIDTH);
+	fontHeight = pgm_read_byte(fontData+FONT_HEIGHT);
+	fontStart = pgm_read_byte(fontData+FONT_START);
+	fontLength = pgm_read_byte(fontData+FONT_LENGTH);
+}
+
+
 /*
 draw fast vertical line
 this uses fast contiguos commands method but opens SPi transaction and enable CS
@@ -882,7 +974,6 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 		
 	}
 }
-
 
 //80% fast
 /*
@@ -988,98 +1079,6 @@ void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 	#endif
 	endTransaction();
 }
-
-
-
-void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-	startTransaction();
-	setAddrWindow_cont(x0,y0,x1,y1);
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
-		writecommand_last(CMD_NOP);//bogus command to set HI the CS
-	#endif
-	endTransaction();
-}
-
-
-void TFT_ILI9163C::setRotation(uint8_t m) {
-	rotation = m % 4; // can't be higher than 3
-	_Mactrl_Data &= ~(0xF0);//clear bit 4...7
-	if (rotation == 0){
-		_width  = _TFTWIDTH;
-		_height = _TFTHEIGHT;//-__OFFSET;
-		_portrait = false;
-	} else if (rotation == 1){
-		bitSet(_Mactrl_Data,6);
-		bitSet(_Mactrl_Data,5);
-		_width  = _TFTHEIGHT;//-__OFFSET;
-		_height = _TFTWIDTH;
-		_portrait = true;
-	} else if (rotation == 2){
-		bitSet(_Mactrl_Data,7);
-		bitSet(_Mactrl_Data,6);
-		_width  = _TFTWIDTH;
-		_height = _TFTHEIGHT;//-__OFFSET;
-		_portrait = false;
-	} else {
-		bitSet(_Mactrl_Data,7);
-		bitSet(_Mactrl_Data,5);
-		_width  = _TFTHEIGHT;
-		_height = _TFTWIDTH;//-__OFFSET;
-		_portrait = true;
-	}
-	colorSpace(_colorspaceData);
-	
-	startTransaction();
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		writecommand_cont(CMD_MADCTL);
-		writedata8_last(_Mactrl_Data);
-	#else
-		enableCommandStream();
-		spiwrite(CMD_MADCTL);
-		enableDataStream();
-		spiwrite(_Mactrl_Data);
-	#endif
-	endTransaction();
-}
-
-
-int16_t TFT_ILI9163C::width(void) const {
-	return _width;
-}
- 
-int16_t TFT_ILI9163C::height(void) const {
-	return _height;
-}
-
-/* --------------------------------------------------------------------------------------------------
-										GRAPHIC SUBS
------------------------------------------------------------------------------------------------------*/
-
-void TFT_ILI9163C::setFont(uint8_t f) 
-{
-	font = f;
-	switch(font) {
-		case GFXFONT_GLCD:
-			fontData = glcdFont;
-			fontKern = 1;
-		break;
-		case GFXFONT_GLCD_ASCII:
-			fontData = glcdFont_ascii;
-			fontKern = 1;
-		break;
-		default:
-			font = GFXFONT_GLCD;
-			fontData = glcdFont;
-			fontKern = 1;
-		break;
-	}
-	fontWidth = pgm_read_byte(fontData+FONT_WIDTH);
-	fontHeight = pgm_read_byte(fontData+FONT_HEIGHT);
-	fontStart = pgm_read_byte(fontData+FONT_START);
-	fontLength = pgm_read_byte(fontData+FONT_LENGTH);
-}
-
-
 
 //fast
 void TFT_ILI9163C::drawArcHelper(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color) 
@@ -1470,6 +1469,24 @@ void TFT_ILI9163C::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t di
 			cx + (sin(((i+1)*rads + rot) * dtr) * diameter),
 			cy + (cos(((i+1)*rads + rot) * dtr) * diameter),
 			color);
+	}
+}
+
+void TFT_ILI9163C::drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+	if (boundaryCheck(x,y)) return;
+	if (((x + w) - 1) >= _width)  w = _width  - x;
+	if (((y + h) - 1) >= _height) h = _height - y;
+	
+	int16_t n, m;
+
+	if (w < x) {n = w; w = x; x = n;}
+	if (h < y) {n = h; h = y; y = n;}
+
+	for (m = y; m <= h; m += 2) {
+		for (n = x; n <= w; n += 2) {
+			drawPixel(n, m, color);
+		}
 	}
 }
 

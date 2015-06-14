@@ -26,6 +26,7 @@ drawRoundRect	KEYWORD2
 fillRoundRect	KEYWORD2
 drawQuad	KEYWORD2
 fillQuad	KEYWORD2
+drawMesh	KEYWORD2
 drawPolygon	KEYWORD2
 drawArc	KEYWORD2
 drawEllipse	KEYWORD2
