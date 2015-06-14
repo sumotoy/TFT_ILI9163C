@@ -52,9 +52,7 @@
 	{
 		startTransaction();
 			enableCommandStream();
-			enableSpiStream();
 			spiwrite(c);
-			disableSpiStream();
 		endTransaction();
 	}
 
@@ -62,9 +60,7 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite(c);
-			disableSpiStream();
 		endTransaction();
 	} 
 
@@ -72,10 +68,8 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite(d >> 8);
 			spiwrite(d);
-			disableSpiStream();
 		endTransaction();
 	} 
 
@@ -99,9 +93,7 @@
 	{
 		startTransaction();
 			enableCommandStream();
-			enableSpiStream();
 			spiwrite(c);
-			disableSpiStream();
 		endTransaction();
 	}
 
@@ -109,9 +101,7 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite(c);
-			disableSpiStream();
 		endTransaction();
 	} 
 
@@ -119,9 +109,7 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite16(d);
-			disableSpiStream();
 		endTransaction();
 	}
 
@@ -137,13 +125,12 @@
 			SPI.setClockDivider(divider);
 		#endif
 	}
-#elif defined(__MKL26Z64__)//Teensy LC (preliminary
+#elif defined(__MKL26Z64__)//Teensy LC
 
 	void TFT_ILI9163C::writecommand(uint8_t c)
 	{
 		startTransaction();
 			enableCommandStream();
-			enableSpiStream();
 			spiwrite(c);
 		endTransaction();
 	}
@@ -152,7 +139,6 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite(c);
 		endTransaction();
 	} 
@@ -162,7 +148,6 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite16(d);
 		endTransaction();
 	} 
@@ -185,9 +170,7 @@
 	{
 		startTransaction();
 			enableCommandStream();
-			enableSpiStream();
 			spiwrite(c);
-			disableSpiStream();
 		endTransaction();
 	}
 
@@ -195,9 +178,7 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite(c);
-			disableSpiStream();
 		endTransaction();
 	} 
 
@@ -205,9 +186,7 @@
 	{
 		startTransaction();
 			enableDataStream();
-			enableSpiStream();
 			spiwrite16(d);
-			disableSpiStream();
 		endTransaction();
 	} 
 
@@ -260,7 +239,7 @@ void TFT_ILI9163C::begin(void)
 	#else
 		ILI9163C_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
 	#endif
-	disableSpiStream();
+	*csport |= cspinmask;//hi
 	enableDataStream();
 #elif defined(__SAM3X8E__)
 	pinMode(_rs, OUTPUT);
@@ -277,7 +256,7 @@ void TFT_ILI9163C::begin(void)
 	#else
 		ILI9163C_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);
 	#endif
-	disableSpiStream();
+	csport->PIO_SODR  |=  cspinmask;//HI
 	enableDataStream();
 #elif defined(__MKL26Z64__)//Teensy LC (preliminary)
 	pinMode(_rs, OUTPUT);
@@ -314,7 +293,6 @@ void TFT_ILI9163C::begin(void)
 		}
 	}
 	#if defined(_TEENSYLC_FASTPORT)
-		_csState = 1;
 		csportSet    	= portSetRegister(digitalPinToPort(_cs));
 		csportClear     = portClearRegister(digitalPinToPort(_cs));
 		cspinmask 		= digitalPinToBitMask(_cs);
@@ -323,7 +301,11 @@ void TFT_ILI9163C::begin(void)
 		dcportClear     = portClearRegister(digitalPinToPort(_rs));
 		dcpinmask	    = digitalPinToBitMask(_rs);
 	#endif
-		disableSpiStream();
+		#if !defined(_TEENSYLC_FASTPORT)
+			digitalWriteFast(_cs,HIGH);
+		#else
+			*csportSet = cspinmask;
+		#endif
 		enableDataStream();
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)
 	ILI9163C_SPI = SPISettings(30000000, MSBFIRST, SPI_MODE0);
@@ -355,7 +337,7 @@ void TFT_ILI9163C::begin(void)
 	#else
 		ILI9163C_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
 	#endif
-	disableSpiStream();
+	digitalWrite(_cs,HIGH);
 	enableDataStream();
 #endif
 	if (_rst != 255) {
@@ -704,7 +686,9 @@ void TFT_ILI9163C::scroll(uint16_t adrs) {
 //fast
 void TFT_ILI9163C::fillScreen(uint16_t color) {
 	int px;
+	
 	startTransaction();
+	
 	setAddrWindow_cont(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		for (px = 0;px < _GRAMSIZE; px++){
@@ -715,6 +699,7 @@ void TFT_ILI9163C::fillScreen(uint16_t color) {
 		enableDataStream();
 		for (px = 0;px < _GRAMSIZE; px++){ spiwrite16(color); }
 	#endif
+	
 	endTransaction();
 }
 
@@ -875,11 +860,13 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 				spiwrite16(color);
 			#endif
 		}
+		
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			writedata16_last(color);
 		#else
 			spiwrite16(color);
 		#endif
+		
 	}
 }
 
@@ -991,8 +978,7 @@ void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 
 
 
-void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) 
-{
+void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 	startTransaction();
 	setAddrWindow_cont(x0,y0,x1,y1);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
@@ -1000,67 +986,6 @@ void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 	#endif
 	endTransaction();
 }
-
-//fast
-/*
-set the address window
-This should be used when CS it's already LOW and SPI transaction started
-It also NOT change the CS and NOT close the SPI transaction, leave other cmds to follow this
-*/
-void TFT_ILI9163C::setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		writecommand_cont(CMD_CLMADRS); // Column
-		
-		if (rotation == 0 || rotation > 1){
-			writedata16_cont(x0);
-			writedata16_cont(x1);
-		} else {
-			writedata16_cont(x0 + __OFFSET);
-			writedata16_cont(x1 + __OFFSET);
-		}
-		
-		writecommand_cont(CMD_PGEADRS); // Page
-		
-		if (rotation != 0){
-			writedata16_cont(y0);
-			writedata16_cont(y1);
-		} else {
-			writedata16_cont(y0 + __OFFSET);
-			writedata16_cont(y1 + __OFFSET);
-		}
-		
-		writecommand_cont(CMD_RAMWR); //Into RAM
-		
-	#else
-		enableCommandStream();	
-		spiwrite(CMD_CLMADRS); // command Column
-		
-		enableDataStream();
-		if (rotation == 0 || rotation > 1){
-			spiwrite16(x0);
-			spiwrite16(x1);
-		} else {
-			spiwrite16(x0 + __OFFSET);
-			spiwrite16(x1 + __OFFSET);
-		}
-		
-		enableCommandStream();
-		spiwrite(CMD_PGEADRS); // command Page
-		
-		enableDataStream();
-		if (rotation != 0){
-			spiwrite16(y0);
-			spiwrite16(y1);
-		} else {
-			spiwrite16(y0 + __OFFSET);
-			spiwrite16(y1 + __OFFSET);
-		}
-		
-		enableCommandStream();
-		spiwrite(CMD_RAMWR);
-	#endif
-}
-
 
 
 void TFT_ILI9163C::setRotation(uint8_t m) {
@@ -1090,6 +1015,7 @@ void TFT_ILI9163C::setRotation(uint8_t m) {
 		_portrait = true;
 	}
 	colorSpace(_colorspaceData);
+	
 	startTransaction();
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_cont(CMD_MADCTL);
@@ -1309,6 +1235,27 @@ void TFT_ILI9163C::setArcParams(float arcAngleMax, int arcAngleOffset)
 	_arcAngleOffset = arcAngleOffset;
 }
 
+/*
+void TFT_ILI9163C::drawPie(int16_t x, int16_t y, int16_t r, int16_t rs, int16_t re,uint16_t color)
+{
+	int16_t px, py, cx, cy, d;
+	rs -= 90;
+	re   -= 90;
+	if (rs>re) rs -= 360;
+	px = x + cos((rs*3.14)/180) * r;
+	py = y + sin((rs*3.14)/180) * r;
+	drawLine(x, y, px, py,color);
+	for (d=rs+1; d<re+1; d++){
+		cx = x + cos((d*3.14)/180) * r;
+		cy = y + sin((d*3.14)/180) * r;
+		drawLine(px, py, cx, cy,color);
+		px = cx;
+		py = cy;
+	}
+	drawLine(x, y, px, py,color);
+}
+*/
+
 //fast
 void TFT_ILI9163C::drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t radiusH,uint16_t color)
 {
@@ -1364,6 +1311,50 @@ void TFT_ILI9163C::drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t rad
 	#endif
 	endTransaction();
 }
+
+
+/*
+void TFT_ILI9163C::drawBezier(int x0, int y0, int x1, int y1, int x2, int y2,uint16_t color)
+{
+	int sx = x0 < x2 ? 1 : -1, sy = y0 < y2 ? 1 : -1; // step direction
+	int cur = sx * sy * ((x0 - x1) * (y2 - y1) - (x2 - x1) * (y0 - y1)); // curvature
+	int x = x0 - 2 * x1 + x2, y = y0 - 2 * y1 + y2, xy = 2 * x * y * sx * sy;
+                                // compute error increments of P0
+	long dx = (1 - 2 * abs(x0 - x1)) * y * y + abs(y0 - y1) * xy - 2 * cur * abs(y0 - y2);
+	long dy = (1 - 2 * abs(y0 - y1)) * x * x + abs(x0 - x1) * xy + 2 * cur * abs(x0 - x2);
+                                // compute error increments of P2 
+	long ex = (1 - 2 * abs(x2 - x1)) * y * y + abs(y2 - y1) * xy + 2 * cur * abs(y0 - y2);
+	long ey = (1 - 2 * abs(y2 - y1)) * x * x + abs(x2 - x1) * xy - 2 * cur * abs(x0 - x2);
+
+	if (cur == 0) { drawLine(x0, y0, x2, y2, color); return; } // straight line 
+
+	x *= 2 * x; y *= 2 * y;
+	if (cur < 0) { // negated curvature 
+		x = -x; dx = -dx; ex = -ex; xy = -xy;
+		y = -y; dy = -dy; ey = -ey;
+	}
+  // algorithm fails for almost straight line, check error values 
+	if (dx >= -y || dy <= -x || ex <= -y || ey >= -x) {
+		drawLine(x0, y0, x1, y1, color); // simple approximation 
+		drawLine(x1, y1, x2, y2, color);
+		return;
+	}
+	dx -= xy; ex = dx+dy; dy -= xy; // error of 1.step 
+
+	for(;;) { // plot curve
+		drawPixel(y0, x0, color);
+		ey = 2 * ex - dy; // save value for test of y step 
+		if (2 * ex >= dx) { // x step
+			if (x0 == x2) break;
+			x0 += sx; dy -= xy; ex += dx += y;
+		}
+		if (ey <= 0) { // y step 
+			if (y0 == y2) break;
+			y0 += sy; dx -= xy; ex += dy += x;
+		}
+	}
+}
+*/
 
 
 //fast
@@ -1667,8 +1658,7 @@ void TFT_ILI9163C::drawChar_cont(int16_t x, int16_t y, unsigned char c,uint16_t 
 	} else {
 		c -= fontStart;
 	}
-
-	uint16_t bitCount=0;
+	uint16_t bitCount = 0;
 	uint16_t line = 0;
 	uint16_t i,j;
 	int fontIndex = (c*(fontWidth*fontHeight)/8)+4;
@@ -1679,14 +1669,12 @@ void TFT_ILI9163C::drawChar_cont(int16_t x, int16_t y, unsigned char c,uint16_t 
 			if (line & 0x80) {
 				if (size > 1) {//big
 					fillRect_cont(x+(j*size), y+(i*size), size, size, color);
-					//fillRect_cont(x+(j*size), y+(i*size-i), size, size, color);//temp workaround!
 				} else {  // default size
 					drawPixel_cont(x+j, y+i, color);
 				} 
 			} else if (bg != color) {
 				if (size > 1) {// big
 					fillRect_cont(x+(j*size), y+(i*size), size, size, bg);
-					//fillRect_cont(x+(j*size), y+(i*size-i), size, size, bg);//temp workaround!
 				} else {  // def size
 					drawPixel_cont(x+j, y+i, bg);
 				}
@@ -1698,7 +1686,6 @@ void TFT_ILI9163C::drawChar_cont(int16_t x, int16_t y, unsigned char c,uint16_t 
 
 //fast
 void TFT_ILI9163C::startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-	//setAddr(x0,y0,x1,y1);
 	startTransaction();
 	setAddrWindow_cont(x0,y0,x1,y1);
 	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
@@ -1712,7 +1699,6 @@ void TFT_ILI9163C::pushData(uint16_t color) {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writedata16_cont(color);
 	#else
-		//writedata16(color);
 		spiwrite16(color);
 	#endif
 }
@@ -1721,7 +1707,6 @@ void TFT_ILI9163C::pushData(uint16_t color) {
 void TFT_ILI9163C::endPushData() {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_last(CMD_NOP);
-		//endTransaction();
 	#endif
 	endTransaction();
 }
@@ -1741,7 +1726,7 @@ void TFT_ILI9163C::pushColor(uint16_t color) {
 //fast
 void TFT_ILI9163C::drawColorBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint32_t *bitmap,bool true24) 
 {
-	uint16_t px;
+	int16_t px;
 	uint16_t color;
 	
 	startTransaction();
@@ -1795,3 +1780,4 @@ void TFT_ILI9163C::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_
     }
   }
 }
+
