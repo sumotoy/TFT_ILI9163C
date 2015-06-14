@@ -843,7 +843,7 @@ void TFT_ILI9163C::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color
 	if (boundaryCheck(x,y)) return;
 	if (((y + h) - 1) >= _height) h = _height-y;
 	setAddr(x,y,x,(y+h)-1);
-	while (h-- > 1) {
+	while (h-- > 0) {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		if (h == 0){
 			writedata16_last(color);
@@ -869,7 +869,7 @@ void TFT_ILI9163C::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color
 	if (boundaryCheck(x,y)) return;
 	if (((x+w) - 1) >= _width)  w = _width-x;
 	setAddr(x,y,(x+w)-1,y);
-	while (w-- > 1) {
+	while (w-- > 0) {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		if (w == 0){
 			writedata16_last(color);
