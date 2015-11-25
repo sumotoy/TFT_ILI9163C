@@ -461,20 +461,8 @@ class TFT_ILI9163C : public Print {
 	#elif defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3, Teensy 3.1
 		uint8_t 			pcs_data, pcs_command;
 		uint8_t 			_mosi, _sclk;		
-		
-		void startTransaction(void)
-		__attribute__((always_inline)) {
-			#if defined(SPI_HAS_TRANSACTION)
-				SPI.beginTransaction(ILI9163C_SPI);
-			#endif
-		}
-
-		void endTransaction(void)
-		__attribute__((always_inline)) {
-			#if defined(SPI_HAS_TRANSACTION)
-				SPI.endTransaction();
-			#endif
-		}
+				//in here are voids are a quick hack to get the teensy working with the audio lib
+		//basically copied from the ili9341_teens3 library.
 		
 		//Here's Paul Stoffregen magic in action...
 		void waitFifoNotFull(void) {
@@ -485,7 +473,6 @@ class TFT_ILI9163C : public Print {
 				if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
 			} while ((sr & (15 << 12)) > (3 << 12));
 		}
-
 		void waitFifoEmpty(void) {
 			uint32_t sr;
 			uint32_t tmp __attribute__((unused));
@@ -494,96 +481,70 @@ class TFT_ILI9163C : public Print {
 				if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
 			} while ((sr & 0xF0F0) > 0);// wait both RX & TX empty
 		}
-		
-		#if !defined(__FORCECOMPAT_SPI)//faster
-			void waitTransmitComplete(void) 
-			__attribute__((always_inline)) {
-				uint32_t tmp __attribute__((unused));
-				while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-				tmp = SPI0_POPR;// drain the final RX FIFO word
-			}
-		#else
-			void waitTransmitComplete(uint32_t mcr)
-			__attribute__((always_inline)) {
-				uint32_t tmp __attribute__((unused));
-				while (1) {
-					uint32_t sr = KINETISK_SPI0.SR;
-					if (sr & SPI_SR_EOQF) break;  // wait for last transmit
-					if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
-				}
-				KINETISK_SPI0.SR = SPI_SR_EOQF;
-				SPI0_MCR = mcr;
-				while (KINETISK_SPI0.SR & 0xF0) { tmp = KINETISK_SPI0.POPR; }
-			}
-		#endif
-	
-		void writecommand_cont(uint8_t c) 
+		void startTransaction(void)
 		__attribute__((always_inline)) {
-			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-			waitFifoNotFull();
-		}
-	
-		void writedata8_cont(uint8_t c) 
-		__attribute__((always_inline)) {
-			KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
-			waitFifoNotFull();
-		}
-	
-		void writedata16_cont(uint16_t d) 
-		__attribute__((always_inline)) {
-			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
-			waitFifoNotFull();
+			//#if defined(SPI_HAS_TRANSACTION)
+				SPI.beginTransaction(ILI9163C_SPI);
+			//#endif
 		}
 
-		#if !defined(__FORCECOMPAT_SPI)
-			void writecommand_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				waitFifoEmpty();
-				KINETISK_SPI0.SR = SPI_SR_TCF;
-				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
-				waitTransmitComplete();
-			}
-			
-	
-			void writedata8_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				waitFifoEmpty();
-				KINETISK_SPI0.SR = SPI_SR_TCF;
-				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
-				waitTransmitComplete();
-			}	
-	
-			void writedata16_last(uint16_t d) 
-			__attribute__((always_inline)) {
-				waitFifoEmpty();
-					KINETISK_SPI0.SR = SPI_SR_TCF;
-					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
-				waitTransmitComplete();
-			}
-		#else
-			void writecommand_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				uint32_t mcr = SPI0_MCR;
-				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				waitTransmitComplete(mcr);
-			}
-
+		void endTransaction(void)
+		__attribute__((always_inline)) {
+			//#if defined(SPI_HAS_TRANSACTION)
+					SPI.endTransaction();
+			//#endif
+		}
 		
-			void writedata8_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				uint32_t mcr = SPI0_MCR;
-				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				waitTransmitComplete(mcr);
-			}	
 
-		
-			void writedata16_last(uint16_t d) 
-			__attribute__((always_inline)) {
-				uint32_t mcr = SPI0_MCR;
-				KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
-				waitTransmitComplete(mcr);
-			}
-		#endif
+
+	void waitTransmitComplete(void) __attribute__((always_inline)) {
+		uint32_t tmp __attribute__((unused));
+		while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
+		tmp = KINETISK_SPI0.POPR;                  // drain the final RX FIFO word
+	}
+	void writecommand_cont(uint8_t c) __attribute__((always_inline)) {
+		KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		waitFifoNotFull();
+	}
+	void writedata8_cont(uint8_t c) __attribute__((always_inline)) {
+		KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		waitFifoNotFull();
+	}
+	void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
+		waitFifoNotFull();
+		KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+		waitFifoNotFull();
+	}
+	void waitTransmitComplete(uint32_t mcr) __attribute__((always_inline)) {
+		uint32_t tmp __attribute__((unused));
+		while (1) {
+			uint32_t sr = KINETISK_SPI0.SR;
+			if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+			if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
+		}
+		KINETISK_SPI0.SR = SPI_SR_EOQF;
+		SPI0_MCR = mcr;
+		while (KINETISK_SPI0.SR & 0xF0) {
+			tmp = KINETISK_SPI0.POPR;
+		}
+	}
+	void writecommand_last(uint8_t c) __attribute__((always_inline)) {
+		uint32_t mcr = SPI0_MCR;
+		KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+		waitTransmitComplete(mcr);
+	}
+	void writedata8_last(uint8_t c) __attribute__((always_inline)) {
+		uint32_t mcr = SPI0_MCR;
+		KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+		waitTransmitComplete(mcr);
+	}
+	void writedata16_last(uint16_t d) __attribute__((always_inline)) {
+		uint32_t mcr = SPI0_MCR;
+		KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+		waitTransmitComplete(mcr);
+	}
+	
+
 			void setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) 
 			__attribute__((always_inline)) {
 				writecommand_cont(CMD_CLMADRS); // Column
@@ -604,8 +565,7 @@ class TFT_ILI9163C : public Print {
 				}
 				writecommand_cont(CMD_RAMWR); //Into RAM
 			}
-			
-		// Teensy's 3/3.1 optimized primitives
+				// Teensy's 3/3.1 optimized primitives
 		void drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color) 
 		__attribute__((always_inline)) {
 			setAddrWindow_cont(x, y, x+w-1, y);
@@ -623,6 +583,7 @@ class TFT_ILI9163C : public Print {
 			setAddrWindow_cont(x, y, x+1, y+1);
 			writedata16_cont(color);
 		}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
 //----------------------------- Unknown CPU (use legacy SPI) ---------------------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
