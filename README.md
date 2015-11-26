@@ -18,7 +18,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	Teensy LC  	-> fast 
 	UNO and similar -> fast
 	DUE 		-> can be better but fast
-	ESP8266		-> it works!
+	ESP8266		-> it works and pretty fast.
 	
 ==========================
 
@@ -134,6 +134,16 @@ https://github.com/greiman/SdFat
 	- A0		-->		DC or RS pin (3v3 level!)
 	- SDA		-->		Mosi (3v3 level!)
 	- SCK		-->		Sclk (3v3 level!)
+	- LED		-->		Some display need a resistor (see note below)
+
+	TFT side   -------------------- ESP8266  
+	- Vcc		-->		+3V3V(!!!!)
+	- Gnd		-->		Gnd
+	- CS		-->		D0
+	- RST		-->		D2
+	- A0		-->		D1
+	- SDA		-->		Mosi (D7)
+	- SCK		-->		Sclk (D5)
 	- LED		-->		Some display need a resistor (see note below)
 	
 * Note about led:
