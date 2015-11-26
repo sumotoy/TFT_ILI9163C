@@ -53,6 +53,7 @@
 	Version:
 	1.0r1: Completely recoded, dropped adafruitGFX, much faster.
 	1.0r2: Now tested and fixed for 8bit CPU, even tiny faster globally.
+	1.0r3: Firts attempt to fix Audio Board compatibility, some minor bugs and now works with ESP8266!
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -75,7 +76,7 @@ Triangles (filled)       98161
 Rounded rects (outline)  27568
 Rounded rects (filled)   274337
 --- Teensy 3.0 ------------------------------------------
-Screen fill              81301
+Screen fill              74707
 Text                     5835
 Text2                    19210
 Lines                    22036
@@ -84,9 +85,9 @@ Arc                      446888
 Rectangles (outline)     4725
 Rectangles (filled)      100974
 Circles (filled)         18898
-Circles (outline)        16177
+Circles (outline)        15626
 Triangles (outline)      6940
-Triangles (filled)       38338
+Triangles (filled)       36754
 Rounded rects (outline)  10307
 Rounded rects (filled)   114324
 --- Mega ------------------------------------------------
@@ -107,7 +108,6 @@ Rounded rects (filled)   442964
 
 
 
-
 */
 #ifndef _TFT_ILI9163CLIB_H_
 #define _TFT_ILI9163CLIB_H_
@@ -123,7 +123,9 @@ Rounded rects (filled)   442964
 #include <SPI.h>
 
 #include "_settings/TFT_ILI9163C_settings.h"
+#include "_settings/TFT_ILI9163C_colors.h"
 
+/*
 #if !defined(_ADAFRUIT_GFX_VARIANT)
 	#ifdef __AVR__
 		#include <avr/pgmspace.h>
@@ -135,6 +137,7 @@ Rounded rects (filled)   442964
 		typedef unsigned char prog_uchar;
 	#endif
 #endif
+*/
 
 
 //--------- Keep out hands from here!-------------
@@ -143,6 +146,11 @@ Rounded rects (filled)   442964
 #define WHITE   		0xFFFF
 
 #include "_settings/TFT_ILI9163C_registers.h"
+
+#if defined(ESP8266)
+	#include <eagle_soc.h>
+#endif
+
 #if defined(SPI_HAS_TRANSACTION)
 	static SPISettings ILI9163C_SPI;
 #endif
@@ -251,8 +259,7 @@ class TFT_ILI9163C : public Print {
 		volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
 		uint8_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
 		volatile uint8_t	_dcState;
-		//volatile uint8_t	_csState;
-		
+
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
 			SPDR = c;
@@ -286,18 +293,12 @@ class TFT_ILI9163C : public Print {
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.beginTransaction(ILI9163C_SPI);
 			#endif
-			//if (_csState){
 				*csport &= ~cspinmask;//low
-			//	_csState = 0;
-			//}
 		}
 
 		void endTransaction(void)
 		__attribute__((always_inline)) {
-			//if (!_csState){
 				*csport |= cspinmask;//hi
-			//	_csState = 1;
-			//}
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.endTransaction();
 			#endif
@@ -309,7 +310,6 @@ class TFT_ILI9163C : public Print {
 		Pio 				*dataport, *clkport, *csport, *rsport;
 		uint32_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
 		volatile uint8_t	_dcState;
-		//volatile uint8_t	_csState;
 		
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -344,19 +344,13 @@ class TFT_ILI9163C : public Print {
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.beginTransaction(ILI9163C_SPI);
 			#endif
-			//if (_csState){
 				csport->PIO_CODR  |=  cspinmask;//LO
-			//	_csState = 0;
-			//}
 		}
 
 
 		void endTransaction(void)
 		__attribute__((always_inline)) {
-			//if (!_csState){
 				csport->PIO_SODR  |=  cspinmask;//HI
-			//	_csState = 1;
-			//}
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.endTransaction();
 			#endif
@@ -372,8 +366,7 @@ class TFT_ILI9163C : public Print {
 		#endif
 		bool				_useSPI1;
 		volatile uint8_t	_dcState;
-		//volatile uint8_t	_csState;
-		
+
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
 			if (_useSPI1){
@@ -426,27 +419,21 @@ class TFT_ILI9163C : public Print {
 					SPI.beginTransaction(ILI9163C_SPI);
 				}
 			#endif
-			//if (_csState){
 				#if !defined(_TEENSYLC_FASTPORT)
 					digitalWriteFast(_cs,LOW);
 				#else
 					*csportClear = cspinmask;
 				#endif
-			//	_csState = 0;
-			//}
 		}
 
 
 		void endTransaction(void)
 		__attribute__((always_inline)) {
-			//if (!_csState){
 				#if !defined(_TEENSYLC_FASTPORT)
 					digitalWriteFast(_cs,HIGH);
 				#else
 					*csportSet = cspinmask;
 				#endif
-			//	_csState = 1;
-			//}
 			#if defined(SPI_HAS_TRANSACTION)
 				if (_useSPI1){
 					SPI1.endTransaction();
@@ -482,7 +469,7 @@ class TFT_ILI9163C : public Print {
 			uint32_t tmp __attribute__((unused));
 			do {
 				sr = KINETISK_SPI0.SR;
-				if (sr & 0xF0) tmp = SPI0_POPR;  // drain RX FIFO
+				if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
 			} while ((sr & (15 << 12)) > (3 << 12));
 		}
 
@@ -492,98 +479,64 @@ class TFT_ILI9163C : public Print {
 			do {
 				sr = KINETISK_SPI0.SR;
 				if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
-			} while ((sr & 0xF0F0) > 0);// wait both RX & TX empty
+			} while ((sr & 0xF0F0) > 0);             // wait both RX & TX empty
 		}
 		
-		#if !defined(__FORCECOMPAT_SPI)//faster
-			void waitTransmitComplete(void) 
-			__attribute__((always_inline)) {
-				uint32_t tmp __attribute__((unused));
-				while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-				tmp = SPI0_POPR;// drain the final RX FIFO word
+		void waitTransmitComplete(void) __attribute__((always_inline)) {
+			uint32_t tmp __attribute__((unused));
+			while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
+			tmp = KINETISK_SPI0.POPR;                  // drain the final RX FIFO word
+		}
+		
+		void waitTransmitComplete(uint32_t mcr) __attribute__((always_inline)) {
+			uint32_t tmp __attribute__((unused));
+			while (1) {
+				uint32_t sr = KINETISK_SPI0.SR;
+				if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+				if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
 			}
-		#else
-			void waitTransmitComplete(uint32_t mcr)
-			__attribute__((always_inline)) {
-				uint32_t tmp __attribute__((unused));
-				while (1) {
-					uint32_t sr = KINETISK_SPI0.SR;
-					if (sr & SPI_SR_EOQF) break;  // wait for last transmit
-					if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
-				}
-				KINETISK_SPI0.SR = SPI_SR_EOQF;
-				SPI0_MCR = mcr;
-				while (KINETISK_SPI0.SR & 0xF0) { tmp = KINETISK_SPI0.POPR; }
+			KINETISK_SPI0.SR = SPI_SR_EOQF;
+			SPI0_MCR = mcr;
+			while (KINETISK_SPI0.SR & 0xF0) {
+				tmp = KINETISK_SPI0.POPR;
 			}
-		#endif
+		}
 	
-		void writecommand_cont(uint8_t c) 
-		__attribute__((always_inline)) {
+		void writecommand_cont(uint8_t c) __attribute__((always_inline)) {
 			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 	
-		void writedata8_cont(uint8_t c) 
-		__attribute__((always_inline)) {
+		void writedata8_cont(uint8_t c) __attribute__((always_inline)) {
 			KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 	
-		void writedata16_cont(uint16_t d) 
-		__attribute__((always_inline)) {
+		void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
 			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 
-		#if !defined(__FORCECOMPAT_SPI)
-			void writecommand_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				waitFifoEmpty();
-				KINETISK_SPI0.SR = SPI_SR_TCF;
-				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0);
-				waitTransmitComplete();
-			}
+		void writecommand_last(uint8_t c) __attribute__((always_inline)) {
+			uint32_t mcr = SPI0_MCR;
+			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+			waitTransmitComplete(mcr);
+		}
 			
 	
-			void writedata8_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				waitFifoEmpty();
-				KINETISK_SPI0.SR = SPI_SR_TCF;
-				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0);
-				waitTransmitComplete();
-			}	
+		void writedata8_last(uint8_t c) __attribute__((always_inline)) {
+			uint32_t mcr = SPI0_MCR;
+			KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+			waitTransmitComplete(mcr);
+		}
 	
-			void writedata16_last(uint16_t d) 
-			__attribute__((always_inline)) {
-				waitFifoEmpty();
-					KINETISK_SPI0.SR = SPI_SR_TCF;
-					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1);
-				waitTransmitComplete();
-			}
-		#else
-			void writecommand_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				uint32_t mcr = SPI0_MCR;
-				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				waitTransmitComplete(mcr);
-			}
+		void writedata16_last(uint16_t d) __attribute__((always_inline)) {
+			uint32_t mcr = SPI0_MCR;
+			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+			waitTransmitComplete(mcr);
+		}
 
-		
-			void writedata8_last(uint8_t c) 
-			__attribute__((always_inline)) {
-				uint32_t mcr = SPI0_MCR;
-				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
-				waitTransmitComplete(mcr);
-			}	
-
-		
-			void writedata16_last(uint16_t d) 
-			__attribute__((always_inline)) {
-				uint32_t mcr = SPI0_MCR;
-				KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
-				waitTransmitComplete(mcr);
-			}
-		#endif
+			
 			void setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) 
 			__attribute__((always_inline)) {
 				writecommand_cont(CMD_CLMADRS); // Column
@@ -624,11 +577,15 @@ class TFT_ILI9163C : public Print {
 			writedata16_cont(color);
 		}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
-//----------------------------- Unknown CPU (use legacy SPI) ---------------------------------
+//----------------------------- XTENSA ESP8266  ---------------------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
-	#else
+	#elif defined(ESP8266)
 		volatile uint8_t	_dcState;
-		//volatile uint8_t	_csState;
+		
+		uint32_t _pinRegister(uint8_t pin)
+		__attribute__((always_inline)) {
+			return _BV(pin);
+		}
 		
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -637,8 +594,61 @@ class TFT_ILI9163C : public Print {
 	
 		void spiwrite16(uint16_t c)
 		__attribute__((always_inline)) {
-			SPI.transfer(d >> 8);
-			SPI.transfer(d);
+			SPI.transfer(c >> 8);
+			SPI.transfer(c);
+		}
+		
+		
+		void enableCommandStream(void)
+		__attribute__((always_inline)) {
+			if (_dcState){
+				const uint32_t pinRegister = _BV(_rs);
+				GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_rs));//L
+				_dcState = 0;
+			}
+		}
+	
+		void enableDataStream(void)
+		__attribute__((always_inline)) {
+			if (!_dcState){
+				const uint32_t pinRegister = _BV(_rs);
+				GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_rs));//H
+				_dcState = 1;
+			}
+		}
+		
+		void startTransaction(void)
+		__attribute__((always_inline)) {
+			const uint32_t pinRegister = _BV(_cs);
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.beginTransaction(ILI9163C_SPI);
+			#endif
+				GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_cs));//L
+		}
+
+
+		void endTransaction(void)
+		__attribute__((always_inline)) {
+				GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_cs));//H
+			#if defined(SPI_HAS_TRANSACTION)
+				SPI.endTransaction();
+			#endif
+		}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
+//----------------------------- Unknown CPU (use legacy SPI) ---------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
+	#else
+		volatile uint8_t	_dcState;
+		
+		void spiwrite(uint8_t c)
+		__attribute__((always_inline)) {
+			SPI.transfer(c);
+		}
+	
+		void spiwrite16(uint16_t c)
+		__attribute__((always_inline)) {
+			SPI.transfer(c >> 8);
+			SPI.transfer(c);
 		}
 		
 		
@@ -654,7 +664,7 @@ class TFT_ILI9163C : public Print {
 		__attribute__((always_inline)) {
 			if (!_dcState){
 				digitalWrite(_rs,HIGH);
-				__dcState = 1;
+				_dcState = 1;
 			}
 		}
 		
@@ -663,19 +673,13 @@ class TFT_ILI9163C : public Print {
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.beginTransaction(ILI9163C_SPI);
 			#endif
-			//if (_csState){
 				digitalWrite(_cs,LOW);
-			//	_csState = 0;
-			//}
 		}
 
 
 		void endTransaction(void)
 		__attribute__((always_inline)) {
-			//if (!_csState)
 				digitalWrite(_cs,HIGH);
-			//	_csState = 1;
-			//}
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.endTransaction();
 			#endif
@@ -755,6 +759,8 @@ class TFT_ILI9163C : public Print {
 	void		fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,int16_t delta, uint16_t color);
 	void 		drawArcHelper(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color);
 	void 		fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+	void 		drawLine_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color);
+	void 		fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color);
 	float 		cosDegrees(float angle);
 	float 		sinDegrees(float angle);
 	void 		setArcParams(float arcAngleMax, int arcAngleOffset);

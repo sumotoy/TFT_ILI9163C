@@ -22,17 +22,6 @@ Default:uncommented
 #define _TEENSYLC_FASTPORT
 
 /*--------------------------------------------------------------------------------
-Teesny 3.0 and Teensy 3.1 force compatibility issue flag.
-The following option will force SPI to acknoledge for trasmitted data.
-This will slow down the SPI speed a bit but can be helpful if you have other devices
-that uses very high SPI speed that share the same SPI lines of your display.
-If you have troubles, try to uncomment the following line, but REMEMBER tha it will
-slow down speed!
-Default:commented
-----------------------------------------------------------------------------------*/
-//#define __FORCECOMPAT_SPI
-
-/*--------------------------------------------------------------------------------
 Default Background Color & default Foreground Color.
 When display turns on, it will set the defaul background and foreground.
 the default background and foreground affects several other function

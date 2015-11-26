@@ -3,7 +3,17 @@
 
 //uncomment for wireframe
 //#define _WIREFRAME
+/*
+ESP8266-----------------------------------
+Use:
+#define __CS  16  //(D0)
+#define __DC  5   //(D1)
+#define __RST 4   //(D2)
 
+ SCLK:D5
+ MOSI:D7
+ */
+ 
 #define __CS  10
 #define __DC  6
 #define __RST 23

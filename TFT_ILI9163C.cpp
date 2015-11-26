@@ -332,6 +332,19 @@ void TFT_ILI9163C::begin(void)
 		bitSet(_initError,1);
 		return;
 	}
+#elif defined(ESP8266)
+	pinMode(_rs, OUTPUT);
+	pinMode(_cs, OUTPUT);
+	SPI.begin();
+	#if !defined(SPI_HAS_TRANSACTION)
+		SPI.setClockDivider(4);
+		SPI.setBitOrder(MSBFIRST);
+		SPI.setDataMode(SPI_MODE0);
+	#else
+		ILI9163C_SPI = SPISettings(80000000, MSBFIRST, SPI_MODE0);
+	#endif
+	GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_cs));//H
+	enableDataStream();
 #else//all the rest of possible boards
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
@@ -984,20 +997,30 @@ draw LINE
 */
 void TFT_ILI9163C::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color)
 {
+	startTransaction();
+	drawLine_cont(x0,y0,x1,y1,color);
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		writecommand_last(CMD_NOP);//bogus command to set HI the CS
+	#endif
+	endTransaction();
+}
+
+void TFT_ILI9163C::drawLine_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color)
+{
 	if (y0 == y1) {
 		if (x1 > x0) {
-			drawFastHLine(x0, y0, x1 - x0 + 1, color);
+			drawFastHLine_cont(x0, y0, x1 - x0 + 1, color);
 		} else if (x1 < x0) {
-			drawFastHLine(x1, y0, x0 - x1 + 1, color);
+			drawFastHLine_cont(x1, y0, x0 - x1 + 1, color);
 		} else {
-			drawPixel(x0, y0, color);
+			drawPixel_cont(x0, y0, color);
 		}
 		return;
 	} else if (x0 == x1) {
 		if (y1 > y0) {
-			drawFastVLine(x0, y0, y1 - y0 + 1, color);
+			drawFastVLine_cont(x0, y0, y1 - y0 + 1, color);
 		} else {
-			drawFastVLine(x0, y1, y0 - y1 + 1, color);
+			drawFastVLine_cont(x0, y1, y0 - y1 + 1, color);
 		}
 		return;
 	}
@@ -1019,8 +1042,6 @@ void TFT_ILI9163C::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint1
 		ystep = -1;
 	}
 
-	startTransaction();
-	
 	int16_t xbegin = x0;
 	if (steep) {
 		for (; x0<=x1; x0++) {
@@ -1055,10 +1076,6 @@ void TFT_ILI9163C::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint1
 		}
 		if (x0 > xbegin + 1) drawFastHLine_cont(xbegin, y0, x0 - xbegin, color);
 	}
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		writecommand_last(CMD_NOP);//bogus command to set HI the CS
-	#endif
-	endTransaction();
 }
 
 //fast
@@ -1440,17 +1457,27 @@ void TFT_ILI9163C::fillCircle(int16_t x0, int16_t y0, int16_t r,uint16_t color)
 
 void TFT_ILI9163C::drawQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2,int16_t x3, int16_t y3, uint16_t color) 
 {
-	drawLine(x0, y0, x1, y1, color);//low 1
-	drawLine(x1, y1, x2, y2, color);//high 1
-	drawLine(x2, y2, x3, y3, color);//high 2
-	drawLine(x3, y3, x0, y0, color);//low 2
+	startTransaction();//open SPI comm
+	drawLine_cont(x0, y0, x1, y1, color);//low 1
+	drawLine_cont(x1, y1, x2, y2, color);//high 1
+	drawLine_cont(x2, y2, x3, y3, color);//high 2
+	drawLine_cont(x3, y3, x0, y0, color);//low 2
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+		writecommand_last(CMD_NOP);
+	#endif
+	endTransaction();//close SPI comm
 }
 
 
 void TFT_ILI9163C::fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color) 
 {
-    fillTriangle(x0,y0,x1,y1,x2,y2,color);
-    fillTriangle(x0,y0,x2,y2,x3,y3,color);
+	startTransaction();//open SPI comm
+    fillTriangle_cont(x0,y0,x1,y1,x2,y2,color);
+    fillTriangle_cont(x0,y0,x2,y2,x3,y3,color);
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+		writecommand_last(CMD_NOP);
+	#endif
+	endTransaction();//close SPI comm
 }
 
 void TFT_ILI9163C::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t diameter, float rot, uint16_t color)
@@ -1459,14 +1486,19 @@ void TFT_ILI9163C::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t di
 	float dtr = (PI/180.0) + PI;
 	float rads = 360.0 / sides;//points spacd equally
 	uint8_t i;
+	startTransaction();
 	for (i = 0; i < sides; i++) { 
-		drawLine(
+		drawLine_cont(
 			cx + (sin((i*rads + rot) * dtr) * diameter),
 			cy + (cos((i*rads + rot) * dtr) * diameter),
 			cx + (sin(((i+1)*rads + rot) * dtr) * diameter),
 			cy + (cos(((i+1)*rads + rot) * dtr) * diameter),
 			color);
 	}
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+		writecommand_last(CMD_NOP);
+	#endif
+	endTransaction();//close SPI comm
 }
 
 void TFT_ILI9163C::drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
@@ -1479,23 +1511,42 @@ void TFT_ILI9163C::drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 
 	if (w < x) {n = w; w = x; x = n;}
 	if (h < y) {n = h; h = y; y = n;}
-
+	startTransaction();
 	for (m = y; m <= h; m += 2) {
 		for (n = x; n <= w; n += 2) {
-			drawPixel(n, m, color);
+			drawPixel_cont(n, m, color);
 		}
 	}
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+		writecommand_last(CMD_NOP);
+	#endif
+	endTransaction();//close SPI comm
 }
 
 void TFT_ILI9163C::drawTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color) 
 {
-	drawLine(x0, y0, x1, y1, color);
-	drawLine(x1, y1, x2, y2, color);
-	drawLine(x2, y2, x0, y0, color);
+	startTransaction();
+	drawLine_cont(x0, y0, x1, y1, color);
+	drawLine_cont(x1, y1, x2, y2, color);
+	drawLine_cont(x2, y2, x0, y0, color);
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+		writecommand_last(CMD_NOP);
+	#endif
+	endTransaction();//close SPI comm
 }
 
 //85% fast
 void TFT_ILI9163C::fillTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color) 
+{
+	startTransaction();
+	fillTriangle_cont(x0,y0,x1,y1,x2,y2,color);//
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+		writecommand_last(CMD_NOP);
+	#endif
+	endTransaction();//close SPI comm
+}
+
+void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color) 
 {
 	int16_t a, b, y, last;
 
@@ -1515,9 +1566,9 @@ void TFT_ILI9163C::fillTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,in
 		} else if (x2 > b) {
 			b = x2;
 		}
-		drawFastHLine(a, y0, b-a+1, color);
+		drawFastHLine_cont(a, y0, b-a+1, color);
 		return;
-  }
+	}
 
 	int16_t
 		dx01 = x1 - x0,
@@ -1535,7 +1586,7 @@ void TFT_ILI9163C::fillTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,in
 	} else { 
 		last = y1-1;
 	}
-	startTransaction();//open SPI comm
+
 	for (y=y0; y<=last; y++) {
 		a   = x0 + sa / dy01;
 		b   = x0 + sb / dy02;
@@ -1555,10 +1606,6 @@ void TFT_ILI9163C::fillTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,in
 		if (a > b) swap(a,b);
 		drawFastHLine_cont(a, y, b-a+1, color);
 	}
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
-		writecommand_last(CMD_NOP);
-	#endif
-	endTransaction();//close SPI comm
 }
 
 //fast

@@ -13,14 +13,7 @@
 #include <SPI.h>
 #include <TFT_ILI9163C.h>
 
-#define	BLACK   0x0000
-#define	BLUE    0x001F
-#define	RED     0xF800
-#define	GREEN   0x07E0
-#define CYAN    0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW  0xFFE0  
-#define WHITE   0xFFFF
+
 #define NDOTS 512			// Number of dots 512
 #define SCALE 4096//4096
 #define INCREMENT 512//512
@@ -35,7 +28,14 @@ You are using 4 wire SPI here, so:
  MOSI:  11//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
  MISO:  12//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
  SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
- the rest of pin below:
+ESP8266-----------------------------------
+Use:
+#define __CS  16  //(D0)
+#define __DC  5   //(D1)
+#define __RST 4   //(D2)
+
+ SCLK:D5
+ MOSI:D7
  */
 TFT_ILI9163C tft = TFT_ILI9163C(10, 6);
 
