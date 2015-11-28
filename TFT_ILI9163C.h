@@ -602,7 +602,6 @@ class TFT_ILI9163C : public Print {
 		void enableCommandStream(void)
 		__attribute__((always_inline)) {
 			if (_dcState){
-				const uint32_t pinRegister = _BV(_rs);
 				GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_rs));//L
 				_dcState = 0;
 			}
@@ -611,7 +610,6 @@ class TFT_ILI9163C : public Print {
 		void enableDataStream(void)
 		__attribute__((always_inline)) {
 			if (!_dcState){
-				const uint32_t pinRegister = _BV(_rs);
 				GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_rs));//H
 				_dcState = 1;
 			}
@@ -619,7 +617,6 @@ class TFT_ILI9163C : public Print {
 		
 		void startTransaction(void)
 		__attribute__((always_inline)) {
-			const uint32_t pinRegister = _BV(_cs);
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.beginTransaction(ILI9163C_SPI);
 			#endif
