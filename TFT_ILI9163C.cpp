@@ -343,7 +343,11 @@ void TFT_ILI9163C::begin(void)
 	#else
 		ILI9163C_SPI = SPISettings(80000000, MSBFIRST, SPI_MODE0);
 	#endif
-	GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_cs));//H
+	#if defined(ESP8266) && defined(_ESP8266_STANDARDMODE)
+		digitalWrite(_cs,HIGH);
+	#else
+		GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_cs));//H
+	#endif
 	enableDataStream();
 #else//all the rest of possible boards
 	pinMode(_rs, OUTPUT);
@@ -718,12 +722,17 @@ void TFT_ILI9163C::fillScreen(uint16_t color) {
 	setAddrWindow_cont(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		for (px = 0;px < _GRAMSIZE; px++){
-			writedata16_cont(color);
+			writedata16_cont(color);	
 		}
 		writecommand_last(CMD_NOP);
 	#else
 		enableDataStream();
-		for (px = 0;px < _GRAMSIZE; px++){ spiwrite16(color); }
+		for (px = 0;px < _GRAMSIZE; px++){ 
+			spiwrite16(color); 
+			#if defined(ESP8266)   	
+				yield(); 	
+			#endif
+		}
 	#endif
 	//set cursor to 0
 	/*
@@ -987,6 +996,9 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 			writedata16_last(color);
 		#else
 			spiwrite16(color);
+			#if defined(ESP8266)   	
+				yield(); 	
+			#endif
 		#endif
 	}
 }
@@ -1057,6 +1069,9 @@ void TFT_ILI9163C::drawLine_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1, 
 				y0 += ystep;
 				err += dx;
 			}
+			#if defined(ESP8266)   	
+				yield(); 	
+			#endif
 		}
 		if (x0 > xbegin + 1) drawFastVLine_cont(y0, xbegin, x0 - xbegin, color);
 	} else {
@@ -1073,6 +1088,9 @@ void TFT_ILI9163C::drawLine_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1, 
 				y0 += ystep;
 				err += dx;
 			}
+			#if defined(ESP8266)   	
+				yield(); 	
+			#endif
 		}
 		if (x0 > xbegin + 1) drawFastHLine_cont(xbegin, y0, x0 - xbegin, color);
 	}
@@ -1235,6 +1253,9 @@ void TFT_ILI9163C::drawArcHelper(uint16_t cx, uint16_t cy, uint16_t radius, uint
 														// which we haven't found in the loop so the last pixel in a column must be the end
 				drawFastVLine_cont(cx + x, cy + y2s, ymax - y2s + 1, color);
 			}
+			#if defined(ESP8266)   	
+				yield(); 	
+			#endif
 		}
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			writecommand_last(CMD_NOP);
@@ -1311,6 +1332,9 @@ void TFT_ILI9163C::drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t rad
 			ellipseError += xchange;
 			xchange += twoBSquare;
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
     }
     x = 0;
     y = radiusH;
@@ -1331,6 +1355,9 @@ void TFT_ILI9163C::drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t rad
 			ellipseError += ychange;
 			ychange += twoASquare;
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
     }
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
@@ -1401,6 +1428,9 @@ void TFT_ILI9163C::drawCircle(int16_t cx, int16_t cy, int16_t radius, uint16_t c
 			error -= x;
 			error -= x;
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
@@ -1494,6 +1524,9 @@ void TFT_ILI9163C::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t di
 			cx + (sin(((i+1)*rads + rot) * dtr) * diameter),
 			cy + (cos(((i+1)*rads + rot) * dtr) * diameter),
 			color);
+			#if defined(ESP8266)   	
+				yield(); 	
+			#endif	
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
@@ -1516,6 +1549,9 @@ void TFT_ILI9163C::drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 		for (n = x; n <= w; n += 2) {
 			drawPixel_cont(n, m, color);
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
@@ -1594,6 +1630,9 @@ void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t 
 		sb += dx02;
 		if (a > b) swap(a,b);
 		drawFastHLine_cont(a, y, b-a+1, color);
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 
 	sa = dx12 * (y - y1);
@@ -1605,6 +1644,9 @@ void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t 
 		sb += dx02;
 		if (a > b) swap(a,b);
 		drawFastHLine_cont(a, y, b-a+1, color);
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 }
 
@@ -1650,6 +1692,9 @@ void TFT_ILI9163C::drawCircle_cont(int16_t x0,int16_t y0,int16_t r,uint8_t corne
 			drawPixel_cont(x0 - y, y0 - x, color);
 			drawPixel_cont(x0 - x, y0 - y, color);
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 }
 
@@ -1680,6 +1725,9 @@ void TFT_ILI9163C::fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t co
 			drawFastVLine_cont(x0-x, y0-y, 2*y+1+delta, color);
 			drawFastVLine_cont(x0-y, y0-x, 2*x+1+delta, color);
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 }
 
@@ -1746,6 +1794,9 @@ void TFT_ILI9163C::drawChar_cont(int16_t x, int16_t y, unsigned char c,uint16_t 
 			}		
 			line <<= 1;
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 }
 
@@ -1814,6 +1865,9 @@ void TFT_ILI9163C::drawColorBitmap(int16_t x, int16_t y, int16_t w, int16_t h, c
 			writedata16_cont(color);
 		#else
 			spiwrite16(color);
+			#if defined(ESP8266)   	
+				yield(); 	
+			#endif
 		#endif
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
@@ -1830,6 +1884,9 @@ void TFT_ILI9163C::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_
 		for (i=0; i<w; i++ ) {
 			if (pgm_read_byte(bitmap + j * byteWidth + i / 8) & (128 >> (i & 7))) drawPixel(x+i, y+j, color);
 		}
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
 	}
 }
 
@@ -1844,6 +1901,9 @@ void TFT_ILI9163C::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_
 				drawPixel(x+i, y+j, bg);
 		}
     }
+	#if defined(ESP8266)   	
+		yield(); 	
+	#endif
   }
 }
 

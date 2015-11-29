@@ -1,11 +1,14 @@
 /*
 	ILI9163C - A fast SPI driver for TFT that use Ilitek ILI9163C.
+	Version: 1.0r2
 	
 	Features:
 	- Very FAST!, expecially with Teensy 3.x where uses hyper optimized SPI.
 	- It uses just 4 or 5 wires.
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
-	- It uses the standard Adafruit_GFX Library (you need to install). 
+	- Compatible with many CPU (Teensy's, Arduino 8Bit, DUE, ESP8266)
+	
+	https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r
 	
 	Background:
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
@@ -147,7 +150,7 @@ Rounded rects (filled)   442964
 
 #include "_settings/TFT_ILI9163C_registers.h"
 
-#if defined(ESP8266)
+#if defined(ESP8266) && !defined(_ESP8266_STANDARDMODE)
 	#include <eagle_soc.h>
 #endif
 
@@ -250,7 +253,7 @@ class TFT_ILI9163C : public Print {
 	//void 					setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 	uint16_t				_defaultBackground;
 	uint16_t				_defaultForeground;
-	uint8_t 				_cs,_rs,_rst;
+	uint8_t 				_rs,_rst;
 	uint8_t					_bklPin;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
 //-------------------------- UNO,DUEMILANOVE,MEGA,LEONARDO,YUN,Etc.----------------------------
@@ -259,6 +262,7 @@ class TFT_ILI9163C : public Print {
 		volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
 		uint8_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
 		volatile uint8_t	_dcState;
+		uint8_t 			_cs;
 
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -310,6 +314,7 @@ class TFT_ILI9163C : public Print {
 		Pio 				*dataport, *clkport, *csport, *rsport;
 		uint32_t  			datapinmask, clkpinmask, cspinmask, rspinmask;
 		volatile uint8_t	_dcState;
+		uint8_t 			_cs;
 		
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -366,6 +371,7 @@ class TFT_ILI9163C : public Print {
 		#endif
 		bool				_useSPI1;
 		volatile uint8_t	_dcState;
+		uint8_t 			_cs;
 
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -448,6 +454,7 @@ class TFT_ILI9163C : public Print {
 	#elif defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3, Teensy 3.1
 		uint8_t 			pcs_data, pcs_command;
 		uint8_t 			_mosi, _sclk;		
+		uint8_t 			_cs;
 		
 		void startTransaction(void)
 		__attribute__((always_inline)) {
@@ -581,11 +588,16 @@ class TFT_ILI9163C : public Print {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
 	#elif defined(ESP8266)
 		volatile uint8_t	_dcState;
-		
-		uint32_t _pinRegister(uint8_t pin)
-		__attribute__((always_inline)) {
-			return _BV(pin);
-		}
+		#if defined(ESP8266) && defined(_ESP8266_STANDARDMODE)
+			uint8_t 			_cs;
+		#else
+			uint32_t 			_cs;
+			
+			uint32_t _pinRegister(uint8_t pin)
+			__attribute__((always_inline)) {
+				return _BV(pin);
+			}
+		#endif
 		
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -602,7 +614,11 @@ class TFT_ILI9163C : public Print {
 		void enableCommandStream(void)
 		__attribute__((always_inline)) {
 			if (_dcState){
-				GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_rs));//L
+				#if defined(ESP8266) && defined(_ESP8266_STANDARDMODE)
+					digitalWrite(_rs,LOW);
+				#else
+					GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_rs));//L
+				#endif
 				_dcState = 0;
 			}
 		}
@@ -610,7 +626,11 @@ class TFT_ILI9163C : public Print {
 		void enableDataStream(void)
 		__attribute__((always_inline)) {
 			if (!_dcState){
-				GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_rs));//H
+				#if defined(ESP8266) && defined(_ESP8266_STANDARDMODE)
+					digitalWrite(_rs,HIGH);
+				#else
+					GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_rs));//H
+				#endif
 				_dcState = 1;
 			}
 		}
@@ -620,13 +640,21 @@ class TFT_ILI9163C : public Print {
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.beginTransaction(ILI9163C_SPI);
 			#endif
-				GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_cs));//L
+				#if defined(ESP8266) && defined(_ESP8266_STANDARDMODE)
+					digitalWrite(_cs,LOW);
+				#else
+					GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_cs));//L
+				#endif
 		}
 
 
 		void endTransaction(void)
 		__attribute__((always_inline)) {
-				GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_cs));//H
+				#if defined(ESP8266) && defined(_ESP8266_STANDARDMODE)
+					digitalWrite(_cs,HIGH);
+				#else
+					GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_cs));//H
+				#endif
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.endTransaction();
 			#endif
@@ -636,6 +664,7 @@ class TFT_ILI9163C : public Print {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
 	#else
 		volatile uint8_t	_dcState;
+		uint8_t 			_cs;
 		
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -690,6 +719,7 @@ class TFT_ILI9163C : public Print {
 		void		writecommand(uint8_t c);
 		void		writedata(uint8_t d);
 		void		writedata16(uint16_t d);
+		
 		void setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) 
 		__attribute__((always_inline)) {
 			enableCommandStream();	

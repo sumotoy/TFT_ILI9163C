@@ -31,8 +31,13 @@ Default:0x0000 (black)
 ----------------------------------------------------------------------------------*/
 #define _ILI9163C_BACKGROUND		BLACK
 #define _ILI9163C_FOREGROUND		WHITE
-
-
+/*--------------------------------------------------------------------------------
+ESP8266 Compatibility mode.
+This force library to use an alternative way to trigger ESP8266 GPIO, if you uncomment
+the line it will use the standard digitaWrite wich is slow, this help debuggin.
+Default:commented
+----------------------------------------------------------------------------------*/
+//#define _ESP8266_STANDARDMODE
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*---------------------------------------------------------------------------------*/
