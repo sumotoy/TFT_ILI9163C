@@ -29,26 +29,26 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	- It uses just 4 wires (2 shared with other devices).
 	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
 	- It uses the standard Adafruit_GFX Library (you need to install). 
-	- SPI transaction compatible (only where supported, actually only Teensy3 but soon more)
-	- Working with IDE 1.0.6, 1.5.8 (or newer), Energia (soon)
-	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1 and Teensy LC
+	- SPI transaction compatible (only where supported, now widely supported)
+	- Working with IDE 1.0.6, 1.5.8, 1.6.5 (or newer), Energia (soon)
+	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1 and Teensy LC, ESP8266
 	- Working with Energia supported MCU (not yet but really soon)
 	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika
-	- Current version should work even with ESP8266!
+	- NEW: Support for user fonts and Icons! Using mine rendering engine (used in some other libraries I've done here)
 	
 http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 
 <b>Pay Attention to connections!!!!:</b>
 	
-	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino.
+	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino 5V.
 	If you try to connect directly you can burn it very fast so PAY ATTENTION!
 	- My display works at 3V3 volt and uses 3V3 for logic but LED background has resistor for 5V. 
 	Your can be different so carefully check out before connect it.
-	- Library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS).
+	- Library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS, or even A0).
 	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
 	the reset pin. The initialization routine will automatically use the software reset.
 
-	- Teensy 3 and LC cannot use any pin for CS and RS(DC) but should be choosen as follow:
+	- Teensy 3 and LC cannot use any pin for CS and RS(DC or A0) but should be choosen as follow:
 	pins:2,6,9 or 10,15 or 20,13 for CS and RS.
 	The benchmark.ino example has a routine that can help you to understand if you have choosed the right pin for your Teensy.
 	For reset you can use any pin, if you want to save a wire and not use reset, YOU SHOULD CONNECT TO 3V3 OR USE
@@ -64,7 +64,7 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 	first confusion! Many sellers claim that it's compatible with Nokia 5110 (that use a philips
 	controller) but the only similarity it's the pin names since that this one it's color and
 	have totally different controller that's not compatible. Altrough I discovered that it's not
-	128x128 but 128x160 (!??)... Check links below to see if it's similar to yours.
+	128x128 but 128x160 with offset (!??)... Check links below to see if it's similar to yours.
 	UPDATE:
 	Some chinese seller connected the TFT aligned to bottom, other aligned to top, there's not a sure
 	way to discover witch is yours so better try one of the configurations.
@@ -173,6 +173,8 @@ https://github.com/riuson/lcd-image-converter
 <b>Version:</b>
 	
 	1.0r1: The preview of the new version! Totally recoded, faster and a lot of fixing
+	1.0r2: An extra compatibility mode for ESP8266, added some yeld, introducing brand new font rendering
+	and icon rendering
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
