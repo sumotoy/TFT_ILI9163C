@@ -1,0 +1,56 @@
+$(start_block_header)
+/*******************************************************************************
+
+* name: $(doc_name)
+* family: $(fnt_family)
+* size: $(fnt_size)
+* style: $(fnt_style)
+* --------------------------------------
+* included characters: $(fnt_string)
+* --------------------------------------
+* antialiasing: $(fnt_antialiasing)
+* type: $(fnt_width_type)
+* encoding: $(fnt_encoding)
+* unicode bom: $(fnt_use_bom)
+*
+* data block size: $(img_data_block_size) bit(s), uint$(img_data_block_size)_t
+* RLE compression enabled: $(img_rle)
+* conversion type: $(pre_conv_type), $(pre_mono_type) $(pre_mono_edge)
+* bits per pixel: $(out_bpp)
+*
+* preprocess:
+*  main scan direction: $(pre_scan_main)
+*  line scan direction: $(pre_scan_sub)
+*  inverse: $(pre_inverse)
+* ------------------------------------------------------------------------------
+* Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y. RA8875
+* Font template version: 2.0
+* Note: Font height should be fixed and all glyps must have the same height!
+* ------------------------------------------------------------------------------
+*******************************************************************************/
+
+
+
+#include <stdint.h>
+$(end_block_header)
+
+$(start_block_images_table)
+static const uint$(img_data_block_size)_t image_data_$(doc_name_ws)_0x$(out_char_code)[$(out_blocks_count)] __PRGMTAG_  = {
+    $(out_image_data)
+};////character: '$(out_char_text)'
+
+static const tImage $(doc_name_ws)_0x$(out_char_code) __PRGMTAG_ = { image_data_$(doc_name_ws)_0x$(out_char_code),
+    $(out_image_width), $(out_blocks_count)};//character: '$(out_char_text)' , height: $(out_image_height), (charW,total bytes)
+$(end_block_images_table)
+
+static const tChar $(doc_name_ws)_array[] = {
+$(start_block_images_table)
+  // character: '$(out_char_text)'
+  {0x$(out_char_code), &$(doc_name_ws)_0x$(out_char_code)}$(out_comma)
+$(end_block_images_table)
+};
+
+//num chars, array, width, height, compression
+$(start_block_font_def)
+const tFont $(doc_name_ws) = { $(out_images_count), $(doc_name_ws)_array,0,$(out_image_height),0 };
+$(end_block_font_def)

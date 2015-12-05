@@ -1,3 +1,5 @@
+
+#if !defined(_ILI9163_NEWFONTRENDER)
 #ifndef FONT5X7_H
 #define FONT5X7_H
 
@@ -7,10 +9,10 @@
 #else
  #define PROGMEM
 #endif
+
  
 // Standard ASCII 5x7 font
-
-const const unsigned char glcdFont[] PROGMEM = {
+const unsigned char glcdFont[] PROGMEM = {
     0x05,0x08,0x00,0xFF,
     0x0,0x0,0x0,0x0,0x0,
     0x77,0xEB,0xFD,0xC5,0xC0,
@@ -270,3 +272,4 @@ const const unsigned char glcdFont[] PROGMEM = {
     0x90,0xA4,0xA1,0x8,0x42
 };
 #endif // FONT5X7_H
+#endif

@@ -1,3 +1,4 @@
+#if !defined(_ILI9163_NEWFONTRENDER)
 #ifndef FONT5X7_H
 #define FONT5X7_H
 
@@ -7,7 +8,7 @@
 #else
  #define PROGMEM
 #endif
- 
+
 // Standard ASCII 5x7 font
 // printable ACII characters only
 
@@ -110,3 +111,4 @@ const unsigned char glcdFont_ascii[] PROGMEM = {
     0x45,0x44,0x0,0x0,0x0,
 };
 #endif // FONT5X7_H
+#endif

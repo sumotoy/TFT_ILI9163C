@@ -5,11 +5,12 @@ height	KEYWORD2
 width	KEYWORD2
 setRotation	KEYWORD2
 getRotation	KEYWORD2
+invertDisplay	KEYWORD2
 setBackground	KEYWORD2
 setForeground	KEYWORD2
 getBackground	KEYWORD2
 getForeground	KEYWORD2
-invertDisplay	KEYWORD2
+useBacklight	KEYWORD2
 fillScreen	KEYWORD2
 clearScreen	KEYWORD2
 drawPixel	KEYWORD2
@@ -32,13 +33,19 @@ drawArc	KEYWORD2
 drawEllipse	KEYWORD2
 drawBitmap	KEYWORD2
 pushColor	KEYWORD2
+startPushData	KEYWORD2
+pushData	KEYWORD2
+endPushData	KEYWORD2
 drawColorBitmap	KEYWORD2
-useBacklight	KEYWORD2
 setTextColor	KEYWORD2
-setTextSize	KEYWORD2
+setTextScale	KEYWORD2
+setTextWrap	KEYWORD2
+setCharSpacing	KEYWORD2
+setFontInterline	KEYWORD2
+setInternalFont	KEYWORD2
+setFont	KEYWORD2
 setCursor	KEYWORD2
 getCursor	KEYWORD2
-setFont	KEYWORD2
 getErrorCode	KEYWORD2
 idleMode	KEYWORD2
 display	KEYWORD2
@@ -47,4 +54,6 @@ defineScrollArea	KEYWORD2
 scroll	KEYWORD2
 Color565	KEYWORD2
 Color24To565	KEYWORD2
-setBitrate	KEYWORD2
+htmlTo565	KEYWORD2
+
+_ILI9163_NEWFONTRENDER	LITERAL1

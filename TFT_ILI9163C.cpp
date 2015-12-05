@@ -15,7 +15,7 @@
 //constructors
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3.0, Teensy 3.1
-	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
+	TFT_ILI9163C::TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin,const uint8_t mosi,const uint8_t sclk)
 	{
 		_cs   = cspin;
 		_rs   = dcpin;
@@ -24,7 +24,7 @@
 		_sclk = sclk;
 	}
 #elif defined(__MKL26Z64__)//Teensy LC
-	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
+	TFT_ILI9163C::TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin,const uint8_t mosi,const uint8_t sclk)
 	{
 		_cs   = cspin;
 		_rs   = dcpin;
@@ -35,7 +35,7 @@
 		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) _useSPI1 = true;
 	}
 #else//Arduino's and unknown CPU
-	TFT_ILI9163C::TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin)
+	TFT_ILI9163C::TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin)
 	{
 		_cs   = cspin;
 		_rs   = dcpin;
@@ -219,14 +219,15 @@ void TFT_ILI9163C::begin(void)
 	_initError = 0b00000000;
 	_width    = _TFTWIDTH;
 	_height   = _TFTHEIGHT;
-	rotation  = 0;
-	cursor_y  = cursor_x    = 0;
-	textsize  = 1;
-	_defaultBackground = _ILI9163C_BACKGROUND;
-	_defaultForeground = _ILI9163C_FOREGROUND;
-	textcolor = textbgcolor = _defaultForeground;
-	wrap      = true;
-	setFont(GFXFONT_GLCD);
+	_rotation  = 0;
+	_cursorY  = _cursorX = 0;
+	_textScaleX = _textScaleY = 1;
+	_fontInterline = 0;
+	_charSpacing = 0;
+	_defaultBgColor = _ILI9163C_BACKGROUND;
+	_defaultFgColor = _ILI9163C_FOREGROUND;
+	_textForeground = _textBackground = _defaultFgColor;//text transparent
+	_textWrap      = true;
 	_arcAngleMax = 360;
 	_arcAngleOffset = -90;
 	_bklPin = 255;
@@ -581,7 +582,13 @@ void TFT_ILI9163C::chipInit() {
 		delay(1);
 	#endif
 	if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
-	fillScreen(_defaultBackground);
+	fillScreen(_defaultBgColor);
+	#if defined(_ILI9163_NEWFONTRENDER)
+		setFont(&arial_x2);
+	#else
+		setFont(GFXFONT_GLCD);
+	#endif
+	setAddrWindow(0x00,0x00,0,0);//addess 0,0
 }
 
 /*
@@ -729,17 +736,8 @@ void TFT_ILI9163C::fillScreen(uint16_t color) {
 		enableDataStream();
 		for (px = 0;px < _GRAMSIZE; px++){ 
 			spiwrite16(color); 
-			#if defined(ESP8266)   	
-				yield(); 	
-			#endif
 		}
 	#endif
-	//set cursor to 0
-	/*
-	setAddrWindow_cont(0,0,0,0);
-	cursor_x = 0;
-	cursor_y = 0;
-	*/
 	endTransaction();
 }
 
@@ -754,15 +752,74 @@ void TFT_ILI9163C::setCursor(int16_t x, int16_t y)
 {
 	if (boundaryCheck(x,y)) return;
 	setAddrWindow(0x00,0x00,x,y);
-	cursor_x = x;
-	cursor_y = y;
+	_cursorX = x;
+	_cursorY = y;
 }
 
 void TFT_ILI9163C::getCursor(int16_t &x, int16_t &y) 
 {
-	x = cursor_x;
-	y = cursor_y;
+	x = _cursorX;
+	y = _cursorY;
 }
+
+
+/*
+uint8_t TFT_ILI9163C::getMaxColumns(void) 
+{
+	return 0;
+}
+
+uint8_t TFT_ILI9163C::getMaxRows(void) 
+{
+	#if defined(_ILI9163_NEWFONTRENDER)
+		if (!_portrait){
+			return (uint8_t)(_height / (_fontHeight*_textScaleY) + _fontInterline);
+		} else {
+			return (uint8_t)(_width / (_fontHeight*_textScaleX) + _fontInterline);
+		}
+	#else
+		if (!_portrait){
+			return (uint8_t)(_height / (_fontHeight*_textScaleY) + _fontInterline);
+		} else {
+			return (uint8_t)(_width / (_fontHeight*_textScaleX) + _fontInterline);
+		}
+	#endif
+}
+
+uint8_t TFT_ILI9163C::getCursorX(bool inColumns) 
+{
+	if (!inColumns){
+		return _cursorX;
+	} else {
+		#if defined(_ILI9163_NEWFONTRENDER)
+		#else
+		#endif
+		return _cursorX;
+	}
+}
+
+uint8_t TFT_ILI9163C::getCursorY(bool inRows) 
+{
+	if (!inRows){
+		return _cursorY;
+	} else {
+		uint8_t maxRows = getMaxRows();
+		#if defined(_ILI9163_NEWFONTRENDER)
+			if (!_portrait){
+				return (uint8_t)(maxRows - (_height / _cursorY));
+			} else {
+				return (uint8_t)_width / (_fontHeight*_textScaleX) + _fontInterline;
+			}
+		#else
+			if (!_portrait){
+				return (uint8_t)_height / (_fontHeight*_textScaleY) + _fontInterline;
+			} else {
+				return (uint8_t)_width / (_fontHeight*_textScaleX) + _fontInterline;
+			}
+		#endif
+	}
+}
+*/
 
 //fast
 void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color) 
@@ -777,52 +834,67 @@ void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color)
 	endTransaction();
 }
 
-
 void TFT_ILI9163C::setTextSize(uint8_t s) 
 {
-	textsize = (s > 0) ? s : 1;
+	setTextScale(s);
+}
+
+void TFT_ILI9163C::setTextScale(uint8_t s) 
+{
+	_textScaleX = _textScaleY = (s > 0) ? s : 1;
+}
+
+void TFT_ILI9163C::setTextSize(uint8_t sx,uint8_t sy) 
+{
+	setTextScale(sx,sy);
+}
+
+void TFT_ILI9163C::setTextScale(uint8_t sx,uint8_t sy) 
+{
+	_textScaleX = (sx > 0) ? sx : 1;
+	_textScaleY = (sy > 0) ? sy : 1;
 }
 
 void TFT_ILI9163C::setTextColor(uint16_t color) 
 {
-	textcolor = textbgcolor = color;
+	_textForeground = _textBackground = color;
 }
 
 void TFT_ILI9163C::setTextColor(uint16_t frgrnd, uint16_t bckgnd) 
 {
-	textcolor = frgrnd;
-	textbgcolor = bckgnd;
+	_textForeground = frgrnd;
+	_textBackground = bckgnd;
 }
 
 void TFT_ILI9163C::setBackground(uint16_t color) 
 {
-	_defaultBackground = color;
+	_defaultBgColor = color;
 }
 
 
 void TFT_ILI9163C::setForeground(uint16_t color) 
 {
-	_defaultForeground = color;
+	_defaultFgColor = color;
 }
 
 uint16_t TFT_ILI9163C::getBackground(void) 
 {
-	return _defaultBackground;
+	return _defaultBgColor;
 }
 
 uint16_t TFT_ILI9163C::getForeground(void) 
 {
-	return _defaultForeground;
+	return _defaultFgColor;
 }
 
 void TFT_ILI9163C::setTextWrap(boolean w) 
 {
-	wrap = w;
+	_textWrap = w;
 }
 
 uint8_t TFT_ILI9163C::getRotation(void)  
 {
-	return rotation;
+	return _rotation;
 }
 
 bool TFT_ILI9163C::boundaryCheck(int16_t x,int16_t y){
@@ -843,19 +915,19 @@ void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 
 
 void TFT_ILI9163C::setRotation(uint8_t m) {
-	rotation = m % 4; // can't be higher than 3
+	_rotation = m % 4; // can't be higher than 3
 	_Mactrl_Data &= ~(0xF0);//clear bit 4...7
-	if (rotation == 0){
+	if (_rotation == 0){
 		_width  = _TFTWIDTH;
 		_height = _TFTHEIGHT;//-__OFFSET;
 		_portrait = false;
-	} else if (rotation == 1){
+	} else if (_rotation == 1){
 		bitSet(_Mactrl_Data,6);
 		bitSet(_Mactrl_Data,5);
 		_width  = _TFTHEIGHT;//-__OFFSET;
 		_height = _TFTWIDTH;
 		_portrait = true;
-	} else if (rotation == 2){
+	} else if (_rotation == 2){
 		bitSet(_Mactrl_Data,7);
 		bitSet(_Mactrl_Data,6);
 		_width  = _TFTWIDTH;
@@ -897,29 +969,6 @@ int16_t TFT_ILI9163C::height(void) const {
 -----------------------------------------------------------------------------------------------------*/
 
 
-void TFT_ILI9163C::setFont(uint8_t f) 
-{
-	font = f;
-	switch(font) {
-		case GFXFONT_GLCD:
-			fontData = glcdFont;
-			fontKern = 1;
-		break;
-		case GFXFONT_GLCD_ASCII:
-			fontData = glcdFont_ascii;
-			fontKern = 1;
-		break;
-		default:
-			font = GFXFONT_GLCD;
-			fontData = glcdFont;
-			fontKern = 1;
-		break;
-	}
-	fontWidth = pgm_read_byte(fontData+FONT_WIDTH);
-	fontHeight = pgm_read_byte(fontData+FONT_HEIGHT);
-	fontStart = pgm_read_byte(fontData+FONT_START);
-	fontLength = pgm_read_byte(fontData+FONT_LENGTH);
-}
 
 
 /*
@@ -962,7 +1011,8 @@ void TFT_ILI9163C::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color
 
 void TFT_ILI9163C::clearScreen(void) 
 {
-	fillScreen(_defaultBackground);
+	fillScreen(_defaultBgColor);
+	_cursorX = _cursorY = 0;
 }
 
 /*
@@ -980,6 +1030,18 @@ void TFT_ILI9163C::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 
 void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) 
 {
+	if (w < 2 && h < 2){
+		drawPixel_cont(x,y,color);
+		return;
+	}
+	if (h < 2) {
+		drawFastHLine_cont(x,y,w,color);
+		return;
+	}
+	if (w < 2) {
+		drawFastVLine_cont(x,y,h,color);
+		return;
+	}
 	setAddrWindow_cont(x,y,(x+w)-1,(y+h)-1);
 	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
 		enableDataStream();
@@ -1366,49 +1428,6 @@ void TFT_ILI9163C::drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t rad
 }
 
 
-/*
-void TFT_ILI9163C::drawBezier(int x0, int y0, int x1, int y1, int x2, int y2,uint16_t color)
-{
-	int sx = x0 < x2 ? 1 : -1, sy = y0 < y2 ? 1 : -1; // step direction
-	int cur = sx * sy * ((x0 - x1) * (y2 - y1) - (x2 - x1) * (y0 - y1)); // curvature
-	int x = x0 - 2 * x1 + x2, y = y0 - 2 * y1 + y2, xy = 2 * x * y * sx * sy;
-                                // compute error increments of P0
-	long dx = (1 - 2 * abs(x0 - x1)) * y * y + abs(y0 - y1) * xy - 2 * cur * abs(y0 - y2);
-	long dy = (1 - 2 * abs(y0 - y1)) * x * x + abs(x0 - x1) * xy + 2 * cur * abs(x0 - x2);
-                                // compute error increments of P2 
-	long ex = (1 - 2 * abs(x2 - x1)) * y * y + abs(y2 - y1) * xy + 2 * cur * abs(y0 - y2);
-	long ey = (1 - 2 * abs(y2 - y1)) * x * x + abs(x2 - x1) * xy - 2 * cur * abs(x0 - x2);
-
-	if (cur == 0) { drawLine(x0, y0, x2, y2, color); return; } // straight line 
-
-	x *= 2 * x; y *= 2 * y;
-	if (cur < 0) { // negated curvature 
-		x = -x; dx = -dx; ex = -ex; xy = -xy;
-		y = -y; dy = -dy; ey = -ey;
-	}
-  // algorithm fails for almost straight line, check error values 
-	if (dx >= -y || dy <= -x || ex <= -y || ey >= -x) {
-		drawLine(x0, y0, x1, y1, color); // simple approximation 
-		drawLine(x1, y1, x2, y2, color);
-		return;
-	}
-	dx -= xy; ex = dx+dy; dy -= xy; // error of 1.step 
-
-	for(;;) { // plot curve
-		drawPixel(y0, x0, color);
-		ey = 2 * ex - dy; // save value for test of y step 
-		if (2 * ex >= dx) { // x step
-			if (x0 == x2) break;
-			x0 += sx; dy -= xy; ex += dx += y;
-		}
-		if (ey <= 0) { // y step 
-			if (y0 == y2) break;
-			y0 += sy; dx -= xy; ex += dy += x;
-		}
-	}
-}
-*/
-
 
 //fast
 void TFT_ILI9163C::drawCircle(int16_t cx, int16_t cy, int16_t radius, uint16_t color)
@@ -1731,74 +1750,7 @@ void TFT_ILI9163C::fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t co
 	}
 }
 
-//fast
-size_t TFT_ILI9163C::write(uint8_t c) 
-{
-	if (c == '\n') {
-		cursor_y += textsize*8;
-		cursor_x  = 0;
-	} else if (c == '\r') {
-		// skip em
-	} else {
-		startTransaction();
-		drawChar_cont(cursor_x,cursor_y,c,textcolor,textbgcolor,textsize);
-		if (fontKern > 0 && textcolor != textbgcolor) {
-			fillRect_cont(cursor_x+fontWidth*textsize,cursor_y,fontKern*textsize,fontHeight*textsize,textbgcolor);
-		}
-		#if defined(__MK20DX128__) || defined(__MK20DX256__)	
-			writecommand_last(CMD_NOP);
-		#endif
-		endTransaction();
-		cursor_x += textsize*(fontWidth+fontKern);
-		if (wrap && (cursor_x > (_width - textsize*fontWidth))) {
-			cursor_y += textsize*fontHeight;
-			cursor_x = 0;
-		}
-	}
-  return 1;
-}
 
-
-//fast
-void TFT_ILI9163C::drawChar_cont(int16_t x, int16_t y, unsigned char c,uint16_t color, uint16_t bg, uint8_t size) {
-	if((x >= _width)             || // Clip right
-		(y >= _height)           || // Clip bottom
-		((x + 6 * size - 1) < 0) || // Clip left
-		((y + 8 * size - 1) < 0))   // Clip top
-    return;
-	if (c < fontStart || c > fontStart+fontLength) {
-		c = 0;
-	} else {
-		c -= fontStart;
-	}
-	uint16_t bitCount = 0;
-	uint16_t line = 0;
-	uint16_t i,j;
-	int fontIndex = (c*(fontWidth*fontHeight)/8)+4;
-	for (i=0; i<fontHeight; i++ ) {
-		//uint8_t line;
-		for (j = 0; j<fontWidth; j++) {
-			if (bitCount++%8 == 0) line = pgm_read_byte(fontData+fontIndex++);
-			if (line & 0x80) {
-				if (size > 1) {//big
-					fillRect_cont(x+(j*size), y+(i*size), size, size, color);
-				} else {  // default size
-					drawPixel_cont(x+j, y+i, color);
-				} 
-			} else if (bg != color) {
-				if (size > 1) {// big
-					fillRect_cont(x+(j*size), y+(i*size), size, size, bg);
-				} else {  // def size
-					drawPixel_cont(x+j, y+i, bg);
-				}
-			}		
-			line <<= 1;
-		}
-		#if defined(ESP8266)   	
-			yield(); 	
-		#endif
-	}
-}
 
 //fast
 void TFT_ILI9163C::startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
@@ -1907,3 +1859,493 @@ void TFT_ILI9163C::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_
   }
 }
 
+void TFT_ILI9163C::setCharSpacing(uint8_t space)
+{
+	_charSpacing = space;
+}
+
+void TFT_ILI9163C::setFontInterline(uint8_t distance)
+{
+	_fontInterline = distance;
+}
+
+void TFT_ILI9163C::setInternalFont(void)
+{
+	#if defined(_ILI9163_NEWFONTRENDER)
+		setFont(&arial_x2);
+	#endif
+}
+
+
+#if defined(_ILI9163_NEWFONTRENDER)
+
+
+int TFT_ILI9163C::_getCharCode(uint8_t ch)
+{
+	int i;
+	for (i=0;i<_currentFont->length;i++){//search for char code
+		if (_currentFont->chars[i].char_code == ch) return i;
+	}//i
+	return -1;
+}
+
+
+/*
+	Return the lenght of a string in pixel with precision
+*/
+int TFT_ILI9163C::_STRlen_helper(const char* buffer,int len)
+{
+	int charIndex = -1;
+	int i;
+	if (len == 0) len = strlen(buffer);		//try to get data from string
+	if (len == 0) return 0;					//better stop here
+	if (_fontWidth > 0){					// fixed width font
+		return ((len * _spaceCharWidth));
+	} else {								// variable width, need to loop trough entire string!
+		int totW = 0;
+		for (i = 0;i < len;i++){			//loop trough buffer
+			if (buffer[i] == 32){			//a space
+				totW += _spaceCharWidth;
+			} else if (buffer[i] != 13 && buffer[i] != 10 && buffer[i] != 32){//avoid special char
+				charIndex = _getCharCode(buffer[i]);
+				if (charIndex > -1) {		//found!
+					#if defined(_FORCE_PROGMEM__)
+						#if defined(ESP8266)
+							totW += (PROGMEM_read(&_currentFont->chars[charIndex].image->image_width));
+						#else
+							totW += (PROGMEM_read(&_currentFont->chars[charIndex].image->image_width));
+						#endif
+					#else
+						totW += (_currentFont->chars[charIndex].image->image_width);
+					#endif
+				}
+			}//inside permitted chars
+		}//buffer loop
+		return totW;						//return data
+	}//end variable w font
+}
+
+
+void TFT_ILI9163C::setFont(const tFont *font) 
+{
+	_currentFont = font;
+	_fontHeight = 		_currentFont->font_height;
+	_fontWidth = 		_currentFont->font_width;//if 0 it's variable width font
+	//get all needed infos
+	if (_fontWidth > 0){//fixed with font
+		_spaceCharWidth = _fontWidth;
+	} else {
+		//_fontWidth will be 0 to inform other functions that this it's a variable w font
+		// We just get the space width now...
+		int temp = _getCharCode(0x20);
+		if (temp > -1){
+			#if defined(_FORCE_PROGMEM__)
+				#if defined(ESP8266)
+					_spaceCharWidth = PROGMEM_read(&_currentFont->chars[temp].image->image_width);
+				#else
+					_spaceCharWidth = PROGMEM_read(&_currentFont->chars[temp].image->image_width);
+				#endif
+			#else
+			_spaceCharWidth = (_currentFont->chars[temp].image->image_width);
+			#endif
+		} else {
+			//font malformed, doesn't have needed space parameter
+			//will return to system font
+			setFont(&arial_x2);
+			return;
+		}
+	}
+}
+
+/*
+Handle strings
+*/
+void TFT_ILI9163C::_textWrite(const char* buffer, uint16_t len)
+ {
+	uint16_t i;
+	if (len == 0) len = strlen(buffer);//try get the info from the buffer
+	if (len == 0) return;//better stop here, the string it's really empty!
+	//Loop trough every char and write them one by one until end (or a break!)
+	startTransaction();
+	for (i=0;i<len;i++){
+		if (_renderSingleChar(buffer[i])) {
+			//aha! in that case I have to break out!
+			break;
+		}
+		/*
+	#if defined(ESP8266)   	
+		yield(); 	
+	#endif
+	*/
+	}//end loop
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		writecommand_last(CMD_NOP);//just for set CS hi
+	#endif
+	endTransaction();
+}
+
+/*
+Preprocessor for single chars
+This function detect carriage/new line and space and perform separately.
+When a char it's detected it pass the info to the drawChar function.
+It return 0 most of the cases but can return 1 to inform the caller function to break
+the string write loop.
+*/
+bool TFT_ILI9163C::_renderSingleChar(const char c)
+{
+	uint8_t borderRight = 0;
+	uint8_t borderBottom = 0;
+	if (c == 13){//------------------------------- CARRIAGE (detected) -----------------------
+		return 0;//ignore, always OK
+	} else if (c == 10){//------------------------- NEW LINE (detected) -----------------------
+		if (!_portrait){
+			borderBottom = (_fontHeight * _textScaleY) + (_fontInterline * _textScaleY);
+			if (_cursorY + borderBottom  > _height) return 1;//too high!
+			_cursorX = 0;
+			_cursorY += borderBottom;
+		} else {//portrait
+			borderBottom = (_fontHeight * _textScaleX) + (_fontInterline * _textScaleX);
+			if (_cursorX + borderBottom  > _width) return 1;//too high!
+			_cursorX += borderBottom;
+			_cursorY = 0;
+		}
+		return 0;
+	} else if (c == 32){//--------------------------- SPACE (detected) -----------------------
+		if (!_portrait){
+			borderRight = (_spaceCharWidth * _textScaleX) + (_charSpacing * _textScaleX);
+			if (_textForeground != _textBackground) {//fill the space
+				if (_cursorX + borderRight >= _width) borderRight = _width - _cursorX;
+				fillRect_cont(
+					_cursorX,_cursorY,
+					borderRight + (_charSpacing * _textScaleX),
+					(_fontHeight * _textScaleY),
+					_textBackground
+				);
+			}
+			_cursorX += borderRight;
+			return 0;
+		} else {//portrait
+			borderRight = (_spaceCharWidth * _textScaleY) + (_charSpacing * _textScaleY);
+			if (_textForeground != _textBackground) {//fill the space
+				if (_cursorY + borderRight >= _height) borderRight = _height - _cursorY;
+				fillRect_cont(
+					_cursorY,_cursorX,
+					borderRight,
+					(_fontHeight * _textScaleX),
+					_textBackground
+				);
+			}
+			_cursorY += borderRight;
+			return 0;
+		}
+	} else {//-------------------------------------- CHAR  (detected) -------------------------
+		int charIndex = _getCharCode(c);//get char code
+		if (charIndex > -1){//check if it's valid
+			int charW = 0;
+			//I need to know the width...
+			#if defined(_FORCE_PROGMEM__)
+				#if defined(ESP8266)
+					charW = PROGMEM_read(&_currentFont->chars[charIndex].image->image_width);
+				#else
+					charW = PROGMEM_read(&_currentFont->chars[charIndex].image->image_width);
+				#endif
+			#else
+				charW = _currentFont->chars[charIndex].image->image_width;
+			#endif
+			//---------------------------------- WRAP is ON? --------------------------------
+			if (_textWrap){//wrap, goes in the new line 
+				if (!_portrait && (_cursorX + (charW * _textScaleX) + (_charSpacing * _textScaleX)) >= _width){
+					_cursorX = 0;
+					_cursorY += (_fontHeight * _textScaleY) + (_fontInterline * _textScaleY);
+				} else if (_portrait && (_cursorY + (charW * _textScaleY) + (_charSpacing * _textScaleY)) >= _width){
+					_cursorX += (_fontHeight * _textScaleX) + (_fontInterline * _textScaleX);
+					_cursorY = 0;
+				}
+			} else {//not wrap, will get rid of the data
+				if (_portrait){
+					if (_cursorY + (charW * _textScaleY) + (_charSpacing * _textScaleY) >= _width) return 1;
+				} else {
+					if (_cursorX + (charW * _textScaleX) + (_charSpacing * _textScaleX) >= _width) return 1;
+				}
+			}
+			//-------------------------Actual single char drawing here -----------------------------------
+			if (!_portrait){
+				if (_cursorY + (_fontHeight * _textScaleY) > _height) return 1;//too high!
+				_glyphRender_unc(_cursorX,_cursorY,charW,_textScaleX,_textScaleY,charIndex);
+			} else {
+				if (_cursorX + (_fontHeight * _textScaleX) > _width) return 1;//too high!
+				_glyphRender_unc(_cursorY,_cursorX,charW,_textScaleY,_textScaleX,charIndex);
+			}
+			//add charW to total -----------------------------------------------------
+			if (!_portrait){
+				_cursorX += (charW * _textScaleX) + (_charSpacing * _textScaleX);
+			} else {
+				_cursorY += (charW * _textScaleX) + (_charSpacing * _textScaleY);
+			}
+			return 0;
+		}//end valid
+	}//end char
+}
+
+/*
+This is the draw char function (version for uncompressed font)
+It detects blank and filled lines and render separately, this is the first
+accelleration step of the unique (and currently under commercial licence) sumotoy render engine,
+it's a variation of LPGO font render accelleration used in RA8875 (under GNU v3).
+The lines are not blank or filled are passed to the grouping function that is the second part of the accelleration. 
+*/
+void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX,uint8_t scaleY,int index)
+{
+	//start by getting some glyph data...
+	#if defined(_FORCE_PROGMEM__)
+		#if defined(ESP8266)
+			const uint8_t * charGlyp = PROGMEM_read(&_currentFont->chars[index].image->data);//char data
+			int			  totalBytes = PROGMEM_read(&_currentFont->chars[index].image->image_datalen);
+		#else
+			const uint8_t * charGlyp = PROGMEM_read(&_currentFont->chars[index].image->data);//char data
+			int			  totalBytes = PROGMEM_read(&_currentFont->chars[index].image->image_datalen);
+		#endif
+	#else
+		const uint8_t * charGlyp = _currentFont->chars[index].image->data;
+		int			  totalBytes = _currentFont->chars[index].image->image_datalen;
+	#endif
+	int i;
+	uint8_t temp = 0;
+	//some basic variable...
+	uint8_t currentXposition = 0;//the current position of the writing cursor in the x axis, from 0 to charW
+	uint8_t currentYposition = 0;//the current position of the writing cursor in the y axis, from 0 to _FNTheight
+	uint8_t tempYpos = 0;
+	int currentByte = 0;//the current byte in reading (from 0 to totalBytes)
+	bool lineBuffer[charW];//the temporary line buffer
+	int lineChecksum = 0;//part of the optimizer
+	//the main loop that will read all bytes of the glyph
+	while (currentByte < totalBytes){
+		//read n byte
+		#if defined(_FORCE_PROGMEM__)
+			#if defined(ESP8266)
+				temp = PROGMEM_read(&charGlyp[currentByte]);
+			#else
+				temp = PROGMEM_read(&charGlyp[currentByte]);
+			#endif
+		#else
+			temp = charGlyp[currentByte];
+		#endif
+		for (i=7; i>=0; i--){
+			//----------------------------------- exception
+			if (currentXposition == charW){
+				//line buffer has been filled!
+				currentXposition = 0;//reset the line x position
+				tempYpos = y + (currentYposition * scaleY);
+				if (lineChecksum < 1){//empty line
+					if ((_textForeground != _textBackground) && (currentYposition < _fontHeight)) {
+							//will fill background till it's legal (added a workaround for malformed data)
+							fillRect_cont(
+								x,
+								tempYpos,
+								(charW * scaleX) + (_charSpacing * scaleX),//now handle _charSpacing!
+								scaleY,
+								_textBackground
+							);
+						
+					}
+				} else if (lineChecksum == charW){//full line
+					fillRect_cont(
+							x,
+							tempYpos,
+							(charW * scaleX),
+							scaleY,
+							_textForeground
+					);
+				} else { //line render
+					_charLineRender(
+							lineBuffer,
+							charW,
+							x,
+							y,
+							scaleX,
+							scaleY,
+							currentYposition
+					);
+				}
+				currentYposition++;//next line
+				lineChecksum = 0;//reset checksum
+			}//end exception
+			//-------------------------------------------------------
+			lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
+			lineChecksum += lineBuffer[currentXposition++];
+			//currentXposition++;
+		}
+		currentByte++;
+	}
+	// missed bottom space line...
+	//For some reason some glyph missed one blank line, this happen rarely and I really don't know
+	//why (I suppose it's font converter issue), this is not a problem when no background it's needed
+	//but it's visible when backgound it's on, so this small piece of code fix the problem
+	
+	if (_textForeground != _textBackground && currentYposition < _fontHeight) {
+		fillRect_cont(
+			x,
+			y + (currentYposition * scaleY),
+			(charW * scaleX) + (_charSpacing * scaleX), //now handle _charSpacing!
+			(_fontHeight - currentYposition) * scaleY,
+			_textBackground
+		);
+	}
+	
+}
+
+/*
+LPGO font render accelleration (GNU v3), part 2, pixel grouping.
+the sumotoy proprietary line render engine, please do not steal
+without author permission since there's currently some licence on it!
+This function group pixels with same color and perform much less memory addressing
+than any other similar function I ever seen. 
+Here has been used to avoid multiple memory addressing but can be inproved, the LPGO shines 
+where harware accelleration it's present but this chip has only direct memory access...
+*/
+void TFT_ILI9163C::_charLineRender(bool lineBuffer[],int charW,int16_t x,int16_t y,uint8_t scaleX,uint8_t scaleY,int16_t currentYposition)
+{
+	int xlinePos = 0;
+	int px;
+	uint8_t endPix = 0;
+	bool refPixel = false;
+	while (xlinePos < charW){
+		refPixel = lineBuffer[xlinePos];//xlinePos pix as reference value for next pixels
+		//detect and render concurrent pixels
+		for (px = xlinePos;px <= charW;px++){
+			if (lineBuffer[px] == lineBuffer[xlinePos] && px < charW){
+				//grouping pixels with same val
+				endPix++;
+			} else {
+				if (refPixel) {
+						fillRect_cont(
+						x,
+						y + (currentYposition * scaleY),
+						(endPix * scaleX),
+						scaleY,
+						_textForeground
+					);
+				} else {
+					if (_textForeground != _textBackground) {
+						fillRect_cont(
+							x,
+							y + (currentYposition * scaleY),
+							(endPix * scaleX) + (_charSpacing * scaleX),//now handle _charSpacing!
+							scaleY,
+							_textBackground
+						);
+					}
+				}
+				//reset and update some vals
+				xlinePos += endPix;
+				x += endPix * scaleX;
+				endPix = 0;
+				break;//exit cycle for...
+			}
+		}
+	}//while
+}
+
+#else
+	
+void TFT_ILI9163C::setFont(uint8_t f) 
+{
+	_font = f;
+	switch(_font) {
+		case GFXFONT_GLCD:
+			_fontData = glcdFont;
+			_fontKern = 1;
+		break;
+		case GFXFONT_GLCD_ASCII:
+			_fontData = glcdFont_ascii;
+			_fontKern = 1;
+		break;
+		default:
+			_font = GFXFONT_GLCD;
+			_fontData = glcdFont;
+			_fontKern = 1;
+		break;
+	}
+	_fontWidth = pgm_read_byte(_fontData + FONT_WIDTH);
+	_fontHeight = pgm_read_byte(_fontData + FONT_HEIGHT);
+	_fontStart = pgm_read_byte(_fontData + FONT_START);
+	_fontLength = pgm_read_byte(_fontData + FONT_LENGTH);
+}
+
+
+//fast
+size_t TFT_ILI9163C::write(uint8_t c) 
+{
+	if (c == '\n') {
+		_cursorY += _textScaleY*8;
+		_cursorX  = 0;
+	} else if (c == '\r') {
+		// skip em
+	} else {
+		startTransaction();
+		drawChar_cont(_cursorX,_cursorY,c,_textForeground,_textBackground);
+		if (_fontKern > 0 && _textForeground != _textBackground) {
+			fillRect_cont(
+			(_cursorX + _fontWidth * _textScaleX),
+			_cursorY,
+			_fontKern * _textScaleX,
+			_fontHeight * _textScaleY,
+			_textBackground);
+		}
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)	
+			writecommand_last(CMD_NOP);
+		#endif
+		endTransaction();
+		_cursorX += _textScaleX * (_fontWidth+_fontKern);
+		if (_textWrap && (_cursorX > (_width - _textScaleX * _fontWidth))) {
+			_cursorY += _textScaleY * _fontHeight;
+			_cursorX = 0;
+		}
+	}
+  return 1;
+}
+
+
+//fast
+void TFT_ILI9163C::drawChar_cont(int16_t x, int16_t y, unsigned char c,uint16_t color, uint16_t bg) {
+	if((x >= _width)             || // Clip right
+		(y >= _height)           || // Clip bottom
+		((x + 6 * _textScaleX - 1) < 0) || // Clip left
+		((y + 8 * _textScaleY - 1) < 0))   // Clip top
+    return;
+	if (c < _fontStart || c > _fontStart+_fontLength) {
+		c = 0;
+	} else {
+		c -= _fontStart;
+	}
+	uint16_t bitCount = 0;
+	uint16_t line = 0;
+	uint16_t i,j;
+	int fontIndex = (c*(_fontWidth*_fontHeight)/8)+4;
+	for (i=0; i<_fontHeight; i++ ) {
+		//uint8_t line;
+		for (j = 0; j<_fontWidth; j++) {
+			if (bitCount++%8 == 0) line = pgm_read_byte(_fontData+fontIndex++);
+			if (line & 0x80) {
+				if (_textScaleX > 1 || _textScaleY > 1) {//big
+					fillRect_cont(x+(j*_textScaleX), y+(i*_textScaleY), _textScaleX, _textScaleY, color);
+				} else {  // default size
+					drawPixel_cont(x+j, y+i, color);
+				} 
+			} else if (bg != color) {
+				if (_textScaleX > 1 || _textScaleY > 1) {// big
+					fillRect_cont(x + (j * _textScaleX), y + (i * _textScaleY), _textScaleX, _textScaleY, bg);
+				} else {  // def size
+					drawPixel_cont(x+j, y+i, bg);
+				}
+			}		
+			line <<= 1;
+		}
+		
+		#if defined(ESP8266)   	
+			yield(); 	
+		#endif
+		
+	}
+}
+#endif

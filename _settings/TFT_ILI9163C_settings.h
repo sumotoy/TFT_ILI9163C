@@ -4,8 +4,8 @@
 /*--------------------------------------------------------------------------------
 Here you have to select the display you own..........................
 You have a RED PCB, BLACK PCB or what?
-(uncomment just one below...)
 Default:__144_RED_PCB__
+(uncomment just one below...)
 ----------------------------------------------------------------------------------*/
 
 #define __144_RED_PCB__//128x128
@@ -35,10 +35,19 @@ Default:0x0000 (black)
 ESP8266 Compatibility mode.
 This force library to use an alternative way to trigger ESP8266 GPIO, if you uncomment
 the line it will use the standard digitaWrite wich is slow, this help debuggin.
+NOTE: This is slower!
 Default:commented
 ----------------------------------------------------------------------------------*/
 //#define _ESP8266_STANDARDMODE
 
+/*--------------------------------------------------------------------------------
+Font Rendering method..
+From 1.0p4 the library support sumotoy proprietary LPGO Font rendering Engine (GNU v3).
+To use it the following should be uncommented. New font engine it's faster than old one and can use
+many fonts converted with lcd-image-converter
+Default:_ILI9163_NEWFONTRENDER
+----------------------------------------------------------------------------------*/
+#define _ILI9163_NEWFONTRENDER
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*---------------------------------------------------------------------------------*/
 //								 END OF USER SETTINGS
