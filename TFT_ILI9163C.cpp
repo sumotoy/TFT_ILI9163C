@@ -762,6 +762,88 @@ void TFT_ILI9163C::getCursor(int16_t &x, int16_t &y)
 	y = _cursorY;
 }
 
+/**************************************************************************/
+/*!
+	  calculate a grandient color
+	  return a spectrum starting at blue to red (0...127)
+	  From my RA8875 library
+*/
+/**************************************************************************/
+uint16_t TFT_ILI9163C::grandient(uint8_t val)
+{
+	uint8_t r = 0;
+	uint8_t g = 0;
+	uint8_t b = 0;
+	uint8_t q = val / 32;
+	switch(q){
+		case 0:
+			r = 0; g = 2 * (val % 32); b = 31;
+		break;
+		case 1:
+			r = 0; g = 63; b = 31 - (val % 32);
+		break;
+		case 2:
+			r = val % 32; g = 63; b = 0;
+		break;
+		case 3:
+			r = 31; g = 63 - 2 * (val % 32); b = 0;
+		break;
+	}
+	return (r << 11) + (g << 5) + b;
+}
+
+
+/**************************************************************************/
+/*!
+	  interpolate 2 16bit colors
+	  return a 16bit mixed color between the two
+	  Parameters:
+	  color1:
+	  color2:
+	  pos:0...div (mix percentage) (0:color1, div:color2)
+	  div:divisions between color1 and color 2
+	  From my RA8875 library
+*/
+/**************************************************************************/
+uint16_t TFT_ILI9163C::colorInterpolation(uint16_t color1,uint16_t color2,uint16_t pos,uint16_t div)
+{
+    if (pos == 0) return color1;
+    if (pos >= div) return color2;
+	uint8_t r1,g1,b1;
+	Color565ToRGB(color1,r1,g1,b1);//split in r,g,b
+	uint8_t r2,g2,b2;
+	Color565ToRGB(color2,r2,g2,b2);//split in r,g,b
+	return colorInterpolation(r1,g1,b1,r2,g2,b2,pos,div);
+}
+
+
+/**************************************************************************/
+/*!
+	  interpolate 2 r,g,b colors
+	  return a 16bit mixed color between the two
+	  Parameters:
+	  r1.
+	  g1:
+	  b1:
+	  r2:
+	  g2:
+	  b2:
+	  pos:0...div (mix percentage) (0:color1, div:color2)
+	  div:divisions between color1 and color 2
+	  From my RA8875 library
+*/
+/**************************************************************************/
+uint16_t TFT_ILI9163C::colorInterpolation(uint8_t r1,uint8_t g1,uint8_t b1,uint8_t r2,uint8_t g2,uint8_t b2,uint16_t pos,uint16_t div)
+{
+    if (pos == 0) return Color565(r1,g1,b1);
+    if (pos >= div) return Color565(r2,g2,b2);
+	float pos2 = (float)pos/div;
+	return Color565(
+				(uint8_t)(((1.0 - pos2) * r1) + (pos2 * r2)),
+				(uint8_t)((1.0 - pos2) * g1 + (pos2 * g2)),
+				(uint8_t)(((1.0 - pos2) * b1) + (pos2 * b2))
+	);
+}
 
 /*
 uint8_t TFT_ILI9163C::getMaxColumns(void) 
@@ -1518,11 +1600,12 @@ void TFT_ILI9163C::drawQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_
 }
 
 
-void TFT_ILI9163C::fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color) 
+void TFT_ILI9163C::fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color,bool triangled) 
 {
 	startTransaction();//open SPI comm
     fillTriangle_cont(x0,y0,x1,y1,x2,y2,color);
-    fillTriangle_cont(x0,y0,x2,y2,x3,y3,color);
+	if (triangled) fillTriangle_cont(x2, y2, x3, y3, x0, y0, color);
+    fillTriangle_cont(x1,y1,x2,y2,x3,y3,color);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
 	#endif
@@ -1750,7 +1833,145 @@ void TFT_ILI9163C::fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t co
 	}
 }
 
+/**************************************************************************/
+/*!
+      ringMeter 
+	  (adapted from Alan Senior (thanks man!))
+	  it create a ring meter with a lot of personalizations,
+	  it return the width of the gauge so you can use this value
+	  for positioning other gauges near the one just created easily
+	  Parameters:
+	  val:  your value
+	  minV: the minimum value possible
+	  maxV: the max value possible
+	  x:    the position on x axis
+	  y:    the position on y axis
+	  r:    the radius of the gauge (minimum 50)
+	  units: a text that shows the units, if "none" all text will be avoided
+	  scheme:0...7 or 16 bit color (not BLACK or WHITE)
+	  0:red
+	  1:green
+	  2:blue
+	  3:blue->red
+	  4:green->red
+	  5:red->green
+	  6:red->green->blue
+	  7:cyan->green->red
+	  8:black->white linear interpolation
+	  9:violet->yellow linear interpolation
+	  or
+      RGB565 color (not BLACK or WHITE)
+	  backSegColor: the color of the segments not active (default BLACK)
+	  angle:		90 -> 180 (the shape of the meter, 90:halfway, 180:full round, 150:default)
+	  inc: 			5...20 (5:solid, 20:sparse divisions, default:10)
+*/
+/**************************************************************************/
+void TFT_ILI9163C::ringMeter(int val, int minV, int maxV, int16_t x, int16_t y, uint16_t r, uint16_t colorScheme,uint16_t backSegColor,int16_t angle,uint8_t inc)
+{
+	if (inc < 5) inc = 5;
+	if (inc > 20) inc = 20;
+	if (r < 50) r = 50;
+	if (angle < 90) angle = 90;
+	if (angle > 180) angle = 180;
+	int16_t i;
+	int curAngle = map(val, minV, maxV, -angle, angle);
+	uint16_t colour;
+	x += r;
+	y += r;   // Calculate coords of centre of ring
+	uint16_t w = r / 4;    // Width of outer ring is 1/4 of radius
+	const uint8_t seg = 5; // Segments are 5 degrees wide = 60 segments for 300 degrees
+	// Draw colour blocks every inc degrees
+	for (i = -angle; i < angle; i += inc) {
+		colour = BLACK;
+		switch (colorScheme) {
+			case 0:
+				colour = RED;
+				break; // Fixed colour
+			case 1:
+				colour = GREEN;
+				break; // Fixed colour
+			case 2:
+				colour = BLUE;
+				break; // Fixed colour
+			case 3:
+				colour = grandient(map(i, -angle, angle, 0, 127));
+				break; // Full spectrum blue to red
+			case 4:
+				colour = grandient(map(i, -angle, angle, 63, 127));
+				break; // Green to red (high temperature etc)
+			case 5:
+				colour = grandient(map(i, -angle, angle, 127, 63));
+				break; // Red to green (low battery etc)
+			case 6:
+				colour = grandient(map(i, -angle, angle, 127, 0));
+				break; // Red to blue (air cond reverse)
+			case 7:
+				colour = grandient(map(i, -angle, angle, 35, 127));
+				break; // cyan to red 
+			case 8:
+				colour = colorInterpolation(0,0,0,255,255,255,map(i,-angle,angle,0,w),w);
+				break; // black to white
+			case 9:
+				colour = colorInterpolation(0x80,0,0xC0,0xFF,0xFF,0,map(i,-angle,angle,0,w),w);
+				break; // violet to yellow
+			default:
+				if (colorScheme > 9){
+					colour = colorScheme;
+				} else {
+					colour = BLUE;
+				}
+				break; // Fixed colour
+		}
+		// Calculate pair of coordinates for segment start
+		float xStart = cos((i - 90) * 0.0174532925);
+		float yStart = sin((i - 90) * 0.0174532925);
+		uint16_t x0 = xStart * (r - w) + x;
+		uint16_t y0 = yStart * (r - w) + y;
+		uint16_t x1 = xStart * r + x;
+		uint16_t y1 = yStart * r + y;
 
+		// Calculate pair of coordinates for segment end
+		float xEnd = cos((i + seg - 90) * 0.0174532925);
+		float yEnd = sin((i + seg - 90) * 0.0174532925);
+		int16_t x2 = xEnd * (r - w) + x;
+		int16_t y2 = yEnd * (r - w) + y;
+		int16_t x3 = xEnd * r + x;
+		int16_t y3 = yEnd * r + y;
+
+		if (i < curAngle) { // Fill in coloured segments with 2 triangles
+			fillQuad(x0, y0, x1, y1, x2, y2, x3, y3, colour, false);
+		} else {// Fill in blank segments
+			fillQuad(x0, y0, x1, y1, x2, y2, x3, y3, backSegColor, false);
+		}
+	}
+
+	// text
+	/*
+	if (strcmp(units, "none") != 0){
+		//erase internal background
+		if (angle > 90) {
+			fillCircle(x, y, r - w, _backColor); 
+		} else {
+			fillCurve(x, y + getFontHeight() / 2, r - w, r - w, 1, _backColor);
+			fillCurve(x, y + getFontHeight() / 2, r - w, r - w, 2, _backColor);
+		}
+		//prepare for write text
+		if (r > 84) {
+			setFontScale(1);
+		} else {
+			setFontScale(0);
+		}
+		if (_portrait){
+			setCursor(y, x - 15, true);
+		} else {
+			setCursor(x - 15, y, true);
+		}
+		print(val);
+		print(" ");
+		print(units);
+	}
+	*/
+}
 
 //fast
 void TFT_ILI9163C::startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {

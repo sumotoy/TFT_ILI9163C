@@ -138,7 +138,7 @@ class TFT_ILI9163C : public Print {
 				drawRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,int16_t radius, uint16_t color),
 				fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,int16_t radius, uint16_t color),
 				drawQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color),
-				fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color),
+				fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color,bool triangled=true),
 				drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t diameter, float rot, uint16_t color),
 				drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 	void 		drawArc(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color) {
@@ -149,6 +149,7 @@ class TFT_ILI9163C : public Print {
 					}	
 				}
 	void 		drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t radiusH,uint16_t color);
+	void 		ringMeter(int val, int minV, int maxV, int16_t x, int16_t y, uint16_t r, uint16_t colorScheme=4,uint16_t backSegColor=BLACK,int16_t angle=150,uint8_t inc=10);
 	//------------------------------- BITMAP --------------------------------------------------
 	void		drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
 	void		drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color, uint16_t bg);
@@ -192,9 +193,13 @@ class TFT_ILI9163C : public Print {
 	void		scroll(uint16_t adrs);
 	void 		setBitrate(uint32_t n);//will be deprecated
 	//------------------------------- COLOR ----------------------------------------------------
+	uint16_t 	grandient(uint8_t val);
+	uint16_t 	colorInterpolation(uint16_t color1,uint16_t color2,uint16_t pos,uint16_t div=100);
+	uint16_t 	colorInterpolation(uint8_t r1,uint8_t g1,uint8_t b1,uint8_t r2,uint8_t g2,uint8_t b2,uint16_t pos,uint16_t div=100);
 	inline uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);};
 	inline uint16_t Color24To565(int32_t color_) { return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) &  0xFF) / 8);}
 	inline uint16_t htmlTo565(int32_t color_) { return (uint16_t)(((color_ & 0xF80000) >> 8) | ((color_ & 0x00FC00) >> 5) | ((color_ & 0x0000F8) >> 3));}
+	inline void 	Color565ToRGB(uint16_t color, uint8_t &r, uint8_t &g, uint8_t &b){r = (((color & 0xF800) >> 11) * 527 + 23) >> 6; g = (((color & 0x07E0) >> 5) * 259 + 33) >> 6; b = ((color & 0x001F) * 527 + 23) >> 6;}
 	
 	
  protected:
@@ -216,6 +221,7 @@ class TFT_ILI9163C : public Print {
 		uint8_t					_fontLength;
 		uint8_t 				_font;
 		int8_t  				_fontKern;
+		void					drawChar_cont(int16_t x, int16_t y, unsigned char c, uint16_t color,uint16_t bg);
 	#endif
 	uint8_t					_charSpacing;
 	uint16_t 				_textForeground;
@@ -753,7 +759,7 @@ class TFT_ILI9163C : public Print {
 	float 		_arcAngleMax;
 	int 		_arcAngleOffset;
 	//HELPERS--------------------------------------------------------------------------------------
-	void		drawChar_cont(int16_t x, int16_t y, unsigned char c, uint16_t color,uint16_t bg);
+	
 	void 		plot4points_cont(uint16_t cx, uint16_t cy, uint16_t x, uint16_t y, uint16_t color);
 	void		drawCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,uint16_t color);
 	void		fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,int16_t delta, uint16_t color);
