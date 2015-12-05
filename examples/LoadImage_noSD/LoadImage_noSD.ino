@@ -59,7 +59,8 @@ static const uint32_t image_data_batman_ume[16384] = {
 
 void setup() {
   tft.begin();
-  tft.writeScreen24(image_data_batman_ume);
+  //tft.writeScreen24(image_data_batman_ume);
+  tft.drawColorBitmap(0,0,128,128,image_data_batman_ume);
 }
 
 
