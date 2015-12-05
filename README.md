@@ -1,10 +1,10 @@
 TFT_ILI9163C
 
-A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's Teensy's and more...
+A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's, Teensy's, ESP8266 and more...
 
-Actual release: 0.8
+Actual release: 1.0p4
 
-Can be used with IDE 1.0.6 (Teensyduino 1.20) or IDE 1.6.x (Teensyduino 1.21b)
+Can be used with IDE 1.65 (Teensyduino 1.20 or better)
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
@@ -17,14 +17,10 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 <b>Features:</b>
 	
 	- Very FAST!, expecially with Teensy 3.x where uses hyper fast SPI.
+	- Can use external fonts with proprietary GLPO Rendering engine.
 	- Tons of examples !!!
 	- It uses just 4 or 5 wires.
-	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
-	- It uses the standard Adafruit_GFX Library (you need to install). 
-	- SPI transaction compatible (only where supported, actually only Teensy3 but soon more)
-	- Working with IDE 1.0.6, 1.5.8 (or newer), Energia (soon)
-	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1 and Teensy LC
-	- Working with Energia supported MCU (not yet but really soon)
+	- SPI transaction compatible
 	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika
 	- 
 http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
@@ -103,21 +99,6 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	The Teensy 3 side it's almost complete and quite optimized, however Arduino's side can be tweaked a bit
 	by using the same Teensy3 technique (multiple transfer with just one CS call, etc), this will be the 1.0 		version.
 
-<b>Needed stuff you have to install first!!!</b>
-
-	This library use Adafruit GFX library as all my TFT,OLED and LCD libraries:
-	(Remember to update GFX library often to have more features with this and other library!)
-	
-
-https://github.com/adafruit/Adafruit-GFX-Library
-	
-    	Since Adafruit are quite reluctant to update often I have a 100% compatible one that it's faster and has
-    	more features, faster char rendering, ability to use different fonts etc.
-
-https://github.com/sumotoy/Adafruit-GFX-Library
-
-    	It's 100% compatible with the Adafruit one so don't worry about.
-    	
     	If you plan to use an SD for the SD example you will need Bill Greyman's SdFat
     	
 https://github.com/greiman/SdFat
@@ -155,33 +136,10 @@ https://github.com/riuson/lcd-image-converter
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 <b>Special Thanks:</b>
-	
-	Thanks Adafruit for his Adafruit_GFX!
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and high speed SPI magic.
 	
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-<b>Version:</b>
-	
-	0.1a1: First release, compile correctly. Altrough not fully working!
-	0.1a3: Some bugfix, still some addressing problems, partial rotation solved.
-	0.1b1: Beta version! Fully working but still not tested with Arduino and DUE (altrough it compile)
-	0.2b2: Code cleaned and added support for 2.2" RED PCB displays.
-	0.2b4: Bug fixes and added color space support.
-	0.3b1: Complete rework on Teensy SPI based on Paul Stoffregen work
-	SPI transaction,added BLACK TAG 2.2 display
-	0.3b2: Added 24bit image display code and example.
-	0.5:   A lot of changes, preliminary scroll, added sleep and some other command but
-	most important fixed a nasty bug on fillScreen. If you have download any previous
-	version you should upgrade since there was several fixes.
-	0.6: Added subroutines for SD fast load images (mainly for Teensy3)
-	0.6b1: Rolled back clearScreen. Again the datasheet have wrong infos! Grrr
-	0.6b2: scroll completed.
-	0.6b3: ClearScreen v2 fix. Added idle mode.
-	0.7:   Gold release candidate. Fixed initialization (thanks Masuda)
-	0.75:  SPI transactions for Arduino's (beta) please report if troubles (not tested)
-	0.8:   Added compatibility with IDE 1.6.x (Teensyduino 1.21b)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
 	
