@@ -52,7 +52,16 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 	pins:2,6,9 or 10,15 or 20,13 for CS and RS.
 	The benchmark.ino example has a routine that can help you to understand if you have choosed the right pin for your Teensy.
 	For reset you can use any pin, if you want to save a wire and not use reset, YOU SHOULD CONNECT TO 3V3 OR USE
-	A PULLUP RESISTOR (10K to 3V3) BUT NOT LEAVE FLOATING!
+	A PULLUP RESISTOR (4.7K to 3V3) BUT NOT LEAVE FLOATING!
+
+<b>Fonts:</b>
+	This is a preview that uses the new font rendering engine, faster than old one. However it's still a 'preview'
+	so the fonts folder contain just a few fonts. I've included as testing purposes and may contain some error,
+	if you want to try convert your fonts please look the wiki and learn to use the program conversion but
+	remember that I'm not the font converter program developer so don't start any Issue Request about this!
+	Just analize my font file, follow wiki and try yourself!
+	You want to use font file from other libraries? No, don't ask me. I've choosed this way because strong reasons
+	and belive me, it uses less resources than many others.
 
 <b>Backgrounds:</b>
 	
