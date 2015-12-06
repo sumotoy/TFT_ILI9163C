@@ -149,7 +149,7 @@ class TFT_ILI9163C : public Print {
 					}	
 				}
 	void 		drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t radiusH,uint16_t color);
-	void 		ringMeter(int val, int minV, int maxV, int16_t x, int16_t y, uint16_t r, uint16_t colorScheme=4,uint16_t backSegColor=BLACK,int16_t angle=150,uint8_t inc=10);
+	void 		ringMeter(int val, int minV, int maxV, uint8_t x, uint8_t y, uint8_t r=20, uint16_t colorScheme=4,uint16_t backSegColor=BLACK,int angle=150,uint8_t inc=5);
 	//------------------------------- BITMAP --------------------------------------------------
 	void		drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
 	void		drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color, uint16_t bg);

@@ -12,7 +12,6 @@
 #define YELLOW  	0xFFE0
 //added
 #define BRIGHT_RED	0xF810	
-#define GRAY1		0x8410  
-#define GRAY2		0x4208  
-
+#define LIGHT_GREY	0x8410  
+#define DARK_GREY	0x4208  
 #endif

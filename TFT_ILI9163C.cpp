@@ -1529,9 +1529,6 @@ void TFT_ILI9163C::drawCircle(int16_t cx, int16_t cy, int16_t radius, uint16_t c
 			error -= x;
 			error -= x;
 		}
-		#if defined(ESP8266)   	
-			yield(); 	
-		#endif
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
@@ -1626,9 +1623,6 @@ void TFT_ILI9163C::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t di
 			cx + (sin(((i+1)*rads + rot) * dtr) * diameter),
 			cy + (cos(((i+1)*rads + rot) * dtr) * diameter),
 			color);
-			#if defined(ESP8266)   	
-				yield(); 	
-			#endif	
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
@@ -1651,9 +1645,6 @@ void TFT_ILI9163C::drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 		for (n = x; n <= w; n += 2) {
 			drawPixel_cont(n, m, color);
 		}
-		#if defined(ESP8266)   	
-			yield(); 	
-		#endif
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)	
 		writecommand_last(CMD_NOP);
@@ -1732,9 +1723,6 @@ void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t 
 		sb += dx02;
 		if (a > b) swap(a,b);
 		drawFastHLine_cont(a, y, b-a+1, color);
-		#if defined(ESP8266)   	
-			yield(); 	
-		#endif
 	}
 
 	sa = dx12 * (y - y1);
@@ -1746,9 +1734,6 @@ void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t 
 		sb += dx02;
 		if (a > b) swap(a,b);
 		drawFastHLine_cont(a, y, b-a+1, color);
-		#if defined(ESP8266)   	
-			yield(); 	
-		#endif
 	}
 }
 
@@ -1846,7 +1831,7 @@ void TFT_ILI9163C::fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t co
 	  maxV: the max value possible
 	  x:    the position on x axis
 	  y:    the position on y axis
-	  r:    the radius of the gauge (minimum 50)
+	  r:    the radius of the gauge (minimum 20)
 	  units: a text that shows the units, if "none" all text will be avoided
 	  scheme:0...7 or 16 bit color (not BLACK or WHITE)
 	  0:red
@@ -1866,19 +1851,19 @@ void TFT_ILI9163C::fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t co
 	  inc: 			5...20 (5:solid, 20:sparse divisions, default:10)
 */
 /**************************************************************************/
-void TFT_ILI9163C::ringMeter(int val, int minV, int maxV, int16_t x, int16_t y, uint16_t r, uint16_t colorScheme,uint16_t backSegColor,int16_t angle,uint8_t inc)
+void TFT_ILI9163C::ringMeter(int val, int minV, int maxV, uint8_t x, uint8_t y, uint8_t r, uint16_t colorScheme,uint16_t backSegColor,int angle,uint8_t inc)
 {
 	if (inc < 5) inc = 5;
 	if (inc > 20) inc = 20;
-	if (r < 50) r = 50;
+	if (r < 50) r = 20;
 	if (angle < 90) angle = 90;
 	if (angle > 180) angle = 180;
-	int16_t i;
+	int i;
 	int curAngle = map(val, minV, maxV, -angle, angle);
 	uint16_t colour;
 	x += r;
 	y += r;   // Calculate coords of centre of ring
-	uint16_t w = r / 4;    // Width of outer ring is 1/4 of radius
+	uint8_t w = r / 4;    // Width of outer ring is 1/4 of radius
 	const uint8_t seg = 5; // Segments are 5 degrees wide = 60 segments for 300 degrees
 	// Draw colour blocks every inc degrees
 	for (i = -angle; i < angle; i += inc) {
@@ -1925,18 +1910,18 @@ void TFT_ILI9163C::ringMeter(int val, int minV, int maxV, int16_t x, int16_t y, 
 		// Calculate pair of coordinates for segment start
 		float xStart = cos((i - 90) * 0.0174532925);
 		float yStart = sin((i - 90) * 0.0174532925);
-		uint16_t x0 = xStart * (r - w) + x;
-		uint16_t y0 = yStart * (r - w) + y;
-		uint16_t x1 = xStart * r + x;
-		uint16_t y1 = yStart * r + y;
+		uint8_t x0 = xStart * (r - w) + x;
+		uint8_t y0 = yStart * (r - w) + y;
+		uint8_t x1 = xStart * r + x;
+		uint8_t y1 = yStart * r + y;
 
 		// Calculate pair of coordinates for segment end
 		float xEnd = cos((i + seg - 90) * 0.0174532925);
 		float yEnd = sin((i + seg - 90) * 0.0174532925);
-		int16_t x2 = xEnd * (r - w) + x;
-		int16_t y2 = yEnd * (r - w) + y;
-		int16_t x3 = xEnd * r + x;
-		int16_t y3 = yEnd * r + y;
+		uint8_t x2 = xEnd * (r - w) + x;
+		uint8_t y2 = yEnd * (r - w) + y;
+		uint8_t x3 = xEnd * r + x;
+		uint8_t y3 = yEnd * r + y;
 
 		if (i < curAngle) { // Fill in coloured segments with 2 triangles
 			fillQuad(x0, y0, x1, y1, x2, y2, x3, y3, colour, false);

@@ -20,7 +20,6 @@ TFT_ILI9163C tft = TFT_ILI9163C(__CS_TFT, __DC_TFT);
 void setup() {
   Serial.begin(115200);
   tft.begin();
-
 }
 
 void loop() {
@@ -31,10 +30,12 @@ void loop() {
     if (d >= 360) d = 0;
     // Set the the position, gap between meters, and inner radius of the meters
     // Test with Sine wave function, normally reading will be from a sensor
-    //reading = 250 + 250 * sineWave(d);
-    //tft.ringMeter(reading,0,300,0,0,20,4,BLACK,150,10);
     reading = 1000 + 150 * sineWave(d + 90);
-    tft.ringMeter(reading,850,1150,0,0,10,3,BLACK,150,10);
+    tft.ringMeter(reading, 850, 1150, 0, 0, 20, 3, BLACK, 150, 5);
+    reading = 250 + 250 * sineWave(d);
+    tft.ringMeter(reading, 0, 300, 50, 0, 20, 4, BLACK, 150, 5);
+    reading = 15 + 15 * sineWave(d + 150);
+    tft.ringMeter(reading, 0, 30, 0, 50, 20, 6, DARK_GREY, 90, 5);
   }
 }
 
