@@ -1822,6 +1822,7 @@ void TFT_ILI9163C::fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t co
 /*!	
 		sin e cos helpers
 		[private]
+		from my RA8875 library
 */
 /**************************************************************************/
 float TFT_ILI9163C::_cosDeg_helper(float angle)
@@ -1845,6 +1846,7 @@ float TFT_ILI9163C::_sinDeg_helper(float angle)
 	  angle: the angle of the line
 	  length: lenght of the line
 	  color: RGB565 color
+	  from my RA8875 library
 */
 /**************************************************************************/
 void TFT_ILI9163C::drawLineAngle(int16_t x, int16_t y, int angle, uint8_t length, uint16_t color,int offset)
@@ -1871,6 +1873,7 @@ void TFT_ILI9163C::drawLineAngle(int16_t x, int16_t y, int angle, uint8_t length
 	  start: where line start
 	  length: lenght of the line
 	  color: RGB565 color
+	  from my RA8875 library
 */
 /**************************************************************************/
 void TFT_ILI9163C::drawLineAngle(int16_t x, int16_t y, int angle, uint8_t start, uint8_t length, uint16_t color,int offset)
@@ -1891,6 +1894,7 @@ void TFT_ILI9163C::drawLineAngle(int16_t x, int16_t y, int angle, uint8_t start,
 /*!
       ringMeter 
 	  (adapted from Alan Senior (thanks man!))
+	  from my RA8875 library
 	  it create a ring meter with a lot of personalizations,
 	  it return the width of the gauge so you can use this value
 	  for positioning other gauges near the one just created easily
