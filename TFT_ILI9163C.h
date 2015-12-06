@@ -150,6 +150,8 @@ class TFT_ILI9163C : public Print {
 				}
 	void 		drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t radiusH,uint16_t color);
 	void 		ringMeter(int val, int minV, int maxV, uint8_t x, uint8_t y, uint8_t r=20, uint16_t colorScheme=4,uint16_t backSegColor=BLACK,int angle=150,uint8_t inc=5);
+	void 		drawLineAngle(int16_t x, int16_t y, int angle, uint8_t length, uint16_t color,int offset = -90);
+	void 		drawLineAngle(int16_t x, int16_t y, int angle, uint8_t start, uint8_t length, uint16_t color,int offset = -90);
 	//------------------------------- BITMAP --------------------------------------------------
 	void		drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
 	void		drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color, uint16_t bg);
@@ -770,6 +772,8 @@ class TFT_ILI9163C : public Print {
 	float 		cosDegrees(float angle);
 	float 		sinDegrees(float angle);
 	void 		setArcParams(float arcAngleMax, int arcAngleOffset);
+	float 		_cosDeg_helper(float angle);
+	float 		_sinDeg_helper(float angle);
 
 };
 #endif

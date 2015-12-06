@@ -1819,6 +1819,75 @@ void TFT_ILI9163C::fillCircle_cont(int16_t x0, int16_t y0, int16_t r, uint8_t co
 }
 
 /**************************************************************************/
+/*!	
+		sin e cos helpers
+		[private]
+*/
+/**************************************************************************/
+float TFT_ILI9163C::_cosDeg_helper(float angle)
+{
+	float radians = angle / (float)360 * 2 * PI;
+	return cos(radians);
+}
+
+float TFT_ILI9163C::_sinDeg_helper(float angle)
+{
+	float radians = angle / (float)360 * 2 * PI;
+	return sin(radians);
+}
+
+/**************************************************************************/
+/*!
+      Basic line by using Angle as parameter
+	  Parameters:
+	  x: horizontal start pos
+	  y: vertical start
+	  angle: the angle of the line
+	  length: lenght of the line
+	  color: RGB565 color
+*/
+/**************************************************************************/
+void TFT_ILI9163C::drawLineAngle(int16_t x, int16_t y, int angle, uint8_t length, uint16_t color,int offset)
+{
+	if (length < 2) {//NEW
+		drawPixel(x,y,color);
+	} else {
+		drawLine(
+		x,
+		y,
+		x + (length * _cosDeg_helper(angle + offset)),//_angle_offset
+		y + (length * _sinDeg_helper(angle + offset)), 
+		color);
+	}
+}
+
+/**************************************************************************/
+/*!
+      Basic line by using Angle as parameter
+	  Parameters:
+	  x: horizontal start pos
+	  y: vertical start
+	  angle: the angle of the line
+	  start: where line start
+	  length: lenght of the line
+	  color: RGB565 color
+*/
+/**************************************************************************/
+void TFT_ILI9163C::drawLineAngle(int16_t x, int16_t y, int angle, uint8_t start, uint8_t length, uint16_t color,int offset)
+{
+	if (start - length < 2) {//NEW
+		drawPixel(x,y,color);
+	} else {
+		drawLine(
+		x + start * _cosDeg_helper(angle + offset),//_angle_offset
+		y + start * _sinDeg_helper(angle + offset),
+		x + (start + length) * _cosDeg_helper(angle + offset),
+		y + (start + length) * _sinDeg_helper(angle + offset), 
+		color);
+	}
+}
+
+/**************************************************************************/
 /*!
       ringMeter 
 	  (adapted from Alan Senior (thanks man!))
