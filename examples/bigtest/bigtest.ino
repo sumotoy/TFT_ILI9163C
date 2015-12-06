@@ -146,7 +146,7 @@ void testlines(uint16_t color) {
 
 
 void testdrawtext(char *text, uint16_t color) {
-  tft.setTextSize(1);
+  tft.setTextScale(1);
   tft.setTextColor(WHITE);
   tft.setCursor(0,0);
 
@@ -242,21 +242,21 @@ void tftPrintTest() {
   tft.clearScreen();
   tft.setCursor(0, 5);
   tft.setTextColor(RED);  
-  tft.setTextSize(1);
+  tft.setTextScale(1);
   tft.println("Hello World!");
   tft.setTextColor(YELLOW, GREEN);
-  tft.setTextSize(2);
+  tft.setTextScale(2);
   tft.print("Hello Wo");
   tft.setTextColor(BLUE);
-  tft.setTextSize(3);
+  tft.setTextScale(3);
   tft.print(12.57);
   delay(1500);
   tft.setCursor(0, 5);
   tft.clearScreen();
   tft.setTextColor(WHITE);
-  tft.setTextSize(0);
+  tft.setTextScale(0);
   tft.println("Hello World!");
-  tft.setTextSize(1);
+  tft.setTextScale(1);
   tft.setTextColor(GREEN);
   tft.print(p, 5);
   tft.println(" Want pi?");

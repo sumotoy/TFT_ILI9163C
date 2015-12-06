@@ -30,19 +30,19 @@ unsigned long testFillScreen() {
 unsigned long testText() {
   tft.clearScreen();
   tft.setTextColor(WHITE);
-  tft.setTextSize(0);
+  tft.setTextScale(0);
   start = micros();
   tft.println("Hello World!");
   tft.setTextColor(0xFFE0);
-  tft.setTextSize(1);
+  tft.setTextScale(1);
   tft.println(1234.56);
   tft.setTextColor(0xF800);
   tft.println(0xFFFF, HEX);
   tft.println();
   tft.setTextColor(0x07E0);
-  tft.setTextSize(3);
+  tft.setTextScale(3);
   tft.println("Hello");
-  tft.setTextSize(0);
+  tft.setTextScale(0);
   tft.println("I implore thee, my foonting turlingdromes.");
   tft.println("And hooptiously drangle me");
   tft.println("with crinkly bindlewurdles, Or I will rend thee");
@@ -237,10 +237,10 @@ void test(uint8_t rot) {
   tft.setRotation(rot);
   tft.setCursor(tft.width() / 2, tft.height() / 2);
   tft.setTextColor(WHITE);
-  tft.setTextSize(2);
+  tft.setTextScale(2);
   tft.print("Rot:");
   tft.print(rot);
-  tft.setTextSize(2);
+  tft.setTextScale(2);
   tft.setCursor(0, 0);
   delay(1000);
   Serial.print(F("screen:"));

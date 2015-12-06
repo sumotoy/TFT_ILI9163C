@@ -126,17 +126,17 @@ unsigned long testText() {
   unsigned long start = micros();
   tft.setCursor(0, 0);
   tft.setTextColor(WHITE);
-  tft.setTextSize(1);
+  tft.setTextScale(1);
   tft.println("Hello World!");
   tft.setTextColor(YELLOW);
-  tft.setTextSize(2);
+  tft.setTextScale(2);
   tft.println(1234.56);
   tft.setTextColor(RED);
-  tft.setTextSize(3);
+  tft.setTextScale(3);
   tft.println(0xDEAD, HEX);
   tft.println();
   tft.setTextColor(GREEN);
-  tft.setTextSize(4);
+  tft.setTextScale(4);
   tft.println("Hello");
   return micros() - start;
 
@@ -148,9 +148,9 @@ unsigned long testText2() {
   unsigned long start = micros();
   tft.setCursor(0, 0);
   tft.setTextColor(WHITE);
-  tft.setTextSize(2);
+  tft.setTextScale(2);
   tft.println("I implore thee,");
-  tft.setTextSize(1);
+  tft.setTextScale(1);
   tft.println("my foonting turlingdromes.");
   tft.println("And hooptiously drangle me");
   tft.println("with crinkly bindlewurdles,");
