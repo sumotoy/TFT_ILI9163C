@@ -2,13 +2,7 @@
 #include <TFT_ILI9163C.h>
 
 
-#define  NBINS                12
-const uint8_t bar_Width =     3;
 
-uint32_t     avrg_TmrF =    0;
-uint16_t     t_b[NBINS];
-
-uint16_t datax_[NBINS];
 
 /*
 Teensy3.x and Arduino's
@@ -26,8 +20,8 @@ Use:
  MOSI:D7
  */
 #define __CS  10
-#define __DC  6
-#define __RST 23
+#define __DC  8
+
 /*
 Teensy 3.x can use: 2,6,10,15,20,21,22,23
 Arduino's 8 bit: any
@@ -36,17 +30,16 @@ If you do not use reset, tie it to +3V3
 */
 
 
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
+#define  NBINS                12
+const uint8_t bar_Width =     3;
+uint16_t datax_[NBINS];
+
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
 
 void setup(void) {
   Serial.begin(38400);
   //while(!Serial);
   tft.begin();
-  tft.setRotation(1);
-  tft.clearScreen();
-  tft.setTextWrap(true);
-  tft.setTextColor(WHITE, BLACK);
-  tft.setCursor(0, 0);
 }
 
 
@@ -64,16 +57,15 @@ void verticalBarGraphs(uint16_t datax[], uint8_t barWidth, uint8_t barHeight, ui
   uint8_t startX;
   uint16_t color;
   uint8_t dataToWidth;
+  int idx;
   uint8_t div;
   for (uint8_t i = 1; i <= NBINS - 1; i++) {
     startX = (i * 11);
     //tft.drawRect((startX-1),vOrigin,barWidth,barHeight,WHITE);//container
     dataToWidth = map(datax[i], 0, 1024, (barHeight - 2), 0);
-    uint8_t b = map(datax[i], 0, 1024, 255, 0);
-    uint8_t g = map(datax[i], 0, 1024, 128, 0);
-    uint8_t r = map(datax[i], 0, 1024, 0, 255);
     div = (barHeight - 2) / 10;
-    color = ((b & 0xF8) << 8) | ((g & 0xFC) << 3) | (r >> 3);
+    idx = map(datax[i], 0, 1024, -180, 180);
+    color = tft.grandient(map(idx, 180, -180, 127, 0));
     tft.fillRect(startX, (vOrigin + 1), (bar_Width + 3), dataToWidth, BLACK); //mask ok
     tft.fillRect(startX, (dataToWidth + vOrigin) + 1, (bar_Width + 3), ((barHeight - 2) - dataToWidth), color); //fillRect(X,Y,width,height,color)
   }

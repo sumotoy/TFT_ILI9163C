@@ -32,6 +32,15 @@ Default:0x0000 (black)
 #define _ILI9163C_BACKGROUND		BLACK
 #define _ILI9163C_FOREGROUND		WHITE
 /*--------------------------------------------------------------------------------
+ESP8266 SPI SPeed.
+Somo module has problems to work at full speed, I don't know exactly why but I have four nodemcu modules
+all running at full speed and never a problem. I actually updated all my modules with 
+v1.3.0.2 AT Firmware.bin, official one, but I'm not expert on this, maybe it's not important.
+You can slow down the speed by changing the default to 8000000.
+Default:80000000UL
+----------------------------------------------------------------------------------*/
+#define _ESP8266MAXSPISPEED		80000000UL
+/*--------------------------------------------------------------------------------
 ESP8266 Compatibility mode.
 This force library to use an alternative way to trigger ESP8266 GPIO, if you uncomment
 the line it will use the standard digitaWrite wich is slow, this help debuggin.

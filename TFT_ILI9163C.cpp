@@ -1,5 +1,5 @@
 #include "TFT_ILI9163C.h"
-
+/*
 #ifdef __AVR__
 	#include <avr/pgmspace.h>
 #elif defined(ESP8266)
@@ -11,6 +11,7 @@
 	#define pgm_read_word(addr) (*(const unsigned short *)(addr))
 	typedef unsigned char prog_uchar;
 #endif
+*/
 	
 //constructors
 
@@ -342,7 +343,7 @@ void TFT_ILI9163C::begin(void)
 		SPI.setBitOrder(MSBFIRST);
 		SPI.setDataMode(SPI_MODE0);
 	#else
-		ILI9163C_SPI = SPISettings(80000000, MSBFIRST, SPI_MODE0);
+		ILI9163C_SPI = SPISettings(_ESP8266MAXSPISPEED, MSBFIRST, SPI_MODE0);
 	#endif
 	#if defined(ESP8266) && defined(_ESP8266_STANDARDMODE)
 		digitalWrite(_cs,HIGH);
