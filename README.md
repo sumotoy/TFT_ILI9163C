@@ -154,6 +154,9 @@ https://github.com/greiman/SdFat
 	- SCK		-->		Sclk (D5)
 	- LED		-->		Some display need a resistor (see note below)
 	
+	Use the current staging version 2.0rc2 with ESP8266 or it will probably fail, it works much better
+	with SPI and it's overall better than stable version.
+	
 * Note about led:
 
 Some display have an internal resistor to limit current, you see on the back of the display, following LED pcb
