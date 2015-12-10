@@ -24,7 +24,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	Teensy LC  	-> still not 100% optimized but fast
 	UNO and similar -> still not 100% optimized but fast
 	DUE 		-> still not 100% optimized but fast
-	ESP8266		-> it works!
+	ESP8266		-> use the preview 1.0p4 and works
 	
 ==========================
 
