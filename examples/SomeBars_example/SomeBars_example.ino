@@ -1,8 +1,9 @@
+/*
+	Very easy vertical VU
+*/
+
 #include <SPI.h>
 #include <TFT_ILI9163C.h>
-
-
-
 
 /*
 Teensy3.x and Arduino's
@@ -10,6 +11,10 @@ You are using 4 wire SPI here, so:
  MOSI:  11//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
  MISO:  12//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
  SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+Teensy 3.x can use: 2,6,10,15,20,21,22,23
+Arduino's 8 bit: any
+DUE: check arduino site
+If you do not use reset, tie it to +3V3
 ESP8266-----------------------------------
 Use:
 #define __CS  16  //(D0)
@@ -22,51 +27,28 @@ Use:
 #define __CS  10
 #define __DC  8
 
-/*
-Teensy 3.x can use: 2,6,10,15,20,21,22,23
-Arduino's 8 bit: any
-DUE: check arduino site
-If you do not use reset, tie it to +3V3
-*/
 
+#define _BARS 		10
+#define _BARWIDTH 	10
+#define _BARSPACE 	2
 
-#define  NBINS                12
-const uint8_t bar_Width =     3;
-uint16_t datax_[NBINS];
-
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
-
-void setup(void) {
-  Serial.begin(38400);
-  //while(!Serial);
+void setup() {
   tft.begin();
 }
 
-
 void loop() {
-  for (int i = 0; i < NBINS; i++) {
-    datax_[i] = random(0, 1024);
+  for (uint8_t i=0;i<_BARS;i++){
+    drawVerticalVU(_BARWIDTH*i+_BARSPACE*i,_BARS,_BARWIDTH,random(255),0);
   }
-  //Print_Data();
-  verticalBarGraphs(datax_, 5, 127, 0);
-  delay(50);
+  delay(40);
 }
 
-
-void verticalBarGraphs(uint16_t datax[], uint8_t barWidth, uint8_t barHeight, uint8_t vOrigin) { //3,12,64,10
-  uint8_t startX;
-  uint16_t color;
-  uint8_t dataToWidth;
-  int idx;
-  uint8_t div;
-  for (uint8_t i = 1; i <= NBINS - 1; i++) {
-    startX = (i * 11);
-    //tft.drawRect((startX-1),vOrigin,barWidth,barHeight,WHITE);//container
-    dataToWidth = map(datax[i], 0, 1024, (barHeight - 2), 0);
-    div = (barHeight - 2) / 10;
-    idx = map(datax[i], 0, 1024, -180, 180);
-    color = tft.grandient(map(idx, 180, -180, 127, 0));
-    tft.fillRect(startX, (vOrigin + 1), (bar_Width + 3), dataToWidth, BLACK); //mask ok
-    tft.fillRect(startX, (dataToWidth + vOrigin) + 1, (bar_Width + 3), ((barHeight - 2) - dataToWidth), color); //fillRect(X,Y,width,height,color)
-  }
+/*
+if color = 0 it will create a value sensitive spectrum color
+ */
+void drawVerticalVU(uint8_t x,uint8_t y,uint8_t w,uint8_t val,uint16_t color){
+  uint8_t h = map(val,0,255,127-y,0);
+  if (color < 1) color = tft.grandient(map(val, 0, 255, 0, 127));
+  tft.fillRect(x,0,w,h,DARK_GREY);
+  if (val > 4) tft.fillRect(x,h+1,w,127-(h+y+2),color);
 }
