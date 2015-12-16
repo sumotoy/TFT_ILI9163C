@@ -122,6 +122,7 @@ class TFT_ILI9163C : public Print {
 	uint16_t 	getBackground(void);
 	uint16_t 	getForeground(void);
 	void		useBacklight(const uint8_t pin);
+	void 		backlight(bool state);
 	//---------------------------- GEOMETRY ------------------------------------------------
 	void		fillScreen(uint16_t color),
 				clearScreen(void),//fill with color choosed in setBackground

@@ -3,6 +3,7 @@ begin	KEYWORD2
 setAddrWindow	KEYWORD2
 height	KEYWORD2
 width	KEYWORD2
+backlight	KEYWORD2
 setRotation	KEYWORD2
 getRotation	KEYWORD2
 invertDisplay	KEYWORD2

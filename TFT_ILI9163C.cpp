@@ -52,6 +52,11 @@ void TFT_ILI9163C::useBacklight(const uint8_t pin)
 	digitalWrite(_bklPin,LOW);
 }
 
+void TFT_ILI9163C::backlight(bool state)
+{
+	if (_bklPin != 255) digitalWrite(_bklPin,!state);
+}
+
 //Arduino Uno, Leonardo, Mega, Teensy 2.0, etc
 #if defined(__AVR__)
 	void TFT_ILI9163C::writecommand(uint8_t c)
@@ -582,7 +587,7 @@ void TFT_ILI9163C::chipInit() {
 		
 		delay(1);
 	#endif
-	if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
+	backlight(1);
 	fillScreen(_defaultBgColor);
 	#if defined(_ILI9163_NEWFONTRENDER)
 		setFont(&arial_x2);
@@ -624,7 +629,7 @@ void TFT_ILI9163C::display(boolean onOff) {
 		#else
 			writecommand(CMD_DISPON);
 		#endif
-		if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
+		backlight(1);
 	} else {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			startTransaction();
@@ -633,7 +638,7 @@ void TFT_ILI9163C::display(boolean onOff) {
 		#else
 			writecommand(CMD_DISPOFF);
 		#endif
-		if (_bklPin != 255) digitalWrite(_bklPin,LOW);
+		backlight(0);
 	}
 }
 
@@ -646,7 +651,7 @@ void TFT_ILI9163C::idleMode(boolean onOff) {
 		#else
 			writecommand(CMD_IDLEON);
 		#endif
-		if (_bklPin != 255) digitalWrite(_bklPin,LOW);
+		backlight(0);
 	} else {
 		#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			startTransaction();
@@ -655,7 +660,7 @@ void TFT_ILI9163C::idleMode(boolean onOff) {
 		#else
 			writecommand(CMD_IDLEOF);
 		#endif
-		if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
+		backlight(1);
 	}
 }
 
@@ -670,7 +675,7 @@ void TFT_ILI9163C::sleepMode(boolean mode) {
 		#else
 			writecommand(CMD_SLPIN);
 		#endif
-		if (_bklPin != 255) digitalWrite(_bklPin,LOW);
+		backlight(0);
 		delay(5);//needed
 	} else {
 		if (sleep == 0) return; //Already awake
@@ -682,7 +687,7 @@ void TFT_ILI9163C::sleepMode(boolean mode) {
 		#else
 			writecommand(CMD_SLPOUT);
 		#endif
-		if (_bklPin != 255) digitalWrite(_bklPin,HIGH);
+		backlight(1);
 		delay(120);//needed
 	}
 }
@@ -2364,6 +2369,7 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 			}
 			return 0;
 		}//end valid
+		return 0;
 	}//end char
 }
 
