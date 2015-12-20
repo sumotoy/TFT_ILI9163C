@@ -218,7 +218,7 @@ void TFT_ILI9163C::backlight(bool state)
 #endif
 
 
-void TFT_ILI9163C::begin(void) 
+void TFT_ILI9163C::begin(bool avoidSPIinit) 
 {
 	sleep = 0;
 	_portrait = false;
@@ -244,7 +244,7 @@ void TFT_ILI9163C::begin(void)
 	rsport    = portOutputRegister(digitalPinToPort(_rs));
 	cspinmask = digitalPinToBitMask(_cs);
 	rspinmask = digitalPinToBitMask(_rs);
-    SPI.begin();
+    if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz
 		SPI.setBitOrder(MSBFIRST);
@@ -261,7 +261,7 @@ void TFT_ILI9163C::begin(void)
 	rsport    = digitalPinToPort(_rs);
 	cspinmask = digitalPinToBitMask(_cs);
 	rspinmask = digitalPinToBitMask(_rs);
-    SPI.begin();
+    if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		SPI.setClockDivider(5); // 8 MHz
 		SPI.setBitOrder(MSBFIRST);
@@ -279,7 +279,7 @@ void TFT_ILI9163C::begin(void)
 			ILI9163C_SPI = SPISettings(24000000, MSBFIRST, SPI_MODE0);
 			SPI1.setMOSI(_mosi);
 			SPI1.setSCK(_sclk);
-			SPI1.begin();
+			if (!avoidSPIinit) SPI1.begin();
 			_useSPI1 = true; //confirm
 		} else {
 			bitSet(_initError,0);
@@ -294,7 +294,7 @@ void TFT_ILI9163C::begin(void)
 			ILI9163C_SPI = SPISettings(12000000, MSBFIRST, SPI_MODE0);
 			SPI.setMOSI(_mosi);
 			SPI.setSCK(_sclk);
-			SPI.begin();
+			if (!avoidSPIinit) SPI.begin();
 			_useSPI1 = false; //confirm
 		} else {
 			bitSet(_initError,0);
@@ -329,7 +329,7 @@ void TFT_ILI9163C::begin(void)
 		bitSet(_initError,0);
 		return;
 	}
-	SPI.begin();
+	if (!avoidSPIinit) SPI.begin();
 	if (SPI.pinIsChipSelect(_cs, _rs)) {
 		pcs_data = SPI.setCS(_cs);
 		pcs_command = pcs_data | SPI.setCS(_rs);
@@ -342,7 +342,7 @@ void TFT_ILI9163C::begin(void)
 #elif defined(ESP8266)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
-	SPI.begin();
+	if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		SPI.setClockDivider(4);
 		SPI.setBitOrder(MSBFIRST);
@@ -359,7 +359,7 @@ void TFT_ILI9163C::begin(void)
 #else//all the rest of possible boards
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
-	SPI.begin();
+	if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		SPI.setClockDivider(4);
 		SPI.setBitOrder(MSBFIRST);

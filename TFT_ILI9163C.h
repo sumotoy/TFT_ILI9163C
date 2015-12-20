@@ -110,7 +110,7 @@ class TFT_ILI9163C : public Print {
 		TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin=255);
 	#endif
 	
-	void     	begin(void);
+	void     	begin(bool avoidSPIinit=false);//avoidSPIinit=true set everithing but not call SPI.init()
 	void		setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 	int16_t		height(void) const;
 	int16_t 	width(void) const;
