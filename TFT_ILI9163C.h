@@ -1,6 +1,6 @@
 /*
 	ILI9163C - A fast SPI driver for TFT that use Ilitek ILI9163C.
-	Version: 1.0r4
+	Version: 1.0r5
 	
 	Features:
 	- Very FAST!, expecially with Teensy 3.x where uses hyper optimized SPI.
@@ -57,6 +57,7 @@
 	1.0r2: Now tested and fixed for 8bit CPU, even tiny faster globally.
 	1.0r3: Firts attempt to fix Audio Board compatibility, some minor bugs and now works with ESP8266!
 	1.0r4: New proprietary text rendering engine, faster and fonts can be created by user.
+	1.0r5: Deprecated old font rendering. New method for get PROGMEM stuff.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -82,12 +83,10 @@
 #include "_includes/TFT_ILI9163C_registers.h"
 
 
-#if defined(_ILI9163_NEWFONTRENDER)
-	#include "_includes/TFT_ILI9163C_fontDescription.h"
-	#include "_fonts/arial_x2.c"
-#else
-	#include "fonts.h"
-#endif
+
+#include "_includes/TFT_ILI9163C_fontDescription.h"
+#include "_fonts/arial_x2.c"
+
 
 
 #if defined(ESP8266) && !defined(_ESP8266_STANDARDMODE)
@@ -172,14 +171,11 @@ class TFT_ILI9163C : public Print {
 	void		setCharSpacing(uint8_t space);
 	void 		setFontInterline(uint8_t distance);
 	void		setInternalFont(void);
-	#if defined(_ILI9163_NEWFONTRENDER)
-		void 		setFont(const tFont *font);
-		virtual size_t 	write(uint8_t b) { _textWrite((const char *)&b, 1); return 1;}
-		virtual size_t  write(const uint8_t *buffer, size_t size) {_textWrite((const char *)buffer, size); return size;}
-	#else
-		void		setFont(uint8_t f);
-		virtual size_t write(uint8_t);
-	#endif
+
+	void 		setFont(const tFont *font);
+	virtual size_t 	write(uint8_t b) { _textWrite((const char *)&b, 1); return 1;}
+	virtual size_t  write(const uint8_t *buffer, size_t size) {_textWrite((const char *)buffer, size); return size;}
+
     //------------------------------- CURSOR ----------------------------------------------------
 	void		setCursor(int16_t x,int16_t y);
 	void		getCursor(int16_t &x,int16_t &y);
@@ -194,7 +190,9 @@ class TFT_ILI9163C : public Print {
 	void		sleepMode(boolean mode);
 	void 		defineScrollArea(uint16_t tfa, uint16_t bfa);
 	void		scroll(uint16_t adrs);
+	#if !defined (SPI_HAS_TRANSACTION)
 	void 		setBitrate(uint32_t n);//will be deprecated
+	#endif
 	//------------------------------- COLOR ----------------------------------------------------
 	uint16_t 	grandient(uint8_t val);
 	uint16_t 	colorInterpolation(uint16_t color1,uint16_t color2,uint16_t pos,uint16_t div=100);
@@ -209,23 +207,15 @@ class TFT_ILI9163C : public Print {
 	int16_t 					_width, _height;
 	volatile int16_t 			_cursorX, _cursorY;
 	
-	#if defined(_ILI9163_NEWFONTRENDER)
-		int					   _spaceCharWidth;
-		const tFont   		*  _currentFont;
-		int 	  	  		   _STRlen_helper(const char* buffer,int len);
-		int 		  		   _getCharCode(uint8_t ch);
-		void 		  		   _textWrite(const char* buffer, uint16_t len);
-		bool 		  		   _renderSingleChar(const char c);
-		void 		 		   _glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX,uint8_t scaleY,int index);
-		void 				   _charLineRender(bool lineBuffer[],int charW,int16_t x,int16_t y,uint8_t scaleX,uint8_t scaleY,int16_t currentYposition);
-	#else
-		const unsigned char *	_fontData;
-		uint8_t					_fontStart;
-		uint8_t					_fontLength;
-		uint8_t 				_font;
-		int8_t  				_fontKern;
-		void					drawChar_cont(int16_t x, int16_t y, unsigned char c, uint16_t color,uint16_t bg);
-	#endif
+	int					   _spaceCharWidth;
+	const tFont   		*  _currentFont;
+	int 	  	  		   _STRlen_helper(const char* buffer,int len);
+	int 		  		   _getCharCode(uint8_t ch);
+	void 		  		   _textWrite(const char* buffer, uint16_t len);
+	bool 		  		   _renderSingleChar(const char c);
+	void 		 		   _glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX,uint8_t scaleY,int index);
+	void 				   _charLineRender(bool lineBuffer[],int charW,int16_t x,int16_t y,uint8_t scaleX,uint8_t scaleY,int16_t currentYposition);
+
 	uint8_t					_charSpacing;
 	uint16_t 				_textForeground;
 	uint16_t 				_textBackground;

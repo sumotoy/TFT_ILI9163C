@@ -1,18 +1,22 @@
-
 {
   "name": "TFT_ILI9163C",
   "keywords": "display",
   "description": "A very fast driver for ILI9163C TFT displays that works with many MCU",
+  "exclude": [
+	"doc",
+	"*.pdf"
+	],
   "authors": 
   {
     "name": "sumotoy",
     "email": "sumotoy@gmail.com",
-    "url": "http://sumotoy.com"
+    "url": "http://sumotoy.com",
+	"maintainer": true
   },  
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r4"
+    "url": "https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r5"
   },
   "examples": [
     "examples/*/*.ino",

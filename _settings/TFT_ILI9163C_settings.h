@@ -39,7 +39,7 @@ v1.3.0.2 AT Firmware.bin, official one, but I'm not expert on this, maybe it's n
 You can slow down the speed by changing the default to 8000000.
 Default:80000000UL
 ----------------------------------------------------------------------------------*/
-#define _ESP8266MAXSPISPEED		80000000UL
+#define _ESP8266MAXSPISPEED		80000000
 /*--------------------------------------------------------------------------------
 ESP8266 Compatibility mode.
 This force library to use an alternative way to trigger ESP8266 GPIO, if you uncomment
@@ -49,14 +49,6 @@ Default:commented
 ----------------------------------------------------------------------------------*/
 //#define _ESP8266_STANDARDMODE
 
-/*--------------------------------------------------------------------------------
-Font Rendering method..
-From 1.0p4 the library support sumotoy proprietary LPGO Font rendering Engine (GNU v3).
-To use it the following should be uncommented. New font engine it's faster than old one and can use
-many fonts converted with lcd-image-converter
-Default:_ILI9163_NEWFONTRENDER
-----------------------------------------------------------------------------------*/
-#define _ILI9163_NEWFONTRENDER
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*---------------------------------------------------------------------------------*/
 //								 END OF USER SETTINGS

@@ -1,18 +1,5 @@
 #include "TFT_ILI9163C.h"
-/*
-#ifdef __AVR__
-	#include <avr/pgmspace.h>
-#elif defined(ESP8266)
-//none
-#elif defined(__SAM3X8E__)
-	#include <include/pio.h>
-	#define PROGMEM
-	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-	#define pgm_read_word(addr) (*(const unsigned short *)(addr))
-	typedef unsigned char prog_uchar;
-#endif
-*/
-	
+
 //constructors
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3.0, Teensy 3.1
@@ -83,10 +70,9 @@ void TFT_ILI9163C::backlight(bool state)
 			spiwrite(d);
 		endTransaction();
 	} 
-
+	#if !defined (SPI_HAS_TRANSACTION)
 	void TFT_ILI9163C::setBitrate(uint32_t n)
 	{
-		#if !defined (SPI_HAS_TRANSACTION)
 			if (n >= 8000000) {
 				SPI.setClockDivider(SPI_CLOCK_DIV2);
 			} else if (n >= 4000000) {
@@ -96,8 +82,8 @@ void TFT_ILI9163C::backlight(bool state)
 			} else {
 				SPI.setClockDivider(SPI_CLOCK_DIV16);
 			}
-		#endif
 	}
+	#endif
 #elif defined(__SAM3X8E__)// Arduino Due
 
 	void TFT_ILI9163C::writecommand(uint8_t c)
@@ -124,18 +110,17 @@ void TFT_ILI9163C::backlight(bool state)
 		endTransaction();
 	}
 
-
+	#if !defined(SPI_HAS_TRANSACTION)
 	void TFT_ILI9163C::setBitrate(uint32_t n)
 	{
-		#if !defined(SPI_HAS_TRANSACTION)
 			uint32_t divider = 1;
 			while (divider < 255) {
 				if (n >= 84000000 / divider) break;
 				divider = divider - 1;
 			}
 			SPI.setClockDivider(divider);
-		#endif
 	}
+	#endif
 #elif defined(__MKL26Z64__)//Teensy LC
 
 	void TFT_ILI9163C::writecommand(uint8_t c)
@@ -164,17 +149,19 @@ void TFT_ILI9163C::backlight(bool state)
 	} 
 	
 
-
+	#if !defined (SPI_HAS_TRANSACTION)
 	void TFT_ILI9163C::setBitrate(uint32_t n)
 	{
 		//nop
 	}
+	#endif
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3.0 & 3.1 
-
+	#if !defined (SPI_HAS_TRANSACTION)
 	void TFT_ILI9163C::setBitrate(uint32_t n)
 	{
 		//nop
 	}
+	#endif
 #else
 
 	void TFT_ILI9163C::writecommand(uint8_t c)
@@ -201,9 +188,9 @@ void TFT_ILI9163C::backlight(bool state)
 		endTransaction();
 	} 
 
+	#if !defined (SPI_HAS_TRANSACTION)
 	void TFT_ILI9163C::setBitrate(uint32_t n)
 	{
-		#if !defined (SPI_HAS_TRANSACTION)
 			if (n >= 8000000) {
 				SPI.setClockDivider(SPI_CLOCK_DIV2);
 			} else if (n >= 4000000) {
@@ -213,8 +200,8 @@ void TFT_ILI9163C::backlight(bool state)
 			} else {
 				SPI.setClockDivider(SPI_CLOCK_DIV16);
 			}
-		#endif
 	}
+	#endif
 #endif
 
 
@@ -589,11 +576,7 @@ void TFT_ILI9163C::chipInit() {
 	#endif
 	backlight(1);
 	fillScreen(_defaultBgColor);
-	#if defined(_ILI9163_NEWFONTRENDER)
-		setFont(&arial_x2);
-	#else
-		setFont(GFXFONT_GLCD);
-	#endif
+	setFont(&arial_x2);
 	setAddrWindow(0x00,0x00,0,0);//addess 0,0
 }
 
@@ -859,19 +842,12 @@ uint8_t TFT_ILI9163C::getMaxColumns(void)
 
 uint8_t TFT_ILI9163C::getMaxRows(void) 
 {
-	#if defined(_ILI9163_NEWFONTRENDER)
 		if (!_portrait){
 			return (uint8_t)(_height / (_fontHeight*_textScaleY) + _fontInterline);
 		} else {
 			return (uint8_t)(_width / (_fontHeight*_textScaleX) + _fontInterline);
 		}
-	#else
-		if (!_portrait){
-			return (uint8_t)(_height / (_fontHeight*_textScaleY) + _fontInterline);
-		} else {
-			return (uint8_t)(_width / (_fontHeight*_textScaleX) + _fontInterline);
-		}
-	#endif
+
 }
 
 uint8_t TFT_ILI9163C::getCursorX(bool inColumns) 
@@ -879,9 +855,7 @@ uint8_t TFT_ILI9163C::getCursorX(bool inColumns)
 	if (!inColumns){
 		return _cursorX;
 	} else {
-		#if defined(_ILI9163_NEWFONTRENDER)
-		#else
-		#endif
+
 		return _cursorX;
 	}
 }
@@ -892,19 +866,12 @@ uint8_t TFT_ILI9163C::getCursorY(bool inRows)
 		return _cursorY;
 	} else {
 		uint8_t maxRows = getMaxRows();
-		#if defined(_ILI9163_NEWFONTRENDER)
 			if (!_portrait){
 				return (uint8_t)(maxRows - (_height / _cursorY));
 			} else {
 				return (uint8_t)_width / (_fontHeight*_textScaleX) + _fontInterline;
 			}
-		#else
-			if (!_portrait){
-				return (uint8_t)_height / (_fontHeight*_textScaleY) + _fontInterline;
-			} else {
-				return (uint8_t)_width / (_fontHeight*_textScaleX) + _fontInterline;
-			}
-		#endif
+
 	}
 }
 */
@@ -2156,13 +2123,8 @@ void TFT_ILI9163C::setFontInterline(uint8_t distance)
 
 void TFT_ILI9163C::setInternalFont(void)
 {
-	#if defined(_ILI9163_NEWFONTRENDER)
 		setFont(&arial_x2);
-	#endif
 }
-
-
-#if defined(_ILI9163_NEWFONTRENDER)
 
 
 int TFT_ILI9163C::_getCharCode(uint8_t ch)
@@ -2195,11 +2157,8 @@ int TFT_ILI9163C::_STRlen_helper(const char* buffer,int len)
 				charIndex = _getCharCode(buffer[i]);
 				if (charIndex > -1) {		//found!
 					#if defined(_FORCE_PROGMEM__)
-						#if defined(ESP8266)
-							totW += (PROGMEM_read(&_currentFont->chars[charIndex].image->image_width));
-						#else
-							totW += (PROGMEM_read(&_currentFont->chars[charIndex].image->image_width));
-						#endif
+						//totW += (PROGMEM_get(&_currentFont->chars[charIndex].image->image_width));
+						totW += (pgm_read_byte(&(_currentFont->chars[charIndex].image->image_width)));
 					#else
 						totW += (_currentFont->chars[charIndex].image->image_width);
 					#endif
@@ -2225,13 +2184,11 @@ void TFT_ILI9163C::setFont(const tFont *font)
 		int temp = _getCharCode(0x20);
 		if (temp > -1){
 			#if defined(_FORCE_PROGMEM__)
-				#if defined(ESP8266)
-					_spaceCharWidth = PROGMEM_read(&_currentFont->chars[temp].image->image_width);
-				#else
-					_spaceCharWidth = PROGMEM_read(&_currentFont->chars[temp].image->image_width);
-				#endif
+				//_spaceCharWidth = PROGMEM_get(&_currentFont->chars[temp].image->image_width);
+				//PROGMEM_read(&_currentFont->chars[temp].image->image_width,_spaceCharWidth);
+				_spaceCharWidth = pgm_read_byte(&(_currentFont->chars[temp].image->image_width));
 			#else
-			_spaceCharWidth = (_currentFont->chars[temp].image->image_width);
+				_spaceCharWidth = (_currentFont->chars[temp].image->image_width);
 			#endif
 		} else {
 			//font malformed, doesn't have needed space parameter
@@ -2329,11 +2286,9 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 			int charW = 0;
 			//I need to know the width...
 			#if defined(_FORCE_PROGMEM__)
-				#if defined(ESP8266)
-					charW = PROGMEM_read(&_currentFont->chars[charIndex].image->image_width);
-				#else
-					charW = PROGMEM_read(&_currentFont->chars[charIndex].image->image_width);
-				#endif
+				//charW = PROGMEM_get(&_currentFont->chars[charIndex].image->image_width);
+				charW = pgm_read_byte(&(_currentFont->chars[charIndex].image->image_width));
+				//PROGMEM_read(&_currentFont->chars[charIndex].image->image_width,charW);
 			#else
 				charW = _currentFont->chars[charIndex].image->image_width;
 			#endif
@@ -2384,13 +2339,12 @@ void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX
 {
 	//start by getting some glyph data...
 	#if defined(_FORCE_PROGMEM__)
-		#if defined(ESP8266)
-			const uint8_t * charGlyp = PROGMEM_read(&_currentFont->chars[index].image->data);//char data
-			int			  totalBytes = PROGMEM_read(&_currentFont->chars[index].image->image_datalen);
-		#else
-			const uint8_t * charGlyp = PROGMEM_read(&_currentFont->chars[index].image->data);//char data
-			int			  totalBytes = PROGMEM_read(&_currentFont->chars[index].image->image_datalen);
-		#endif
+		//const uint8_t * charGlyp = PROGMEM_get(&_currentFont->chars[index].image->data);//char data
+		//int			  totalBytes = PROGMEM_get(&_currentFont->chars[index].image->image_datalen);
+		const uint8_t * charGlyp;
+		PROGMEM_read(&_currentFont->chars[index].image->data,charGlyp);//char data
+		int			  totalBytes;
+		PROGMEM_read(&_currentFont->chars[index].image->image_datalen,totalBytes);
 	#else
 		const uint8_t * charGlyp = _currentFont->chars[index].image->data;
 		int			  totalBytes = _currentFont->chars[index].image->image_datalen;
@@ -2408,11 +2362,8 @@ void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX
 	while (currentByte < totalBytes){
 		//read n byte
 		#if defined(_FORCE_PROGMEM__)
-			#if defined(ESP8266)
-				temp = PROGMEM_read(&charGlyp[currentByte]);
-			#else
-				temp = PROGMEM_read(&charGlyp[currentByte]);
-			#endif
+			//temp = PROGMEM_get(&charGlyp[currentByte]);
+			temp = pgm_read_byte(&(charGlyp[currentByte]));
 		#else
 			temp = charGlyp[currentByte];
 		#endif
@@ -2532,106 +2483,4 @@ void TFT_ILI9163C::_charLineRender(bool lineBuffer[],int charW,int16_t x,int16_t
 	}//while
 }
 
-#else
-	
-void TFT_ILI9163C::setFont(uint8_t f) 
-{
-	_font = f;
-	switch(_font) {
-		case GFXFONT_GLCD:
-			_fontData = glcdFont;
-			_fontKern = 1;
-		break;
-		case GFXFONT_GLCD_ASCII:
-			_fontData = glcdFont_ascii;
-			_fontKern = 1;
-		break;
-		default:
-			_font = GFXFONT_GLCD;
-			_fontData = glcdFont;
-			_fontKern = 1;
-		break;
-	}
-	_fontWidth = pgm_read_byte(_fontData + FONT_WIDTH);
-	_fontHeight = pgm_read_byte(_fontData + FONT_HEIGHT);
-	_fontStart = pgm_read_byte(_fontData + FONT_START);
-	_fontLength = pgm_read_byte(_fontData + FONT_LENGTH);
-}
 
-
-//fast
-size_t TFT_ILI9163C::write(uint8_t c) 
-{
-	if (c == '\n') {
-		_cursorY += _textScaleY*8;
-		_cursorX  = 0;
-	} else if (c == '\r') {
-		// skip em
-	} else {
-		startTransaction();
-		drawChar_cont(_cursorX,_cursorY,c,_textForeground,_textBackground);
-		if (_fontKern > 0 && _textForeground != _textBackground) {
-			fillRect_cont(
-			(_cursorX + _fontWidth * _textScaleX),
-			_cursorY,
-			_fontKern * _textScaleX,
-			_fontHeight * _textScaleY,
-			_textBackground);
-		}
-		#if defined(__MK20DX128__) || defined(__MK20DX256__)	
-			writecommand_last(CMD_NOP);
-		#endif
-		endTransaction();
-		_cursorX += _textScaleX * (_fontWidth+_fontKern);
-		if (_textWrap && (_cursorX > (_width - _textScaleX * _fontWidth))) {
-			_cursorY += _textScaleY * _fontHeight;
-			_cursorX = 0;
-		}
-	}
-  return 1;
-}
-
-
-//fast
-void TFT_ILI9163C::drawChar_cont(int16_t x, int16_t y, unsigned char c,uint16_t color, uint16_t bg) {
-	if((x >= _width)             || // Clip right
-		(y >= _height)           || // Clip bottom
-		((x + 6 * _textScaleX - 1) < 0) || // Clip left
-		((y + 8 * _textScaleY - 1) < 0))   // Clip top
-    return;
-	if (c < _fontStart || c > _fontStart+_fontLength) {
-		c = 0;
-	} else {
-		c -= _fontStart;
-	}
-	uint16_t bitCount = 0;
-	uint16_t line = 0;
-	uint16_t i,j;
-	int fontIndex = (c*(_fontWidth*_fontHeight)/8)+4;
-	for (i=0; i<_fontHeight; i++ ) {
-		//uint8_t line;
-		for (j = 0; j<_fontWidth; j++) {
-			if (bitCount++%8 == 0) line = pgm_read_byte(_fontData+fontIndex++);
-			if (line & 0x80) {
-				if (_textScaleX > 1 || _textScaleY > 1) {//big
-					fillRect_cont(x+(j*_textScaleX), y+(i*_textScaleY), _textScaleX, _textScaleY, color);
-				} else {  // default size
-					drawPixel_cont(x+j, y+i, color);
-				} 
-			} else if (bg != color) {
-				if (_textScaleX > 1 || _textScaleY > 1) {// big
-					fillRect_cont(x + (j * _textScaleX), y + (i * _textScaleY), _textScaleX, _textScaleY, bg);
-				} else {  // def size
-					drawPixel_cont(x+j, y+i, bg);
-				}
-			}		
-			line <<= 1;
-		}
-		
-		#if defined(ESP8266)   	
-			yield(); 	
-		#endif
-		
-	}
-}
-#endif
