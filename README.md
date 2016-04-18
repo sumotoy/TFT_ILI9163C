@@ -2,8 +2,11 @@ TFT_ILI9163C
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's,ESP8266 and more...
 
-Preview of the 1.0r4 (with GLPO font rendering engine)
-I'm actually tested this particular version only with ESP8266 but should work with other MCU's.
+Preview of the 1.0r6
+<b>Caution!</b> Actually tested with Teensy and ESP8266 but NOT with other CPU. Colors parameters has to be tuned and probably<br>
+other parameters too. I will release another version pretty soon!<br>
+This version it's really different from 1.0r5 and below, the release will be really similar to this, font format has slight<br> changed and new font are compatible with old version but old font not! If you have font created by yourself you can re-convert using new font-template or look inside settings file and enable old font compatibility.<br>
+This version it's compatible with new RED pcb with yellow pins<br>
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
@@ -183,8 +186,7 @@ https://github.com/riuson/lcd-image-converter
 
 <b>Version:</b>
 	
-	1.0r1: The preview of the new version! Totally recoded, faster and a lot of fixing
-	1.0r4: An extra compatibility mode for ESP8266, added some yeld, introducing brand new font rendering
+	1.0r6: Almost release.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
