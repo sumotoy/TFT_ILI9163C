@@ -4,7 +4,7 @@ A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's
 
 Preview of the 1.0r6<br><br>
 <b>Caution!</b> Actually tested with Teensy and ESP8266 but NOT with other CPU. Colors parameters has to be tuned and probably
-other parameters too. I will release another version pretty soon!<br>
+other parameters too. I will release another version in these days!<br>
 This version it's really different from 1.0r5 and below, the release will be really similar to this, font format has slight<br> changed and new font are compatible with old version but old font not! If you have font created by yourself you can re-convert using new font-template or look inside settings file and enable old font compatibility.<br>
 This version it's compatible with new RED pcb with yellow pins<br>
 
