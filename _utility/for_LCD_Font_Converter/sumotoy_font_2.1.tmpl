@@ -23,8 +23,8 @@ $(start_block_header)
 *  line scan direction: $(pre_scan_sub)
 *  inverse: $(pre_inverse)
 * ------------------------------------------------------------------------------
-* Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y. RA8875
-* Font template version: 2.0
+* Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y.
+* Font template version: 2.1
 * Note: Font height should be fixed and all glyps must have the same height!
 * ------------------------------------------------------------------------------
 *******************************************************************************/
@@ -35,11 +35,17 @@ $(start_block_header)
 $(end_block_header)
 
 $(start_block_images_table)
-static const uint$(img_data_block_size)_t image_data_$(doc_name_ws)_0x$(out_char_code)[$(out_blocks_count)] __PRGMTAG_  = {
-    $(out_image_data)
-};////character: '$(out_char_text)'
+static const uint$(img_data_block_size)_t image_data_$(doc_name_ws)_0x$(out_char_code)[$(out_blocks_count)] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif  
+= { $(out_image_data) };////character: '$(out_char_text)'
 
-static const tImage $(doc_name_ws)_0x$(out_char_code) __PRGMTAG_ = { image_data_$(doc_name_ws)_0x$(out_char_code),
+static const tImage $(doc_name_ws)_0x$(out_char_code) 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
+#endif 
+= { image_data_$(doc_name_ws)_0x$(out_char_code),
     $(out_image_width), $(out_blocks_count)};//character: '$(out_char_text)' , height: $(out_image_height), (charW,total bytes)
 $(end_block_images_table)
 

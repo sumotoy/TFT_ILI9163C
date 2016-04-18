@@ -1,7 +1,12 @@
 /*
-Rudimentary scroll!
+Rudimentary scroll! v1.1
+Scroll on ILI9163C it's only vertical and not affected (unfortunatly) by rotation
+This mean that there's limitation on scroll! See table here:
+*  rotation 0: vertical (bottom to top)
+*  rotation 1: horizontal (right to left)
+*  rotation 2: vertical (top to bottom)
+*  rotation 4: horizontal (left to right)
  */
-
 
 #include <SPI.h>
 #include <TFT_ILI9163C.h>
@@ -22,9 +27,9 @@ Use:
  SCLK:D5
  MOSI:D7
  */
-#define __CS  10
-#define __DC  6
-#define __RST 23
+#define __CS   10
+#define __DC  9
+#define __RST   14
 /*
 Teensy 3.x can use: 2,6,10,15,20,21,22,23
  Arduino's 8 bit: any
@@ -62,35 +67,19 @@ void setup() {
   tft.println("in the gobberwarts");
   tft.println("with my blurglecruncheon,");
   tft.println("see if I don't!");
-  tft.defineScrollArea(23, 50);
-  //try load again with this commented out!
+  tft.defineScrollArea(23, 50);//try load again with this commented out!
 }
 
 
 int t = 0;
 
-
 void loop(void) {
   tft.scroll(t);
-  if (t > 160) {
+  if (t > TFT_ILI9163C_CGR_H) {
     t = 0;
   }
   else {
     t++;
   }
-
   delay(10);
-}
-
-
-void testFilledRects() {
-  int           n, i, i2,
-                cx = (tft.width()  / 2),
-                cy = (tft.height() / 2);
-  n = min(tft.width(), tft.height());
-  for (i = n; i > 0; i -= 6) {
-    i2    = i / 2;
-    tft.fillRect(cx - i2, cy - i2, i, i, random(0x0000, 0xFFFF));
-    tft.drawRect(cx - i2, cy - i2, i, i, random(0x0000, 0xFFFF));
-  }
 }

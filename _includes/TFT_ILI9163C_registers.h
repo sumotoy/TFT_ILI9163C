@@ -50,5 +50,24 @@
 #define CMD_NGAMMAC		0xE1//Negative Gamma Correction Setting
 #define CMD_GAMRSEL		0xF2//GAM_R_SEL
 
+/*
+7) MY:  1(bottom to top), 0(top to bottom) 	| Row Address Order
+6) MX:  1(R to L),        0(L to R)        	| Column Address Order
+5) MV:  1(Exchanged),     0(normal)        	| Row/Column exchange
+4) ML:  1(bottom to top), 0(top to bottom) 	| Vertical Refresh Order
+3) RGB: 1(BGR), 		  0(RGB)            | Color Space
+2) MH:  1(R to L),        0(L to R)        	| Horizontal Refresh Order
+1)
+0)
 
+     MY, MX, MV, ML,RGB, MH, D1, D0
+	 0 | 0 | 0 | 0 | 1 | 0 | x | x	//normal
+	 1 | 0 | 0 | 0 | 1 | 0 | x | x	//Y-Mirror
+	 0 | 1 | 0 | 0 | 1 | 0 | x | x	//X-Mirror
+	 1 | 1 | 0 | 0 | 1 | 0 | x | x	//X-Y-Mirror
+	 0 | 0 | 1 | 0 | 1 | 0 | x | x	//X-Y Exchange
+	 1 | 0 | 1 | 0 | 1 | 0 | x | x	//X-Y Exchange, Y-Mirror
+	 0 | 1 | 1 | 0 | 1 | 0 | x | x	//XY exchange
+	 1 | 1 | 1 | 0 | 1 | 0 | x | x
+*/
 #endif

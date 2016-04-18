@@ -1,5 +1,6 @@
-/* 
+/*
       A benchmark Test, on Teensy it will also check if pin you choose are legal
+	  Version 1.1 (better screenFill test, test in rotation 0...3, fixed test lines results)
 */
 
 #include <SPI.h>
@@ -14,23 +15,23 @@
 uint8_t errorCode = 0;
 
 /*
-Teensy3.x and Arduino's
-You are using 4 wire SPI here, so:
- MOSI:  11//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
- MISO:  12//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
- SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
-ESP8266-----------------------------------
-Use:
-#define __CS  16  //(D0)
-#define __DC  5   //(D1)
-#define __RST 4   //(D2)
+  Teensy3.x and Arduino's
+  You are using 4 wire SPI here, so:
+  MOSI:  11//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+  MISO:  12//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+  SCK:   13//Teensy3.x/Arduino UNO (for MEGA/DUE refere to arduino site)
+  ESP8266-----------------------------------
+  Use:
+  #define __CS  16  //(D0)
+  #define __DC  5   //(D1)
+  #define __RST 4   //(D2)
 
- SCLK:D5
- MOSI:D7
- */
+  SCLK:D5
+  MOSI:D7
+*/
 #define __CS 	10
-#define __DC 	6
-#define __RST 	23
+#define __DC 	9
+#define __RST 	14
 
 TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
 
@@ -40,7 +41,7 @@ void setup() {
   while (!Serial && ((millis () - debug_start) <= 5000)) ;
   tft.begin();
   //the following it's mainly for Teensy
-  //it will help you to understand if you have choosed the 
+  //it will help you to understand if you have choosed the
   //wrong combination of pins!
   errorCode = tft.getErrorCode();
   if (errorCode != 0) {
@@ -48,84 +49,84 @@ void setup() {
     if (bitRead(errorCode, 0)) Serial.print("MOSI or SCLK pin mismach!\n");
     if (bitRead(errorCode, 1)) Serial.print("CS or DC pin mismach!\n");
   } else {
-    Serial.println(F("Benchmark                Time (microseconds)"));
-  }
-  if (errorCode == 0) {
-    Serial.print(F("Screen fill              "));
-    Serial.println(testFillScreen());
-    delay(500);
-
-    Serial.print(F("Text                     "));
-    Serial.println(testText());
-    delay(3000);
-
-    Serial.print(F("Text2                    "));
-    Serial.println(testText2());
-    delay(3000);
-
-    Serial.print(F("Lines                    "));
-    Serial.println(testLines(CYAN));
-    delay(500);
-
-    Serial.print(F("Horiz/Vert Lines         "));
-    Serial.println(testFastLines(RED, BLUE));
-    delay(500);
-    
-    Serial.print(F("Arc                      "));
-    Serial.println(testArc(CYAN));
-    delay(500);
-
-    Serial.print(F("Rectangles (outline)     "));
-    Serial.println(testRects(GREEN));
-    delay(500);
-
-    Serial.print(F("Rectangles (filled)      "));
-    Serial.println(testFilledRects(YELLOW, MAGENTA));
-    delay(500);
-
-    Serial.print(F("Circles (filled)         "));
-    Serial.println(testFilledCircles(10, MAGENTA));
-
-    Serial.print(F("Circles (outline)        "));
-    Serial.println(testCircles(10, WHITE));
-    delay(500);
-
-    Serial.print(F("Triangles (outline)      "));
-    Serial.println(testTriangles());
-    delay(500);
-
-    Serial.print(F("Triangles (filled)       "));
-    Serial.println(testFilledTriangles());
-    delay(500);
-
-    Serial.print(F("Rounded rects (outline)  "));
-    Serial.println(testRoundRects());
-    delay(500);
-
-    Serial.print(F("Rounded rects (filled)   "));
-    Serial.println(testFilledRoundRects());
-    delay(500);
-
-    Serial.println(F("Done!"));
+    Serial.println(F("Benchmark Sketch V1.1"));
   }
 }
 
 void loop(void) {
   for (uint8_t rotation = 0; rotation < 4; rotation++) {
+    tft.clearScreen();
     tft.setRotation(rotation);
-    testText();
-    delay(2000);
+    Serial.print(F("\nBenchmark[rot="));
+    Serial.print(rotation);
+    Serial.println(F("]         Time (microseconds)"));
+    if (errorCode == 0) {
+      Serial.print(F("Screen fill              "));
+      Serial.println(testFillScreen());
+      delay(500);
+
+      Serial.print(F("Text                     "));
+      Serial.println(testText());
+      delay(3000);
+
+      Serial.print(F("Text2                    "));
+      Serial.println(testText2());
+      delay(3000);
+
+      Serial.print(F("Lines                    "));
+      Serial.println(testLines(CYAN));
+      delay(500);
+
+      Serial.print(F("Horiz/Vert Lines         "));
+      Serial.println(testFastLines(RED, BLUE));
+      delay(500);
+
+      Serial.print(F("Arc                      "));
+      Serial.println(testArc(CYAN));
+      delay(500);
+
+      Serial.print(F("Rectangles (outline)     "));
+      Serial.println(testRects(GREEN));
+      delay(500);
+
+      Serial.print(F("Rectangles (filled)      "));
+      Serial.println(testFilledRects(YELLOW, MAGENTA));
+      delay(500);
+
+      Serial.print(F("Circles (filled)         "));
+      Serial.println(testFilledCircles(10, MAGENTA));
+
+      Serial.print(F("Circles (outline)        "));
+      Serial.println(testCircles(10, WHITE));
+      delay(500);
+
+      Serial.print(F("Triangles (outline)      "));
+      Serial.println(testTriangles());
+      delay(500);
+
+      Serial.print(F("Triangles (filled)       "));
+      Serial.println(testFilledTriangles());
+      delay(500);
+
+      Serial.print(F("Rounded rects (outline)  "));
+      Serial.println(testRoundRects());
+      delay(500);
+
+      Serial.print(F("Rounded rects (filled)   "));
+      Serial.println(testFilledRoundRects());
+      delay(500);
+
+      Serial.println(F("Done! ------------------------"));
+    }
+    delay(1000);
   }
 }
 
 
 unsigned long testFillScreen() {
+  tft.clearScreen();
   unsigned long start = micros();
-  tft.clearScreen();
   tft.fillScreen(RED);
-  tft.fillScreen(GREEN);
-  tft.fillScreen(BLUE);
-  tft.clearScreen();
   return micros() - start;
 }
 
@@ -147,8 +148,6 @@ unsigned long testText() {
   tft.setTextScale(4);
   tft.println("Hello");
   return micros() - start;
-
-
 }
 
 unsigned long testText2() {
@@ -216,6 +215,7 @@ unsigned long testLines(uint16_t color) {
   for (x2 = 0; x2 < w; x2 += 6) tft.drawLine(x1, y1, x2, y2, color);
   x2    = 0;
   for (y2 = 0; y2 < h; y2 += 6) tft.drawLine(x1, y1, x2, y2, color);
+  t    += micros() - start;
 
   return micros() - start;
 }

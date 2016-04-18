@@ -2,43 +2,39 @@
 	#define __TFT_ILI9163C_CPU_H
 	
 #if defined(ESP8266)
+	#if defined(_TFTILI9163_OLDFNT)
 		#define __PRGMTAG_  
-		//#define	_fntTypeDef__	uint8_t
+	#endif	
 #elif defined(__AVR__)
 	#include <avr/pgmspace.h>
 	#define _FORCE_PROGMEM__
-	#define __PRGMTAG_ PROGMEM
-	//#define	_fntTypeDef__	uint8_t
+	#if defined(_TFTILI9163_OLDFNT)
+		#define __PRGMTAG_ PROGMEM 
+	#endif	
 #elif defined(__SAM3X8E__)
 	#include <include/pio.h>
 	#define _FORCE_PROGMEM__
-	#define PROGMEM
+	#define PROGMEM 
 	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 	#define pgm_read_word(addr) (*(const unsigned short *)(addr))
 	typedef unsigned char prog_uchar;
-	#define __PRGMTAG_ PROGMEM
-	//#define	_fntTypeDef__	uint8_t
-/*
+	#if defined(_TFTILI9163_OLDFNT)
+		#define __PRGMTAG_ PROGMEM 
+	#endif	
 #elif defined(__MKL26Z64__)	|| defined(__MK20DX128__) || defined(__MK20DX256__)
 	#include <avr/pgmspace.h>
 	#define _FORCE_PROGMEM__
-	#define __PRGMTAG_ PROGMEM
-*/
+	#if defined(_TFTILI9163_OLDFNT)
+		#define __PRGMTAG_ PROGMEM 
+	#endif	
 #else
-	#define __PRGMTAG_   
-	//#define	_fntTypeDef__	uint8_t
+	#if defined(_TFTILI9163_OLDFNT)
+		#define __PRGMTAG_  
+	#endif	
 #endif
 	
 #if defined(_FORCE_PROGMEM__)
-	//#define __PRGMTAG_ PROGMEM
-	/*
-template <typename T> T PROGMEM_get (const T * sce)
-  {
-		static T temp;
-		memcpy_P (&temp, sce, sizeof (T));
-		return temp;
-  }
-  */
+
   
 template <typename T> void PROGMEM_read (const T * sce, T& dest)
   {
