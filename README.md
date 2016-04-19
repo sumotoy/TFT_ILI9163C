@@ -7,6 +7,24 @@ Preview of the 1.0r6<br><br>
 other parameters too. I will release another version in these days!<br>
 This version it's really different from 1.0r5 and below, the release will be really similar to this, font format has slight<br> changed and new font are compatible with old version but old font not! If you have font created by yourself you can re-convert using new font-template or look inside settings file and enable old font compatibility.<br>
 This version it's compatible with new RED pcb with yellow pins<br>
+Changes:<br>
+- Full Compatibility with RED PCB Yellow pin strain.
+- Changed overall library structure, easier to add CPU's
+- Separate display's files, now each display has full set of parameters, easy to add more incoming strain.
+- Since now every display has his configuration file, many parameters can be adjusted.
+- Handle 18Bit color depth.
+- Changed a bit Font Scheme, new ones are backward compatible, old ones should to be re-converted with lcd-image-converter (last beta) and with new template (sumotoy_font2.1.tmpl). I have also added a conversion preset since the last beta of lcd-image-converter has this feature (Font_Conversion.xml).
+However I have included an option in user settings that force lib to read old font types but re-conversion should be performed as soon as possible since the release will not support this.
+- Included font files for editing, if you find any problem you can edit directly library font files with lcd.image.converter and compile for library.
+- Library use less space, made a lot of optimizations on code.
+- Small error corrected.
+- Better initialization sequence.
+- Compatibility with custom online/offline compilers (preprocessor placeholders issue)
+- Speed almost unchanged, something faster, something slight slower but almost same.
+- Delete unused and useless functions.
+- Updated some example.
+- Added partial mode command.
+- Many lib vars are now static, you can use more than one instance (2 or more display)
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
 
