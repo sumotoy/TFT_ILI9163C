@@ -8,7 +8,7 @@ Version 1.0 it's one the corner! New version doesn't use the adafruit_GFX and ha
 Here's the link to the pre-release:<br><br>
 https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r<br>
 And this is the very last preview that use LPGO font rendering:<br>
-https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r5<br>
+https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r6<br>
 
 Can be used with IDE 1.0.6 (Teensyduino 1.20) or IDE 1.6.x (Teensyduino 1.21b or better)<br>
 
