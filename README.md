@@ -26,7 +26,7 @@ However I have included an option in user settings that force lib to read old fo
 - Added partial mode command.
 - Many lib vars are now static, you can use more than one instance (2 or more display)
 
-![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/github/CIMG6810.jpg)
+![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/libraries/20160419_170251.jpg)
 
 	Link to a video:
 	
