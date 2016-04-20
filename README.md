@@ -1,8 +1,8 @@
-TFT_ILI9163C
+<b>TFT_ILI9163C</b>
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's,ESP8266 and more...
 
-Preview of the 1.0r6<br><br>
+<b>Preview of the 1.0r61</b><br><br>
 <b>Caution!</b> Actually tested with Teensy and ESP8266 but NOT with other CPU. Colors parameters has to be tuned and probably
 other parameters too. I will release another version in these days!<br>
 This version it's really different from 1.0r5 and below, the release will be really similar to this, font format has slight<br> changed and new font are compatible with old version but old font not! If you have font created by yourself you can re-convert using new font-template or look inside settings file and enable old font compatibility.<br>
@@ -159,16 +159,21 @@ https://github.com/greiman/SdFat
 
 Some display have an internal resistor to limit current, you see on the back of the display, following LED pcb
 trace with your eyes and if you see a resistor (100 Ohm mine) you can connect this line directly to +5V.
-But be careful <u>do not try connect to 5V before you check the presence of this resistor on pcb</u>, you can try first by using a resistor of 220 ohm, if the image looks very dark, try 100 and if still very dark, tie directly to 5v.
+But be careful <u>do not try connect to 5V before you check the presence of this resistor on pcb</u>, you can try first by using a resistor of 220 ohm, if the image looks very dark, try 100 and if still very dark, use lower values.
+The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the backlight, try use 100Ohm resistor.
 
 <b>Utility included:</b>
 
-	Included you will find LCD Image Converter a free utility to convert in code a 24bit image.
-	
-https://github.com/riuson/lcd-image-converter
+	Included you will find the templates for riuson lcd-image-converter to convert in code a 24bit image.
+	You will find also the preset for font conversion (last beta of lcd-image-converter has support for preset).
+	You will find also the original font files that you can load with lcd-image-converter!
+	Use the last beta of lcd-image-converter!!!
+	ILI9163C datasheet.
+	<b>Download lcd-image-converter here:</b>
+	http://www.riuson.com/lcd-image-converter/download
+	<b>Github page of the developer:</b>
+	https://github.com/riuson/lcd-image-converter
 
-	check included examples. 
-	I have included datasheet as well.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 <b>Special Thanks:</b>
