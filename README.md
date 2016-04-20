@@ -35,6 +35,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	Tested with:
 	Teensy 3.0 	-> really fast
 	Teensy 3.1 	-> really fast
+	Teensy 3.2 	-> really fast
 	Teensy LC  	-> fast 
 	UNO and similar -> fast
 	DUE 		-> can be better but fast
@@ -45,15 +46,14 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 <b>Features:</b>
 	
 	- Very FAST!, expecially with Teensy 3.x where uses hyper fast SPI.
+	- Proprietary GPO fast font rendering engine.
+	- Tools for font conversion included.
 	- Tons of examples !!!
 	- It uses just 4 wires (2 shared with other devices).
-	- Compatible at command level with Adafruit display series so it's easy to adapt existing code.
-	- It uses the standard Adafruit_GFX Library (you need to install). 
-	- SPI transaction compatible (only where supported, now widely supported)
-	- Working with IDE 1.0.6, 1.5.8, 1.6.5 (or newer), Energia (soon)
-	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1 and Teensy LC, ESP8266
-	- Working with Energia supported MCU (not yet but really soon)
-	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika
+	- SPI transaction compatible (where supported, otherwise legacy used)
+	- Working with IDE 1.6.8 (or newer)
+	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1, Teensy 3.2, Teensy LC, ESP8266
+	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika (old version)
 	- NEW: Support for user fonts and Icons! Using mine rendering engine (used in some other libraries I've done here)
 	
 http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
