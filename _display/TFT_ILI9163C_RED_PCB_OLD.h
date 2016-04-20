@@ -35,7 +35,7 @@
 	*/
 	static const uint8_t init_PIXFMT 		= 		0x65;//0xE5 18bit (16bit=0x05)
 	/*Selects the gamma curve used by the display device (0x01[1],0x02[2],0x04[3],0x08[4])*/
-	static const uint8_t init_GAMMASET		=		0x08;						//[alt 0x04] default gamma curve
+	static const uint8_t init_GAMMASET		=		0x04;						//[alt 0x04] default gamma curve
 	static const uint8_t init_GAMRSEL 		=		0x01;						//Enable Gamma adj
 	/* Display Fuction set 5
 	Bits(16):
@@ -48,7 +48,7 @@
 	11,12,13,14,15:00000 (na)
 	*/
 	static const uint8_t init_DFUNCTR[2] 	=		{0b00111111,0b00000110};
-	static const uint8_t init_FRMCTR1[2] 	=		{17,20};//0x08,0x02Frame Rate Control (In normal mode/Full colors)
+	static const uint8_t init_FRMCTR1[2] 	=		{0x08,0x02};//17,20,0x08,0x02 Frame Rate Control (In normal mode/Full colors)
 	/*
 	Display Inversion:
 	Bits:
@@ -65,7 +65,7 @@
 	8,9,10:000(2.75V)...111(2.40V)
 	11,12,13,14,15:00000(nan)
 	*/
-	static const uint8_t init_POWCTR1[2] 	=		{0x1D,0x02};//4.30V(0x0A),2.65V(0x02) (0x1F;
+	static const uint8_t init_POWCTR1[2] 	=		{0x0A,0x02};//4.30V(0x0A),2.65V(0x02) (0x1F;
 	/*Set the AVDD, VCL, VGH and VGL supply power level.
 	Bits:
 	0,1,2:
@@ -105,7 +105,7 @@
 	0,1,2,3,4,5,6:0(VMH,VML)..[goes Vxx-63d]..64(VMH,VML)..[goes Vxx+1d]...127(VMH”+63d,VML”+63d)
 	7:0(VCOM offset value from NV memory),1(VCOM offset value in the VMF[6:0] registers)
 	*/
-	static const int8_t  init_VCOMOFFS 		=		0x80;//40
+	static const int8_t  init_VCOMOFFS 		=		0x40;//40
 	//memory adrs
 	static const uint8_t init_CLMADRS[2] 	=		{0x00,TFT_ILI9163C_CGR_W};	//Column Address
 	static const uint8_t init_PGEADRS[2] 	=		{0x00,TFT_ILI9163C_CGR_H};	//Page Address
