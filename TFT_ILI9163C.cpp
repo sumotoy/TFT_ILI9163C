@@ -53,9 +53,15 @@ void TFT_ILI9163C::useBacklight(const uint8_t pin)
 void TFT_ILI9163C::backlight(bool state)
 {
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
-		if (_bklPin != 255) digitalWriteFast(_bklPin,!state);
+		if (_bklPin != 255) {
+			digitalWriteFast(_bklPin,!state);
+			_backlight = state;
+		}
 	#else
-		if (_bklPin != 255) digitalWrite(_bklPin,!state);
+		if (_bklPin != 255) {
+			digitalWrite(_bklPin,!state);
+			_backlight = state;
+		}
 	#endif
 }
 
@@ -129,7 +135,9 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 {
 //initialize Vars
 	uint8_t i;
-	_sleep = 0;
+	//_sleep = 0;
+	_currentMode = 0;
+	_backlight = 1;
 	_portrait = false;
 	_initError = 0b00000000;
 	_width    = TFT_ILI9163C_W;
@@ -359,7 +367,7 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	backlight(1);
 	fillScreen(_defaultBgColor);
 	setFont(&arial_x2);
-	//setAddrWindow(0x0000,0x0000,0x0000,0x0000);
+	//setArea(0x0000,0x0000,0x0000,0x0000);
 }
 
 uint8_t TFT_ILI9163C::getErrorCode(void) 
@@ -382,12 +390,64 @@ void TFT_ILI9163C::colorSpace(uint8_t cspace)
 	}
 }
 
-void TFT_ILI9163C::invertDisplay(boolean i) 
+void TFT_ILI9163C::changeMode(const enum ILI9163C_modes m) 
 {
-	startTransaction();
-	writecommand_last(i ? CMD_DINVON : CMD_DINVOF);
-	endTransaction();
+	if (m != _currentMode){
+		bool checkBacklight = false;
+		startTransaction();
+		switch(m){
+			case NORMAL:
+				if (_currentMode == 2) {//was in idle?
+					writecommand_cont(CMD_IDLEOF);
+					_currentMode = 0;
+					break;//exit switch
+				}
+				if (_currentMode == 3) {//was in sleep?
+					writecommand_cont(CMD_SLPOUT);
+					checkBacklight = true;
+					_currentMode = 0;
+					delay(120);//needed
+					break;//exit switch
+				}
+				if (_currentMode == 4){//was inverted?
+					_currentMode = 0;
+					writecommand_cont(CMD_DINVOF);
+					break;//exit switch
+				}
+				writecommand_cont(CMD_NORML);
+				_currentMode = 0;
+			break;
+			case PARTIAL:
+				writecommand_cont(CMD_PTLON);
+				_currentMode = 1;
+			break;
+			case IDLE:
+				writecommand_cont(CMD_IDLEON);
+				_currentMode = 2;
+			break;
+			case SLEEP:
+				writecommand_last(CMD_SLPIN);
+				endTransaction();
+				_currentMode = 3;
+				delay(5);//needed
+				backlight(0);
+			return;
+			case INVERT:
+				writecommand_cont(CMD_DINVON);
+				_currentMode = 4;
+			break;
+		}
+		endTransaction();
+		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+			writecommand_last(CMD_NOP);
+		#else
+			disableCS();
+		#endif
+		if (checkBacklight) backlight(!_backlight);
+	}
 }
+
+
 
 void TFT_ILI9163C::display(boolean onOff) 
 {
@@ -404,41 +464,6 @@ void TFT_ILI9163C::display(boolean onOff)
 	}
 }
 
-void TFT_ILI9163C::idleMode(boolean onOff) 
-{
-	if (onOff){
-		startTransaction();
-		writecommand_last(CMD_IDLEON);
-		endTransaction();
-		backlight(0);
-	} else {
-		startTransaction();
-		writecommand_last(CMD_IDLEOF);
-		endTransaction();
-		backlight(1);
-	}
-}
-
-void TFT_ILI9163C::sleepMode(boolean mode) 
-{
-	if (mode){
-		if (_sleep == 1) return;//already sleeping
-		_sleep = 1;
-		startTransaction();
-		writecommand_last(CMD_SLPIN);
-		endTransaction();
-		backlight(0);
-		delay(5);//needed
-	} else {
-		if (_sleep == 0) return; //Already awake
-		_sleep = 0;
-		startTransaction();
-		writecommand_last(CMD_SLPOUT);
-		endTransaction();
-		backlight(1);
-		delay(120);//needed
-	}
-}
 
 void TFT_ILI9163C::defineScrollArea(uint16_t tfa, uint16_t bfa)
 {
@@ -470,7 +495,7 @@ void TFT_ILI9163C::scroll(uint16_t adrs)
 	}
 }
 
-void TFT_ILI9163C::partialArea(int16_t top,int16_t bott) 
+void TFT_ILI9163C::setPartialArea(uint16_t top,uint16_t bott) 
 {
 	startTransaction();
 	writecommand_cont(CMD_PARTAREA);
@@ -504,12 +529,10 @@ void TFT_ILI9163C::fillScreen(uint16_t color)
 }
 
 
-
-
 void TFT_ILI9163C::setCursor(int16_t x, int16_t y) 
 {
 	if (boundaryCheck(x,y)) return;
-	setAddrWindow(0x00,0x00,x,y);
+	setArea(0x00,0x00,x,y);
 	_cursorX = x;
 	_cursorY = y;
 }
@@ -682,15 +705,9 @@ uint8_t TFT_ILI9163C::getRotation(void)
 	return _rotation;
 }
 
-bool TFT_ILI9163C::boundaryCheck(int16_t x,int16_t y)
-{
-	if ((x >= _width) || (y >= _height)) return true;
-	return false;
-}
 
 
-
-void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) 
+void TFT_ILI9163C::setArea(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) 
 {
 	startTransaction();
 	setAddrWindow_cont(x0,y0,x1,y1);
@@ -815,6 +832,7 @@ void TFT_ILI9163C::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 		disableCS();
 	#endif
 	endTransaction();
+	
 }
 
 void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) 
@@ -833,13 +851,17 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 	}
 	setAddrWindow_cont(x,y,(x+w)-1,(y+h)-1);
 	for (y = h;y > 0;y--) {
-		for (x = w;x > 0;x--) { writedata16_cont(color);}
+		for (x = w;x > 0;x--) { 
+			writedata16_cont(color);
+		}
 		//writedata16_last(color);
 		#if defined(ESP8266)   	
 			yield(); 	
 		#endif
 	}
 }
+
+
 
 //80% fast
 /*

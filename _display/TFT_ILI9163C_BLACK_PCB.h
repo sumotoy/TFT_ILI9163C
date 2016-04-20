@@ -44,7 +44,7 @@
 	10:Determine gate output in a non-display area in the partial mode. 0(normal),1(fix on VGL)
 	11,12,13,14,15:00000 (na)
 	*/
-	static const uint8_t init_DFUNCTR[2] 	=		{0b00111111,0b00000110};
+	static const uint8_t init_DFUNCTR[2] 	=		{0b00111111,0b00000001};
 	static const uint8_t init_FRMCTR1[2] 	=		{17,20};//0x08,0x02Frame Rate Control (In normal mode/Full colors)
 	/*
 	Display Inversion:

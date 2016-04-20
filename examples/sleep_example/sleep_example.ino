@@ -3,8 +3,8 @@ Sleep Command example
 Very simple, when sleep on DC/DC converter is stopped, Internal oscillator is stopped, and panel scanning is stopped
 MCU interface and memory are still working and the memory keeps its contents.
 NOTE:
-The led background still active since it's NOT controlled by chip so the result it's a white screen until you turn off
-the backlight!
+The led background still active since it's NOT controlled by chip so you have to use useBacklight!
+To do this, you need a small circuit (a transistor and 2 resistor) as seen in my wiki connected to backlight led.
 */
 
 #include <SPI.h>
@@ -41,13 +41,14 @@ TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
 
 void setup() {
   tft.begin();
+  //tft.useBacklight(any pin connected to backlight LED);
   tft.fillScreen(RED);
   delay(500);
 }
 
 void loop(void) {
-  tft.sleepMode(true);
+  tft.changeMode(SLEEP);
   delay(1000);
-  tft.sleepMode(false);
+  tft.changeMode(NORMAL);
   delay(1000);
 }

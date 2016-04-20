@@ -1,6 +1,6 @@
 /*
 	ILI9163C - A fast SPI driver for TFT that use Ilitek ILI9163C.
-	Version: 1.0r6
+	Version: 1.0r6.3
 	
 	Features:
 	- Very FAST!, expecially with Teensy 3.x where uses hyper optimized SPI.
@@ -60,7 +60,9 @@
 	1.0r5: Deprecated old font rendering. New method for get PROGMEM stuff.
 	1.0r6: Fixed compatibility with a new TFT with RED PCB with yellow pin, library structure update
 	overall faster, cleaned code.
-	1.0r61: Corrected some init parametrs
+	1.0r6.1: Corrected some init parametrs
+	1.0r6.3: Fixed some commands, erased sleep, idle commands and replaced with changeMode(NORMAL,PARTIAL,IDLE,SLEEP,INVERT)
+	Now the SLEEP and display OFF commands shows a BLACk screen instead of white.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -96,6 +98,8 @@
 	static SPISettings ILI9163C_SPI;
 #endif
 
+enum ILI9163C_modes { NORMAL=0,PARTIAL,IDLE,SLEEP,INVERT };//0,1,2,3
+
 class TFT_ILI9163C : public Print {
 
  public:
@@ -109,12 +113,13 @@ class TFT_ILI9163C : public Print {
 	#endif
 	
 	void     	begin(bool avoidSPIinit=false);//avoidSPIinit=true set everithing but not call SPI.init()
-	void		setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	void		setArea(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	void		setPartialArea(uint16_t top,uint16_t bott);
+	void		changeMode(const enum ILI9163C_modes m=NORMAL);
 	int16_t		height(void) const;
 	int16_t 	width(void) const;
 	void		setRotation(uint8_t r);
 	uint8_t 	getRotation(void);
-	void		invertDisplay(boolean i);
 	void 		setBackground(uint16_t color);
 	void 		setForeground(uint16_t color);
 	uint16_t 	getBackground(void);
@@ -170,7 +175,6 @@ class TFT_ILI9163C : public Print {
 	void		setCharSpacing(uint8_t space);
 	void 		setFontInterline(uint8_t distance);
 	void		setInternalFont(void);
-
 	void 		setFont(const tFont *font);
 	virtual size_t 	write(uint8_t b) { _textWrite((const char *)&b, 1); return 1;}
 	virtual size_t  write(const uint8_t *buffer, size_t size) {_textWrite((const char *)buffer, size); return size;}
@@ -180,12 +184,11 @@ class TFT_ILI9163C : public Print {
 	void		getCursor(int16_t &x,int16_t &y);
 	//------------------------------- DISPLAY ----------------------------------------------------
 	uint8_t 	getErrorCode(void);
-	void		idleMode(boolean onOff);
+	//void		idleMode(boolean onOff);
 	void		display(boolean onOff);	
-	void		sleepMode(boolean mode);
+	//void		sleepMode(boolean mode);
 	void 		defineScrollArea(uint16_t tfa, uint16_t bfa);
 	void		scroll(uint16_t adrs);
-	void		partialArea(int16_t top,int16_t bott);
 	#if !defined (SPI_HAS_TRANSACTION)
 	void 		setBitrate(uint32_t n);//will be deprecated
 	#endif
@@ -689,16 +692,23 @@ class TFT_ILI9163C : public Print {
 		setAddrWindow_cont(x, y, x + 1, y + 1);
 		writedata16_cont(color);
 	}
+	
+	bool boundaryCheck(int16_t x,int16_t y)
+	__attribute__((always_inline)) {
+		if ((x >= _width) || (y >= _height)) return true;
+		return false;
+	}
 /* ========================================================================*/
  private:
 	inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
 	void 		colorSpace(uint8_t cspace);
-	bool 		boundaryCheck(int16_t x,int16_t y);
-	
+	//bool 		boundaryCheck(int16_t x,int16_t y);
+	bool		_backlight;
 	uint8_t		_initError;
 	uint8_t		_sleep;
 	float 		_arcAngleMax;
 	int 		_arcAngleOffset;
+	uint8_t		_currentMode;
 /* ========================================================================
 					       Helpers
    ========================================================================*/

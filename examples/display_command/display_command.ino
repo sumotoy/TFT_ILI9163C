@@ -1,6 +1,5 @@
 /*
-Turn display ON/OFF - this command it's almost unusable since it doesn't control the backligh
-It result in a white screen!
+Turn display ON/OFF - this command it's almost unusable since it doesn't control the backligh!
 */
 
 
