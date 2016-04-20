@@ -301,19 +301,21 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	-------------------------------------------------------------*/
 	startTransaction();
 	//Software reset -------------------------
-	writecommand_cont(CMD_SWRESET); delay(500);
+	writecommand_cont(CMD_SWRESET); delay(122);//500
 	//Exit sleep -----------------------------
 	writecommand_cont(CMD_SLPOUT);  delay(5);
 	//Exit idle mode
 	writecommand_cont(CMD_IDLEOF);  delay(1);
 	//Power Control 1 ------------------------
-	writecommand_cont(CMD_PWCTR1); writedata8_cont(init_POWCTR1); delay(1);
+	writecommand_cont(CMD_PWCTR1); for (i=0;i<2;i++){writedata8_cont(init_POWCTR1[i]);} delay(1);
 	//Power Control 2 ------------------------
 	writecommand_cont(CMD_PWCTR2); writedata8_cont(init_POWCTR2); delay(1);
 	//Power Control 3 ------------------------
-	writecommand_cont(CMD_PWCTR3); for (i=0;i<2;i++){writedata8_cont(init_POWCTR3[i]);} delay(1);
+	writecommand_cont(CMD_PWCTR3); writedata8_cont(init_POWCTR3); delay(1);
 	//Power Control 4 (idle) -----------------
-	writecommand_cont(CMD_PWCTR4); for (i=0;i<2;i++){writedata8_cont(init_POWCTR4[i]);} delay(1);
+	writecommand_cont(CMD_PWCTR4); writedata8_cont(CMD_PWCTR4); delay(1);
+	//Power Control 5 (partial) -----------------
+	writecommand_cont(CMD_PWCTR5); writedata8_cont(CMD_PWCTR5); delay(1);
 	//VCOM control 1 -------------------------
 	writecommand_cont(CMD_VCOMCTR1); for (i=0;i<2;i++){writedata8_cont(init_VCOMCTR1[i]);} delay(1);
 	//VCOM Offset Control --------------------
@@ -322,6 +324,10 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	writecommand_cont(CMD_DFUNCTR); for (i=0;i<2;i++){writedata8_cont(init_DFUNCTR[i]);} delay(1);
 	//Frame Rate Control (In normal mode/Full colors)
 	writecommand_cont(CMD_FRMCTR1); for (i=0;i<2;i++){writedata8_cont(init_FRMCTR1[i]);} delay(1);
+	//Frame Rate Control (Idle mode/8 Bits)
+	writecommand_cont(CMD_FRMCTR2); for (i=0;i<2;i++){writedata8_cont(init_FRMCTR1[i]);} delay(1);
+	//Frame Rate Control (Partial mode/Full colors)
+	writecommand_cont(CMD_FRMCTR3); for (i=0;i<2;i++){writedata8_cont(init_FRMCTR1[i]);} delay(1);
 	//How many bits per pixel are used?
 	writecommand_cont(CMD_PIXFMT); writedata8_cont(init_PIXFMT); delay(5);
 	//Default gamma curve?
@@ -353,7 +359,7 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	backlight(1);
 	fillScreen(_defaultBgColor);
 	setFont(&arial_x2);
-	setAddrWindow(0x0000,0x0000,0x0000,0x0000);
+	//setAddrWindow(0x0000,0x0000,0x0000,0x0000);
 }
 
 uint8_t TFT_ILI9163C::getErrorCode(void) 
@@ -497,16 +503,7 @@ void TFT_ILI9163C::fillScreen(uint16_t color)
 	endTransaction();
 }
 
-/*
-void TFT_ILI9163C::homeAddress(void) 
-{
-	if (_portrait){
-		setAddrWindow(0x00,0x00,TFT_ILI9163C_CGR_H,TFT_ILI9163C_CGR_W);
-	} else {
-		setAddrWindow(0x00,0x00,TFT_ILI9163C_CGR_W,TFT_ILI9163C_CGR_H);
-	}
-}
-*/
+
 
 
 void TFT_ILI9163C::setCursor(int16_t x, int16_t y) 

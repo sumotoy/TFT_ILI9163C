@@ -60,6 +60,7 @@
 	1.0r5: Deprecated old font rendering. New method for get PROGMEM stuff.
 	1.0r6: Fixed compatibility with a new TFT with RED PCB with yellow pin, library structure update
 	overall faster, cleaned code.
+	1.0r61: Corrected some init parametrs
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	
@@ -693,7 +694,6 @@ class TFT_ILI9163C : public Print {
 	inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
 	void 		colorSpace(uint8_t cspace);
 	bool 		boundaryCheck(int16_t x,int16_t y);
-	//void 		homeAddress(void);
 	
 	uint8_t		_initError;
 	uint8_t		_sleep;
