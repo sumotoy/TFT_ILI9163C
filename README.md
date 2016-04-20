@@ -98,11 +98,16 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 	Some chinese seller connected the TFT aligned to bottom, other aligned to top, there's not a sure
 	way to discover witch is yours so better try one of the configurations.
 	
-An example of the old RED PCB One:	
+An example of the old RED PCB One:<br>
+
 http://r.ebay.com/H27Lsi
-An example of the RED PCB one (2016) with yellow pin (smaller)
+
+<br>An example of the RED PCB one (2016) with yellow pin (smaller)<br>
+
 http://r.ebay.com/RoKYq9
-An example of BLACK PCB one
+
+<br>An example of BLACK PCB one<br>
+
 http://r.ebay.com/tNE6Mg
 	
 	This TFT it's really cheap but has surprising features since it support very high speed SPI trasfer 
@@ -168,10 +173,11 @@ The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the 
 	You will find also the preset for font conversion (last beta of lcd-image-converter has support for preset).
 	You will find also the original font files that you can load with lcd-image-converter!
 	Use the last beta of lcd-image-converter!!!
-	ILI9163C datasheet.
-	<b>Download lcd-image-converter here:</b>
+	ILI9163C datasheet.<br>
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	<br><b>Download lcd-image-converter here:</b><br>
 	http://www.riuson.com/lcd-image-converter/download
-	<b>Github page of the developer:</b>
+	<br><b>Github page of the developer:</b><br>
 	https://github.com/riuson/lcd-image-converter
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
