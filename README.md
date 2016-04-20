@@ -192,7 +192,7 @@ The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the 
 
 <b>Version:</b>
 	
-	1.0r6: Almost release.
+	1.0r61: The 'almost' release. Works with any strain around
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
