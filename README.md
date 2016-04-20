@@ -98,9 +98,12 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 	Some chinese seller connected the TFT aligned to bottom, other aligned to top, there's not a sure
 	way to discover witch is yours so better try one of the configurations.
 	
-http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
-
-http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
+An example of the old RED PCB One:	
+http://r.ebay.com/H27Lsi
+An example of the RED PCB one (2016) with yellow pin (smaller)
+http://r.ebay.com/RoKYq9
+An example of BLACK PCB one
+http://r.ebay.com/tNE6Mg
 	
 	This TFT it's really cheap but has surprising features since it support very high speed SPI trasfer 
 	(over 40Mhz tested!) and can be used as frame buffer, colors are quite tunable and has a tons of settings.
@@ -108,41 +111,15 @@ http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
 	
 <b>BLACK, RED or ...</b>
 	
-	There's different strain of this display on ebay, I have try to tracking all of them but may missing some 		species! Actually the more popular has a RED pcb and a BLACK pcb that are completely same pcb but mount a 		different display that need some tweaking, in particular RED ones need offset but also some tweak for 			colors, etc. In the .h file in the library try to comment out one of the presets:
-	//#define __144_RED_PCB__
-	#define __144_BLACK_PCB__
-	//#define __22_RED_PCB__
-	I have a discussion here where a couple of users claim that the _GRAMHEIGH propriety should be always 128.
-	This is true ONLY if you will never use scroll! Scroll use the entire memory mapped to screen, my RED tag one
-	it's 128x128 but it uses 128x160! If during scroll you have some garbage means that you have not correctly
-	setup the display property:
-	
-	#define _TFTWIDTH  		128//the REAL W resolution of the TFT
-	#define _TFTHEIGHT 		128//the REAL H resolution of the TFT
-	#define _GRAMWIDTH      	128
-	#define _GRAMHEIGH      	160//Heh? Yes! My display uses offset!
-	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH //
-	#define __COLORSPC		1// 1:GBR - 0:RGB
+	There's different strain of this display on ebay, I have try to tracking all of them but may missing some 		species! Actually the more popular has a RED pcb and a BLACK pcb that are completely same pcb but mount a 		different display that need some tweaking, in particular RED ones need offset but also some tweak for 			colors, etc. Recently, in 2016, another RED PCB display spreaded around, it has yellow pin instead black, it uses different tft so parameters are different too.In the .h file in the library try to comment out one of the presets:
+	//#include "../_display/TFT_ILI9163C_BLACK_PCB.h"
+	#include "../_display/TFT_ILI9163C_RED_PCB_OLD.h"//the old one
+	//#include "../_display/TFT_ILI9163C_RED_PCB_YPIN.h"//the yellow pin one
+	From version 1.r6 display data it's located inside _display folder, you can easily duplicate one of this files,
+	rename it and include in _settings/TFT_ILI9163C_settings.h.
+	Inside display files there's all init parameters that should fit every display type, you can change on the fly
+	some parameter like:
 	#define __GAMMASET3		//uncomment for another gamma (1,2,3)
-	#define __OFFSET		32//this is the offset of my display, 160 - 128 = 32
-	
-	You can write your own one by adding it in the .h file but let me know so I can add for other users.
-	The OFFSET have sense if the chinese vendor decided to align TFT at bottom lines of the controller.
-	This is nonsense since it will force you to use all the off-screen area as well (visible only when you use
-	scrolling).
-	
-<b>Code Optimizations:</b>
-	
-	The purpose of this library it's SPEED. I have tried to use hardware optimized calls
-	where was possible and results are quite good for most applications.
-	Of course it can be improved so feel free to add suggestions.
-	You will notice that not all display command was added, this because this chip it's really fast
-	but have very poor hardware design, for example, the display on/off command will result in a bright
-	white screen since chip will pullup all display lines (at list my display act as this), a nonsense to me,
-	should be exact the opposite! Apart display there's other commands that act the same so I decided to 
-	don't include to save space.
-	The Teensy 3 side it's almost complete and quite optimized, however Arduino's side can be tweaked a bit
-	by using the same Teensy3 technique (multiple transfer with just one CS call, etc), this will be the 1.0 		version.
 
 <b>The release 1.0 it's standalone and NOT NEED adafruitGFX!</b>
 
