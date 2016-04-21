@@ -1,39 +1,35 @@
 /*
 	ILI9163C - A fast SPI driver for TFT that use Ilitek ILI9163C.
-	Version: 1.0r6.3
+	Version: 1.0r6.4
 	
 	Features:
 	- Very FAST!, expecially with Teensy 3.x where uses hyper optimized SPI.
 	- It uses just 4 or 5 wires.
 	- Compatible with many CPU (Teensy's, Arduino 8Bit, DUE, ESP8266)
+	- Full featured
+	- GPO Fast Font Rendering
 	
-	https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r
+	https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r6
 	
 	Background:
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
 	any working library so I decided to hack it. ILI9163C looks pretty similar to other 
-	display driver but it uses it's own commands so it's tricky to work with it unlsess you
+	display driver but it uses his own commands so it's tricky to work with it unlsess you
 	carefully fight with his gigantic and not so clever datasheet.
-	My display it's a 1.44"", 128x128 that suppose to substitute Nokia 5110 LCD and here's the 
+	My display is a 1.44"", 128x128 that suppose to substitute Nokia 5110 LCD and here's the 
 	first confusion! Many sellers claim that it's compatible with Nokia 5110 (that use a philips
 	controller) but the only similarity it's the pin names since that this one it's color and
 	have totally different controller that's not compatible.
-	http://www.ebay.com/itm/Replace-Nokia-5110-LCD-1-44-Red-Serial-128X128-SPI-Color-TFT-LCD-Display-Module-/141196897388
-	http://www.elecrow.com/144-128x-128-tft-lcd-with-spi-interface-p-855.html
-	Pay attention that   can drive different resolutions and your display can be
-	160*128 or whatever, also there's a strain of this display with a black PCB that a friend of mine
-	got some weeks ago and need some small changes in library to get working.
-	If you look at TFT_ILI9163C_settings.h file you can add your modifications and let me know so I
-	can include for future versions.
+	http://r.ebay.com/H27Lsi
+	http://r.ebay.com/RoKYq9
+	http://r.ebay.com/tNE6Mg
+	The library has a settings file inside _settings/TFT_ILI9163C_settings.h, open it and choose
+	your display type. Display settings files are inside _display folder, you may need duplicate and change 
+	name so you can tweak as your needs but normally this is not raccomanded since some parameter can
+	literally destroy your display.
 	
-	Code Optimizations:
-	The purpose of this library it's SPEED and COMPATIBILITY. 
-	I have tried to use hardware optimized calls where was possible and results are quite good for 
-	most applications,without sacrifice compatibility when other SPI devices are sharing same lines.
-	Many SPI call has been optimized by reduce un-needed triggers to RS and CS
-	lines. Of course it can be improved so feel free to add suggestions.
 	-------------------------------------------------------------------------------
-    Copyright (c) 2014/2015, .S.U.M.O.T.O.Y., coded by Max MC Costa.    
+    Copyright (c) 2014/2015/2016, .S.U.M.O.T.O.Y., coded by Max MC Costa.    
 
     TFT_ILI9163C Library is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,19 +49,17 @@
 	Thanks to Jnmattern & Marek Buriak for drawArc!
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Version:
-	1.0r1: Completely recoded, dropped adafruitGFX, much faster.
-	1.0r2: Now tested and fixed for 8bit CPU, even tiny faster globally.
-	1.0r3: Firts attempt to fix Audio Board compatibility, some minor bugs and now works with ESP8266!
-	1.0r4: New proprietary text rendering engine, faster and fonts can be created by user.
-	1.0r5: Deprecated old font rendering. New method for get PROGMEM stuff.
 	1.0r6: Fixed compatibility with a new TFT with RED PCB with yellow pin, library structure update
 	overall faster, cleaned code.
 	1.0r6.1: Corrected some init parametrs
 	1.0r6.3: Fixed some commands, erased sleep, idle commands and replaced with changeMode(NORMAL,PARTIAL,IDLE,SLEEP,INVERT)
-	Now the SLEEP and display OFF commands shows a BLACk screen instead of white.
+	Now the PARTIAL and display OFF commands shows a BLACK screen instead of white.Sleep mode uses 70uA max
+	1.0r6.4: Initialization really fast, now ready in some millisec.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
-	
+	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
+	- The backlight it's not controlled by ILI chip, for this reason you will need another CPU pin if you want to control this feature.
+	- Sleep mode shows only white screen due hardware limitation (gates are pullup during sleep)
 	Please report any!
 
 */
