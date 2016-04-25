@@ -3,6 +3,7 @@ TFT_ILI9163C
 
 <b>Black PCB</b> (common before 2016 but still around)<br>
 This is not as common as the other ones but some user has it. Most of the time it should be used the TFT_ILI9163C_BLACK_PCB.h file but it happen that chinese used a black PCB for the model below! I have not this one so I cannot be more precise, best thing is start with the suggested settings and if doesn't work well try the one below. As you can see this is the only display with correct memory mapping and because this is the fast one (at list on fillScreen). The display has 3v3 regulator for supply the ILI chip but logic levels remain at 3V3 so you will need a level translator for connect 5V logic level CPU (as arduino UNO).<br>
+<br>Following image shows how the display it's mapped...<br>
 ![BlackPCB](https://github.com/sumotoy/TFT_ILI9163C/blob/Docs/images/ILI9163C_blackPCB.png)
 
 -------------------------------------------------------------------------------------------
