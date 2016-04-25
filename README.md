@@ -1,6 +1,6 @@
 Here's a short description of the various display's handled by this library.
 
-Despite some rumors in forum, these display's are NOT ST7735, you should not use ST library with those displays since inside ILI chip there's pump up DC/DC converters and several parameters that has to be fine tuned with the display used. ILI9163C chip it's mounted directly on display flat cable but how this is done depends of the vendor who commissioned display and parameters should be tuned. Many display drivers uses similar commands but RARELY init parameters are common so you should use the righ ones or you can damage display or chip after long use!<br>
+Despite some rumors in some forums, these display's are NOT ST7735, you should not use ST library with those displays since inside ILI chip there's pump up DC/DC converters and several parameters that has to be fine tuned with the display used. ILI9163C chip it's mounted directly on display flat cable but how this is done depends of the vendor who commissioned display and parameters should be tuned. Many display drivers uses similar commands but RARELY init parameters are common so you should use the righ ones or you can damage display or chip after long use!<br>
 
 
 <b>Black PCB</b> (common before 2016 but still around)<br>
