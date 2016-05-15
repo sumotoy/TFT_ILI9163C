@@ -2,29 +2,29 @@
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's,ESP8266 and more...
 
-<b>Preview of the 1.0r61</b><br><br>
-<b>Caution!</b> Actually tested with Teensy and ESP8266 but NOT with other CPU. Colors parameters has to be tuned and probably
-other parameters too. I will release another version in these days!<br>
-This version it's really different from 1.0r5 and below, the release will be really similar to this, font format has slight<br> changed and new font are compatible with old version but old font not! If you have font created by yourself you can re-convert using new font-template or look inside settings file and enable old font compatibility.<br>
-This version it's compatible with new RED pcb with yellow pins, see https://github.com/sumotoy/TFT_ILI9163C/tree/Docs<br>
-Changes:<br>
-- Full Compatibility with RED PCB Yellow pin strain.
-- Changed overall library structure, easier to add CPU's
-- Separate display's files, now each display has full set of parameters, easy to add more incoming strain.
-- Since now every display has his configuration file, many parameters can be adjusted.
-- Handle 18Bit color depth.
-- Changed a bit Font Scheme, new ones are backward compatible, old ones should to be re-converted with lcd-image-converter (last beta) and with new template (sumotoy_font2.1.tmpl). I have also added a conversion preset since the last beta of lcd-image-converter has this feature (Font_Conversion.xml).
-However I have included an option in user settings that force lib to read old font types but re-conversion should be performed as soon as possible since the release will not support this.
-- Included font files for editing, if you find any problem you can edit directly library font files with lcd.image.converter and compile for library.
-- Library use less space, made a lot of optimizations on code.
-- Small error corrected.
-- Better initialization sequence.
-- Compatibility with custom online/offline compilers (preprocessor placeholders issue)
-- Speed almost unchanged, something faster, something slight slower but almost same.
-- Delete unused and useless functions.
-- Updated some example.
-- Added partial mode command.
-- Many lib vars are now static, you can use more than one instance (2 or more display)
+<b>Preview of the 1.0p7</b><br><br>
+<b>This is a massive update, many differences from any other version!</b><br>
+- [x]  **Multiple instances**! There's a setting where you can enable multiple instances support.
+However it uses slight more resources (this is why I add a setting). With multiple instances you can have 2 or more display's (even different type) sharing same pins (apart CS) and fonts!
+- [x]  **Multiple instances**. Automatically avoid multiple SPI initializations thanks to an internal instances counter.
+- [x]  Better **drawCircle** function, more rounded
+- [x]  **fillScreen** can blend 2 colors and create grandient backgrounds es. _fillScreen(RED,BLUE);_
+- [x]  **fillRect** can blend 2 colors and create grandient backgrounds es. _fillRect(x,y,w,h,RED,BLUE);_
+- [x]  added **getMode**
+- [ ]  **setCursor** can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
+- [x]  **Ext Fonts**. Possible change the default font  or even avoid completely to save space
+- [x]  **setCursor** now works as it should on any rotation
+- [ ]  **Scroll** now works as it should for all display's.
+- [ ]  **Fonts** Font over colored background shows a small issue (rendering engine issue).
+- [x]  **Scroll** scroll Up/Down now possible.
+- [x]  **Compiling Errors** fixed almost all compiling errors with some compilers.
+- [x]  Added **getScrollTop** and **getScrollBottom**.
+- [x]  **setTextSize** deprecated. Use always _setTextScale_, exact functionality.
+- [x]  **images** fixed images display
+- [x]  **Font**. Modified template to 2.2.
+- [x]  **Display**. Full Compatibility with RED PCB Yellow pin strain.
+- [x]  **System**. Faster initialization sequence.
+- [x]  **System**. Better compatibility with some compilers.
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/libraries/20160419_170251.jpg)
 
