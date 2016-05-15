@@ -38,8 +38,8 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	Teensy 3.2 	-> really fast
 	Teensy LC  	-> fast 
 	UNO and similar -> fast
-	DUE 		-> can be better but fast
-	ESP8266		-> it works and pretty fast.
+	DUE 		-> fast (but can be better)
+	ESP8266		-> pretty fast.
 	
 ==========================
 
