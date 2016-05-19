@@ -16,7 +16,7 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r5"
+    "url": "https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0p7"
   },
   "examples": [
     "examples/*/*.ino",
