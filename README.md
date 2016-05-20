@@ -4,27 +4,32 @@ A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's
 
 <b>Preview of the 1.0p7</b><br><br>
 <b>This is a massive update, many differences from any other version!</b><br>
-- [x]  **Multiple instances**! There's a setting where you can enable multiple instances support.
+- [ ]  **Bug**  Scroll, should fix for all display's.
+- [ ]  **Added** setCursor can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
+- [x]  **Added** Multiple instances! There's a setting where you can enable multiple instances support.
 However it uses slight more resources (this is why I add a setting). With multiple instances you can have 2 or more display's (even different type) sharing same pins (apart CS) and fonts!
-- [x]  **Multiple instances**. Automatically avoid multiple SPI initializations thanks to an internal instances counter.
-- [x]  Better **drawCircle** function, more rounded
-- [x]  **fillScreen** can blend 2 colors and create grandient backgrounds es. _fillScreen(RED,BLUE);_
-- [x]  **fillRect** can blend 2 colors and create grandient backgrounds es. _fillRect(x,y,w,h,RED,BLUE);_
-- [x]  added **getMode**
-- [ ]  **setCursor** can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
-- [x]  **Ext Fonts**. Possible change the default font  or even avoid completely to save space
-- [x]  **setCursor** now works as it should on any rotation
-- [ ]  **Scroll** now works as it should for all display's.
-- [ ]  **Fonts** Font over colored background shows a small issue (rendering engine issue).
-- [x]  **Scroll** scroll Up/Down now possible.
-- [x]  **Compiling Errors** fixed almost all compiling errors with some compilers.
-- [x]  Added **getScrollTop** and **getScrollBottom**.
-- [x]  **setTextSize** deprecated. Use always _setTextScale_, exact functionality.
-- [x]  **images** fixed images display
-- [x]  **Font**. Modified template to 2.2.
-- [x]  **Display**. Full Compatibility with RED PCB Yellow pin strain.
-- [x]  **System**. Faster initialization sequence.
-- [x]  **System**. Better compatibility with some compilers.
+- [x]  **Added** Multiple instances. Automatically avoid multiple SPI initializations thanks to an internal instances counter.
+- [x]  **Added** getMode().
+- [x]  **Added** Display files now handle any possible type of offset and can correct even upside-down screen. This allow you use any type of display without change a line of code.
+- [x]  **Added** getScrollTop and getScrollBottom.
+- [x]  **Added** Icons! Got a lot of requests and now working. There's a template & preset for converting images to icons (for lcd-image-converter), See examples!
+- [x]  **Added** Icons. Added optional parameters to drawIcon (NONE,TRANSPARENT,REPLACE,BOTH)
+- [x]  **Fixed** setCursor now works as it should on any rotation
+- [x]  **Fixed** drawCircle(). better rounded.
+- [x]  **Fixed** Rendering engine issue on background font fixed.
+- [x]  **Fixed** fixed almost all compiling errors with some compilers.
+- [x]  **Updated** fillScreen(color1,color2). now amazing fast!
+- [x]  **Updated** fillRect(x,y,w,hcolor1,color2). now amazing fast!
+- [x]  **Updated** Fonts. Modified template to 2.2.
+- [x]  **Updated** Fonts. Possible change the default font  or even avoid completely to save space
+- [x]  **Updated** scroll Up/Down now possible.
+- [x]  **Updated** changeMode() now handle display on/off and works correctly.
+- [x]  **Updated** fillScreen() & clearScreen() faster. fillScreen optionally can blend 2 colors and create grandient backgrounds es. _fillScreen(RED,BLUE);_
+- [x]  **Updated** fillRect() faster. Optionally can blend 2 colors and create grandient backgrounds es. _fillRect(x,y,w,h,RED,BLUE);_
+- [x]  **Updated** all examples revised.
+- [x]  **Deprecated** drawColorBitmap(). use drawIcon().
+- [x]  **Deprecated** display.() use changeMode(DISP_ON/DISP_OFF).
+- [x]  **Deprecated** setTextSize(). use setTextScale().
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/libraries/20160419_170251.jpg)
 
