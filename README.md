@@ -30,6 +30,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Deprecated** drawColorBitmap(). use drawIcon().
 - [x]  **Deprecated** display.() use changeMode(DISP_ON/DISP_OFF).
 - [x]  **Deprecated** setTextSize(). use setTextScale().
+- [x]  **Deprecated** .
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/libraries/20160419_170251.jpg)
 
@@ -127,9 +128,6 @@ http://r.ebay.com/tNE6Mg
 	//#include "../_display/TFT_ILI9163C_RED_PCB_YPIN.h"//the yellow pin one
 	From version 1.r6 display data it's located inside _display folder, you can easily duplicate one of this files,
 	rename it and include in _settings/TFT_ILI9163C_settings.h.
-	Inside display files there's all init parameters that should fit every display type, you can change on the fly
-	some parameter like:
-	#define __GAMMASET3		//uncomment for another gamma (1,2,3)
 
 <b>The release 1.0 it's standalone and NOT NEED adafruitGFX!</b>
 
@@ -162,7 +160,7 @@ https://github.com/greiman/SdFat
 	- SCK		-->		Sclk (D5)
 	- LED		-->		Some display need a resistor (see note below)
 	
-	Use the current staging version 2.0rc2 with ESP8266 or it will probably fail, it works much better
+	Use the last version of ESP8266 or it will probably fail, it works much better
 	with SPI and it's overall better than stable version.
 	
 * Note about led:
@@ -192,13 +190,8 @@ The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the 
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and high speed SPI magic.
 	Thanks to riuson https://github.com/riuson for kindly provide lcd tool
 	Thanks to Jnmattern & Marek Buriak for drawArc!
-	
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	Thanks to https://github.com/gimpox for his support!
 
-<b>Version:</b>
-	
-	1.0r61: The 'almost' release. Works with any strain around
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 <b> Legal Notes:</b>
 	
