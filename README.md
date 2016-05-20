@@ -30,7 +30,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Deprecated** drawColorBitmap(). use drawIcon().
 - [x]  **Deprecated** display.() use changeMode(DISP_ON/DISP_OFF).
 - [x]  **Deprecated** setTextSize(). use setTextScale().
-- [x]  **Deprecated** .
+- [x]  **Deprecated** Adafruit-GFX (never again!).
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/libraries/20160419_170251.jpg)
 
