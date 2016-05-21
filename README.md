@@ -8,6 +8,8 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br>
 - [ ]  **Bug**  Scroll, should fix for all display's.
 - [ ]  **Added** RED PCB Display 2.1.
+- [ ]  **Added** Icons. Added RLE compression.
+- [ ]  **Added** Font. Added RLE compression.
 - [ ]  **Added** setCursor can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
 - [ ]  **Added** New font parameter inside Font File. It allows automatical char reassign (es. minus to capital). Useful for include small font file that uses less resources.
 - [x]  **Added** Multiple instances! There's a setting where you can enable multiple instances support.
