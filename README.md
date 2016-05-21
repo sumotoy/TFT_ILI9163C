@@ -2,7 +2,7 @@
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's,ESP8266 and more...
 
-<b>Preview of the 1.0p7</b><br>
+<b>Preview of the 1.0p7</b>, the official release 1.0<br>
 Current version it's a preview, scroll is not complete and other optimizations coming.<br>
 Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b><br>
@@ -43,13 +43,13 @@ However it uses slight more resources (this is why I add a setting). With multip
 https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 
 	Tested with:
-	Teensy 3.0 	-> really fast
-	Teensy 3.1 	-> really fast
-	Teensy 3.2 	-> really fast
-	Teensy LC  	-> fast 
-	UNO and similar -> fast
-	DUE 		-> fast (but can be better)
-	ESP8266		-> pretty fast.
+	Teensy 3.0 	-> really fast (1.0p7 confirmed)
+	Teensy 3.1 	-> really fast (1.0p7 confirmed)
+	Teensy 3.2 	-> blazing fast (1.0p7 confirmed)
+	Teensy LC  	-> fast (1.0p7 not tested yet)
+	UNO and similar -> fast (1.0p7 not tested yet)
+	DUE 		-> fast (1.0p7 not tested yet)
+	ESP8266		-> pretty fast (1.0p7 confirmed)
 	
 ==========================
 
@@ -64,7 +64,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	- Working with IDE 1.6.8 (or newer)
 	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1, Teensy 3.2, Teensy LC, ESP8266
 	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika (old version)
-	- NEW: Support for user fonts and Icons! Using mine rendering engine (used in some other libraries I've done here)
+	- NEW: Support for user fonts and Icons! Using proprietary rendering engine (used in some other libraries I've done here)
 	
 http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 
