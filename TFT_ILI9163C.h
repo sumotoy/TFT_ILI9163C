@@ -589,8 +589,12 @@ class TFT_ILI9163C : public Print {
 
 		void spiwrite16(uint16_t c)
 		__attribute__((always_inline)) {
-			SPI.transfer(c >> 8); SPI.transfer(c);
-			//SPI.transfer16(c);//this it's really slow!!!! Why????
+			#if defined(_SPI_MULTITRANSFER)
+				uint8_t pattern[2] = { (uint8_t)(c >> 8), (uint8_t)(c >> 0) };
+				SPI.writePattern(pattern, 2, (uint8_t)1);
+			#else
+				SPI.transfer(c >> 8); SPI.transfer(c);
+			#endif
 		}
 
 

@@ -4,12 +4,19 @@
 	//this are for the LCD Image Converter as workaround
 	#define RLE_no  (0)
 	#define RLE_yes (1)
+	/*
+		Spi burst multy byte transfer support (experimental)
+		_SPI_MULTITRANSFER
+		uses transfer(void *buf, size_t count), ESP8266 uses writePattern
+		NOTE:currently writePattern for more than 2 byte count not working for ESP8266!!!
+	*/
 	
 	#if defined(ESP8266)
 		#define _smCharType	uint8_t
 		#if defined(SPI_HAS_TRANSACTION)
 			static const uint32_t TFT_ILI9163C_SPI_SPEED 	= 80000000;
 		#endif
+		#define _SPI_MULTITRANSFER//enable burst multy byte transfer
 	#elif defined(__AVR__)
 		#include <avr/pgmspace.h>
 		#define _FORCE_PROGMEM__
@@ -28,12 +35,16 @@
 		#if defined(SPI_HAS_TRANSACTION)
 			const uint32_t TFT_ILI9163C_SPI_SPEED 			= 24000000;
 		#endif
+		#define _SPI_MULTITRANSFER//enable burst multy byte transfer
 	#elif defined(__MKL26Z64__)	|| defined(__MK20DX128__) || defined(__MK20DX256__)
 		//#include <avr/pgmspace.h>
 		//#define _FORCE_PROGMEM__
 		#define _smCharType	unsigned char
 		static const uint32_t TFT_ILI9163C_SPI_SPEED 		= 30000000;
-	#else
+		#if !defined(__MKL26Z64__)
+			#define _SPI_MULTITRANSFER//enable burst multy byte transfer
+		#endif
+	#else//all the rest
 		#define _smCharType	uint8_t
 		#if defined(SPI_HAS_TRANSACTION)
 			static const uint32_t TFT_ILI9163C_SPI_SPEED 	= 8000000;
