@@ -15,6 +15,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Added** getMode().
 - [x]  **Added** Display files now handle any possible type of offset and can correct even upside-down screen. This allow you use any type of display without change a line of code.
 - [x]  **Added** getScrollTop and getScrollBottom.
+- [x]  **Added** Draw Arc Disable (#define _ILI9163C_DRAWARC) in settings. Saves resources if not used.
 - [x]  **Added** Icons! Got a lot of requests and now working. There's a template & preset for converting images to icons (for lcd-image-converter), See examples!
 - [x]  **Added** Icons. Added optional parameters to drawIcon (NONE,TRANSPARENT,REPLACE,BOTH)
 - [x]  **Fixed** setCursor now works as it should on any rotation
