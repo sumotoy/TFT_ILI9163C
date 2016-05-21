@@ -22,14 +22,12 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Fixed** drawCircle(). better rounded.
 - [x]  **Fixed** Rendering engine issue on background font fixed.
 - [x]  **Fixed** fixed almost all compiling errors with some compilers.
-- [x]  **Updated** fillScreen(color1,color2). now amazing fast!
-- [x]  **Updated** fillRect(x,y,w,hcolor1,color2). now amazing fast!
+- [x]  **Updated** fillScreen(color1,color2) for create grandient backgrounds. now amazing fast!
+- [x]  **Updated** fillRect(x,y,w,hcolor1,color2) for create grandient rects. now amazing fast!
 - [x]  **Updated** Fonts. Modified template to 2.2.
 - [x]  **Updated** Fonts. Possible change the default font  or even avoid completely to save space
 - [x]  **Updated** scroll Up/Down now possible.
 - [x]  **Updated** changeMode() now handle display on/off and works correctly.
-- [x]  **Updated** fillScreen() & clearScreen() faster. fillScreen optionally can blend 2 colors and create grandient backgrounds es. _fillScreen(RED,BLUE);_
-- [x]  **Updated** fillRect() faster. Optionally can blend 2 colors and create grandient backgrounds es. _fillRect(x,y,w,h,RED,BLUE);_
 - [x]  **Updated** all examples revised.
 - [x]  **Deprecated** drawColorBitmap(). use drawIcon().
 - [x]  **Deprecated** display.() use changeMode(DISP_ON/DISP_OFF).
