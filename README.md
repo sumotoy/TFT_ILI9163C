@@ -3,13 +3,15 @@
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's,ESP8266 and more...
 
 <b>Preview of the 1.0p7</b>, the official release 1.0<br>
+**CAUTION!** Wait tomorrow before use this version, I'm currently changing Image/Icon support deeply and will be ready tomorrow<br>
 Current version it's a preview, scroll is not complete and other optimizations coming.<br>
 Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br>
 - [ ]  **Bug**  Scroll, should fix for all display's.
 - [ ]  **Added** RED PCB Display 2.1.
+- [ ]  **Added** Images. Added RLE compression.
 - [ ]  **Added** Icons. Added RLE compression.
-- [ ]  **Added** Font. Added RLE compression.
+- [ ]  **Added** Fonts. Added RLE compression.
 - [ ]  **Added** setCursor can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
 - [ ]  **Added** New font parameter inside Font File. It allows automatical char reassign (es. minus to capital). Useful for include small font file that uses less resources.
 - [x]  **Added** Multiple instances! There's a setting where you can enable multiple instances support.
@@ -19,9 +21,10 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Added** Display files now handle any possible type of offset and can correct even upside-down screen. This allow you use any type of display without change a line of code.
 - [x]  **Added** getScrollTop and getScrollBottom.
 - [x]  **Added** Draw Arc Disable (#define _ILI9163C_DRAWARC) in settings. Saves resources if not used.
-- [x]  **Added** Color Icons! Got a lot of requests and now working. There's a template & preset for converting images to icons (for lcd-image-converter), See examples!
-- [x]  **Added** Color Icons. Added optional parameters to drawIcon (NONE,TRANSPARENT,REPLACE,BOTH)
-- [ ]  **Added** B&W Icons. Added optional parameters to drawIcon (NONE,TRANSPARENT,REPLACE,BOTH)
+- [x]  **Added** drawImage!There's a template & preset for converting images (for lcd-image-converter), See examples!
+- [x]  **Added** drawIcon! Got a lot of requests and now working. There's a template & preset for converting images (for lcd-image-converter), See examples!
+- [x]  **Added** drawImage. Added optional parameters (NONE,TRANSPARENT,REPLACE,BOTH)
+- [x]  **Added** drawIcon. Added transparency (set background as foreground and...voilà)
 - [x]  **Fixed** setCursor now works as it should on any rotation
 - [x]  **Fixed** drawCircle(). better rounded.
 - [x]  **Fixed** Rendering engine issue on background font fixed.
