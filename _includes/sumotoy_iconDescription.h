@@ -7,9 +7,6 @@
 	
 	#include <stdio.h>
 	
-	#define RLE_no  (0)
-	#define RLE_yes (1)
-	
 	#if defined(_FORCE_PROGMEM__)
 		typedef struct PROGMEM {
 			const uint16_t 	*data;//R5G6B5

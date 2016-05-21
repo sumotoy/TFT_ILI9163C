@@ -1,7 +1,10 @@
 #ifndef __TFT_ILI9163C_CPU_H
 	#define __TFT_ILI9163C_CPU_H
 	#include <stdint.h>
-
+	//this are for the LCD Image Converter as workaround
+	#define RLE_no  (0)
+	#define RLE_yes (1)
+	
 	#if defined(ESP8266)
 		#define _smCharType	uint8_t
 		#if defined(SPI_HAS_TRANSACTION)
