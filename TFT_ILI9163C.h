@@ -173,13 +173,15 @@ class TFT_ILI9163C : public Print {
 				fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color,bool triangled=true),
 				drawPolygon(int16_t x, int16_t y, uint8_t sides, int16_t diameter, float rot, uint16_t color),
 				drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+	#if defined(_ILI9163C_DRAWARC)//see settings files
 	void 		drawArc(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color) {
 					if (start == 0 && end == _arcAngleMax) {
 						drawArcHelper(cx, cy, radius, thickness, 0, _arcAngleMax, color);
 					} else {
 						drawArcHelper(cx, cy, radius, thickness, start + (_arcAngleOffset / (float)360)*_arcAngleMax, end + (_arcAngleOffset / (float)360)*_arcAngleMax, color);
 					}
-				}
+				};
+	#endif
 	void 		drawEllipse(int16_t cx,int16_t cy,int16_t radiusW,int16_t radiusH,uint16_t color);
 	void 		ringMeter(int val, int minV, int maxV, uint8_t x, uint8_t y, uint8_t r=20, uint16_t colorScheme=4,uint16_t backSegColor=BLACK,int angle=150,uint8_t inc=5);
 	void 		drawLineAngle(int16_t x, int16_t y, int angle, uint8_t length, uint16_t color,int offset = -90);
@@ -253,8 +255,10 @@ class TFT_ILI9163C : public Print {
 	bool					_backlight;
 	uint8_t					_initError;
 	uint8_t					_sleep;
+	#if defined(_ILI9163C_DRAWARC)
 	float 					_arcAngleMax;
 	int 					_arcAngleOffset;
+	#endif
 	uint8_t					_currentMode;
 	int16_t					_scrollTop;
 	int16_t					_scrollBottom;
@@ -791,9 +795,12 @@ class TFT_ILI9163C : public Print {
 	void 		fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color1,uint16_t color2);
 	void 		drawLine_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color);
 	void 		fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color);
+	#if defined(_ILI9163C_DRAWARC)
 	void 		setArcParams(float arcAngleMax, int arcAngleOffset);
+	#endif
 	float 		cosDeg_helper(float angle);
 	float 		sinDeg_helper(float angle);
+	
 	void 		clearMemory(void);
 	
 	#if defined (TFT_ILI9163C_INSTANCES)

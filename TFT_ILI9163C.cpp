@@ -186,8 +186,10 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	_defaultFgColor = _ILI9163C_FOREGROUND;
 	_textForeground = _textBackground = _defaultFgColor;//text transparent
 	_textWrap      = true;
+	#if defined(_ILI9163C_DRAWARC)
 	_arcAngleMax = 360;
 	_arcAngleOffset = -90;
+	#endif
 	_bklPin = 255;
 	_Mactrl_Data = 0b00000000;
 	#if defined (TFT_ILI9163C_INSTANCES)
@@ -1126,7 +1128,7 @@ void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 	endTransaction();
 }
 
-
+#if defined(_ILI9163C_DRAWARC)
 void TFT_ILI9163C::drawArcHelper(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color) 
 {
 	int16_t xmin = 65535;
@@ -1289,6 +1291,13 @@ void TFT_ILI9163C::drawArcHelper(uint16_t cx, uint16_t cy, uint16_t radius, uint
 	}
 }
 
+void TFT_ILI9163C::setArcParams(float arcAngleMax, int arcAngleOffset)
+{
+	_arcAngleMax = arcAngleMax;
+	_arcAngleOffset = arcAngleOffset;
+}
+#endif
+
 /**************************************************************************/
 /*!	
 		sin e cos helpers
@@ -1307,13 +1316,6 @@ float TFT_ILI9163C::sinDeg_helper(float angle)
 {
 	float rads = angle / (float)360 * 2 * PI;
 	return sin(rads);
-}
-
-
-void TFT_ILI9163C::setArcParams(float arcAngleMax, int arcAngleOffset)
-{
-	_arcAngleMax = arcAngleMax;
-	_arcAngleOffset = arcAngleOffset;
 }
 
 

@@ -27,6 +27,13 @@ Default: #include "../_display/TFT_ILI9163C_RED_PCB_OLD.h"
 	#include "../_display/TFT_ILI9163C_RED_PCB_YPIN.h"//the infamous 2016 yellow pin/red pcb one
 #endif
 /*--------------------------------------------------------------------------------
+- Draw Arc Disable (uses resources) -
+DrawArc uses a lot of resources, I know, have to modify this soon. On modern ARM is not a problem
+but in some small CPU's resources are precious, you can try comment this to save resources!
+Default:uncommented
+----------------------------------------------------------------------------------*/
+#define _ILI9163C_DRAWARC
+/*--------------------------------------------------------------------------------
 - Default Display Rotation -
 This parameter can be changed in your code but here you can force orientation
 Default:0
