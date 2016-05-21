@@ -4,11 +4,10 @@ A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's Teensy's
 
 Current release: 0.9 (old! see below!)
 
-Version 1.0 it's one the corner! New version doesn't use the adafruit_GFX and have all the drawing incorporated, this because I've speedup a lot with all processors and uses less resources. <br>
-Here's the link to the pre-release:<br><br>
-https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r<br>
-And this is the very last preview that use LPGO font rendering:<br>
-https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r6<br>
+Version 1.0 it's one the corner!<br>
+New version doesn't use the adafruit_GFX and have all the drawing incorporated, this because I've speedup a lot with all processors and uses less resources. <br>
+The very last preview, completely recoded, with GPO Font Rendering an ICON support, also support all the current display around:<br>
+https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0p7<br>
 
 Can be used with IDE 1.0.6 (Teensyduino 1.20) or IDE 1.6.x (Teensyduino 1.21b or better)<br>
 
