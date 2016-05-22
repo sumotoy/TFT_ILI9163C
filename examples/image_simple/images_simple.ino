@@ -1,7 +1,7 @@
 #include <SPI.h>
 #include <TFT_ILI9163C.h>
 
-#include "_icons/world.c"
+#include "_images/rad1.c"
 
 
 
@@ -20,7 +20,8 @@ TFT_ILI9163C tft1 = TFT_ILI9163C(__CS1, __DC);
 void setup()
 {
 	tft1.begin();
-	tft1.drawIcon(0, 0, &world);
+	//tft1.setTextColor(RED, BLACK);
+	tft1.drawImage(30, 0, &rad1);
 }
 
 void loop()

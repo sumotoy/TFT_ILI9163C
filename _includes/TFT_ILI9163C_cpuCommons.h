@@ -24,6 +24,7 @@
 		#if defined(SPI_HAS_TRANSACTION)
 			static const uint32_t TFT_ILI9163C_SPI_SPEED 	= 8000000;
 		#endif
+		#define _SPI_MULTITRANSFER//enable burst multy byte transfer
 	#elif defined(__SAM3X8E__)
 		#include <include/pio.h>
 		#define _FORCE_PROGMEM__

@@ -2,9 +2,9 @@
 <preset version="3">
   <name>sumotoy_icon</name>
   <prepare>
-    <convType>2</convType>
+    <convType>0</convType>
     <monoType>0</monoType>
-    <edge>128</edge>
+    <edge>144</edge>
     <scanMain>0</scanMain>
     <scanSub>0</scanSub>
     <inverse>0</inverse>
@@ -14,29 +14,19 @@
     <customScript><![CDATA[]]></customScript>
   </prepare>
   <matrix>
-    <maskUsed>0000ffff</maskUsed>
+    <maskUsed>00000001</maskUsed>
     <maskAnd>ffffffff</maskAnd>
     <maskOr>00000000</maskOr>
-    <maskFill>ffffffff</maskFill>
-    <operations count="4">
+    <maskFill>000000ff</maskFill>
+    <operations count="2">
       <operation index="0">
         <mask>ff000000</mask>
         <shift>0</shift>
         <left>0</left>
       </operation>
       <operation index="1">
-        <mask>00f80000</mask>
-        <shift>8</shift>
-        <left>0</left>
-      </operation>
-      <operation index="2">
-        <mask>0000fc00</mask>
-        <shift>5</shift>
-        <left>0</left>
-      </operation>
-      <operation index="3">
-        <mask>000000f8</mask>
-        <shift>3</shift>
+        <mask>00000001</mask>
+        <shift>0</shift>
         <left>0</left>
       </operation>
     </operations>
@@ -46,7 +36,7 @@
   </reordering>
   <image>
     <bytesOrder>0</bytesOrder>
-    <blockSize>1</blockSize>
+    <blockSize>0</blockSize>
     <blockDefaultOnes>0</blockDefaultOnes>
     <splitToRows>0</splitToRows>
     <compressionRle>0</compressionRle>
@@ -61,7 +51,7 @@
     <codec>latin1</codec>
   </font>
   <templates>
-    <images>C:/Users/chinatown/Desktop/lcd-image-converter-beta/sumotoy_icon_1.2.tmpl</images>
-    <fonts>C:/Users/chinatown/Desktop/lcd-image-converter-beta/sumotoy_font_2.2.tmpl</fonts>
+    <images>C:/Users/chinatown/Desktop/lcd-image-converter-beta/sumotoy_icon_1.3.tmpl</images>
+    <fonts>C:/Users/chinatown/Desktop/lcd-image-converter-beta/sumotoy_font_2.3.tmpl</fonts>
   </templates>
 </preset>

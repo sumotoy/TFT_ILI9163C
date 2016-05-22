@@ -1,8 +1,11 @@
+/*
+Batman
+*/
+
 #include <SPI.h>
 #include <TFT_ILI9163C.h>
 
-#include "_icons/world.c"
-
+#include "_images/batman.c"
 
 
 
@@ -15,15 +18,16 @@ TFT_ILI9163C tft1 = TFT_ILI9163C(REDPCB_NEW, __CS1, __DC);
 TFT_ILI9163C tft1 = TFT_ILI9163C(__CS1, __DC);
 #endif
 
-
+uint16_t color;
 
 void setup()
 {
 	tft1.begin();
-	tft1.drawIcon(0, 0, &world);
+	tft1.drawImage(0, 0, &batman);
 }
 
 void loop()
 {
+
 
 }

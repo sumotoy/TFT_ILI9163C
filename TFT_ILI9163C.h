@@ -61,6 +61,7 @@
 	1.0r6.4: Initialization really fast, now ready in some millisec.
 	1.0r6.5: Fixed a small parameter error in ..., added fillScreen with grandient and fillRect with grandient
 	1.0r7: Lot of fixes, see https://github.com/sumotoy/TFT_ILI9163C/issues/32
+	1.0p7.3:fixed drawImage,drawIcon, more speed on ESP8266
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
@@ -91,6 +92,7 @@
 
 //Load sumotoy universal descriptors (used in many other libraries)
 #include "_includes/sumotoy_fontDescription.h"
+#include "_includes/sumotoy_imageDescription.h"
 #include "_includes/sumotoy_iconDescription.h"
 
 #if defined(_ILI9163C_DEF_FONT_PATH)
@@ -173,7 +175,7 @@ class TFT_ILI9163C : public Print {
 				fillQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color,bool triangled=true),
 				drawPolygon(int16_t x, int16_t y, uint8_t sides, int16_t diameter, float rot, uint16_t color),
 				drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-	#if defined(_ILI9163C_DRAWARC)//see settings files
+	#if defined(_ILI9163C_DRAWARC) //see settings file
 	void 		drawArc(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color) {
 					if (start == 0 && end == _arcAngleMax) {
 						drawArcHelper(cx, cy, radius, thickness, 0, _arcAngleMax, color);
@@ -193,7 +195,8 @@ class TFT_ILI9163C : public Print {
 	void 		startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 	void 		pushData(uint16_t color);
 	void 		endPushData();
-	void 		drawIcon(int16_t x, int16_t y,const tIcon *icon,const enum ILI9163C_iconMods m=NONE,uint16_t b=BLACK);
+	void 		drawImage(int16_t x, int16_t y,const tPicture *img,const enum ILI9163C_iconMods m=NONE,uint16_t b=BLACK);
+	void 		drawIcon(int16_t x, int16_t y,const tIcon *icon,uint8_t scale=1,uint16_t f=WHITE,uint16_t b=BLACK,bool inverse=false);
 	//------------------------------- TEXT ----------------------------------------------------
     void		setTextColor(uint16_t color);
     void		setTextColor(uint16_t frgrnd, uint16_t bckgnd);
@@ -206,19 +209,19 @@ class TFT_ILI9163C : public Print {
 	void 		setFont(const tFont *font);
 	virtual size_t 	write(uint8_t b) { _textWrite((const char *)&b, 1); return 1;}
 	virtual size_t  write(const uint8_t *buffer, size_t size) {_textWrite((const char *)buffer, size); return size;}
+	//void		getStringBox(int16_t &w,int16_t &h);
 
     //------------------------------- CURSOR ----------------------------------------------------
 	void		setCursor(int16_t x,int16_t y);
 	void		getCursor(int16_t &x,int16_t &y);
 	//------------------------------- SCROLL ----------------------------------------------------
 	void 		defineScrollArea(int16_t tfa, int16_t bfa);
-	//TODO: Currently in fixing! Do not apology....
+
 	boolean		scroll(uint16_t pointer);
 	uint8_t		getScrollDirection(void);
 	void		setScrollDirection(uint8_t dir);
 	int16_t		getScrollTop(void);
 	int16_t		getScrollBottom(void);
-	//-------------------------------------------
 	#if !defined (SPI_HAS_TRANSACTION)
 	void 		setBitrate(uint32_t n);//will be deprecated
 	#endif
@@ -237,13 +240,6 @@ class TFT_ILI9163C : public Print {
 
 	int						_spaceCharWidth;
 	const tFont   		*	_currentFont;
-	int						_STRlen_helper(const char* buffer,int len);
-	int						_getCharCode(uint8_t ch);
-	void					_textWrite(const char* buffer, uint16_t len);
-	bool					_renderSingleChar(const char c);
-	void					_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX,uint8_t scaleY,int index);
-	void					_charLineRender(bool lineBuffer[],int charW,int16_t x,int16_t y,uint8_t scaleX,uint8_t scaleY,int16_t currentYposition);
-
 	uint8_t					_charSpacing;
 	uint16_t 				_textForeground;
 	uint16_t 				_textBackground;
@@ -385,7 +381,6 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
-				//SPI.beginTransaction(ILI9163C_SPI);
 				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
 			#endif
 				csport->PIO_CODR |=  cspinmask;//LO
@@ -489,7 +484,6 @@ class TFT_ILI9163C : public Print {
 
 		void startTransaction(void)
 		__attribute__((always_inline)) {
-			//SPI.beginTransaction(ILI9163C_SPI);
 			SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
 		}
 
@@ -540,8 +534,8 @@ class TFT_ILI9163C : public Print {
 			waitFifoNotFull();
 		}
 
-		void writedata8_cont(uint8_t c) __attribute__((always_inline)) {
-			KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		void writedata8_cont(uint8_t d) __attribute__((always_inline)) {
+			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 
@@ -590,6 +584,7 @@ class TFT_ILI9163C : public Print {
 		void spiwrite16(uint16_t c)
 		__attribute__((always_inline)) {
 			#if defined(_SPI_MULTITRANSFER)
+			   //last version of ESP8266 for arduino support this
 				uint8_t pattern[2] = { (uint8_t)(c >> 8), (uint8_t)(c >> 0) };
 				SPI.writePattern(pattern, 2, (uint8_t)1);
 			#else
@@ -597,7 +592,20 @@ class TFT_ILI9163C : public Print {
 			#endif
 		}
 
-
+		/*
+		//funny, should work! But at the end will crash SPI at list at 80Mhz SPI!
+		// Too bad, it can improve speed a lot!
+		void pushColors_cont(uint16_t c, uint16_t times)
+		__attribute__((always_inline)) {
+			uint8_t pattern[2] = { (uint8_t)(c >> 8), (uint8_t)(c >> 0) };
+			if (times > 32){
+				SPI.writePattern(pattern, sizeof(pattern), times);
+			} else {
+				SPI.writePattern(pattern, sizeof(pattern), (uint8_t)times);
+			}
+		}
+		*/
+		
 		void enableCommandStream(void)
 		__attribute__((always_inline)) {
 				#if defined(_ESP8266_STANDARDMODE)
@@ -619,7 +627,6 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
-				//SPI.beginTransaction(ILI9163C_SPI);
 				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
 			#endif
 			#if defined(_ESP8266_STANDARDMODE)
@@ -673,7 +680,6 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
-				//SPI.beginTransaction(ILI9163C_SPI);
 				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
 			#endif
 				digitalWrite(_cs,LOW);
@@ -810,6 +816,37 @@ class TFT_ILI9163C : public Print {
 	#if defined (TFT_ILI9163C_INSTANCES)
 	void 		_paramInit(uint8_t disp);
 	#endif
+	//GPO
+	int						_STRlen_helper(const char* buffer,int len);
+	int						_getCharCode(uint8_t ch);
+	void					_textWrite(const char* buffer, uint16_t len);
+	bool					_renderSingleChar(const char c);
+	void					_glyphRender_unc(
+											const _smCharType * charGlyp,//N
+											int16_t 	x,
+											int16_t 	y,
+											int 		charW,
+											int 		charH,
+											uint8_t 	scaleX,
+											uint8_t 	scaleY,
+											uint16_t 	totalBytes,
+											uint8_t 	cspacing,
+											uint16_t 	foreColor,
+											uint16_t 	backColor,
+											bool	 	inverse
+							);
+	void					_charLineRender(
+											bool 		lineBuffer[],
+											int 		charW,
+											int16_t 	x,
+											int16_t 	y,
+											uint8_t 	scaleX,
+											uint8_t 	scaleY,
+											int16_t 	currentYposition,
+											uint8_t 	cspacing,
+											uint16_t 	foreColor,
+											uint16_t 	backColor
+							);
 };
 #endif
 #endif

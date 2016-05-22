@@ -1,5 +1,5 @@
 /*
- Sumotoy universal font Description structure version 2.2
+ Sumotoy universal font Description structure version 2.3
 */
 
 #ifndef __SUMOTOY_FONTD_H
@@ -37,6 +37,7 @@
 			uint8_t			font_width;
 			uint8_t			font_height;
 			boolean 		rle;
+			uint8_t 		remap_code;
 	} tFont;
 
 

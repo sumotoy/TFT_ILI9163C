@@ -24,7 +24,7 @@
 *  inverse: yes
 * ------------------------------------------------------------------------------
 * Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y.
-* Font template version: 2.2
+* Font template version: 2.3
 * Note: Font height should be fixed and all glyps must have the same height!
 * ------------------------------------------------------------------------------
 *******************************************************************************/
@@ -32,7 +32,7 @@
 #if !defined(SUMO_FNT_LIB_defaultFont)
 #define SUMO_FNT_LIB_defaultFont
 
-#include "../_includes/sumotoy_FontDescription.h"
+#include <stdlib.h>
 
 
 static const _smCharType image_data_defaultFont_0x20[1]
@@ -1576,9 +1576,15 @@ const tChar defaultFont_array[] = {
 
 };
 
-//num chars, array, width, height, compression
+//num chars, array, width, height, compression, char remap code
+/*
+	char remap code:
+	0:no remap
+	1:remap minus to CAPITAL
+	2:remap CAPITAL to minus
+*/
 
-const tFont defaultFont = { 96, defaultFont_array,0,9, RLE_no };
+const tFont defaultFont = { 96, defaultFont_array,0,9, RLE_no, 0 };
 
 
 #endif

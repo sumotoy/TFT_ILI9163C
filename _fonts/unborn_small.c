@@ -24,7 +24,7 @@
 *  inverse: yes
 * ------------------------------------------------------------------------------
 * Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y.
-* Font template version: 2.2
+* Font template version: 2.3
 * Note: Font height should be fixed and all glyps must have the same height!
 * ------------------------------------------------------------------------------
 *******************************************************************************/
@@ -32,8 +32,7 @@
 #if !defined(SUMO_FNT_LIB_unborn_small)
 #define SUMO_FNT_LIB_unborn_small
 
-//#include <stdint.h>
-#include "../_includes/sumotoy_FontDescription.h"
+#include <stdlib.h>
 
 
 
@@ -1578,9 +1577,15 @@ const tChar unborn_small_array[] = {
 
 };
 
-//num chars, array, width, height, compression
+//num chars, array, width, height, compression, char remap code
+/*
+	char remap code:
+	0:no remap
+	1:remap minus to CAPITAL
+	2:remap CAPITAL to minus
+*/
 
-const tFont unborn_small = { 96, unborn_small_array,0,7, RLE_no };
+const tFont unborn_small = { 96, unborn_small_array,0,7, RLE_no, 0 };
 
 
 #endif

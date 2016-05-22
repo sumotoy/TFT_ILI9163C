@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <preset version="3">
-  <name>sumotoy_font</name>
+  <name>sumotoy_image</name>
   <prepare>
-    <convType>0</convType>
+    <convType>2</convType>
     <monoType>0</monoType>
-    <edge>144</edge>
+    <edge>128</edge>
     <scanMain>0</scanMain>
     <scanSub>0</scanSub>
-    <inverse>1</inverse>
+    <inverse>0</inverse>
     <bandScanning>0</bandScanning>
     <bandWidth>1</bandWidth>
     <useCustomScript>0</useCustomScript>
     <customScript><![CDATA[]]></customScript>
   </prepare>
   <matrix>
-    <maskUsed>00000001</maskUsed>
+    <maskUsed>0000ffff</maskUsed>
     <maskAnd>ffffffff</maskAnd>
     <maskOr>00000000</maskOr>
-    <maskFill>000000ff</maskFill>
-    <operations count="2">
+    <maskFill>ffffffff</maskFill>
+    <operations count="4">
       <operation index="0">
         <mask>ff000000</mask>
         <shift>0</shift>
         <left>0</left>
       </operation>
       <operation index="1">
-        <mask>00000001</mask>
-        <shift>0</shift>
+        <mask>00f80000</mask>
+        <shift>8</shift>
+        <left>0</left>
+      </operation>
+      <operation index="2">
+        <mask>0000fc00</mask>
+        <shift>5</shift>
+        <left>0</left>
+      </operation>
+      <operation index="3">
+        <mask>000000f8</mask>
+        <shift>3</shift>
         <left>0</left>
       </operation>
     </operations>
@@ -35,8 +45,8 @@
     <operations count="0"/>
   </reordering>
   <image>
-    <bytesOrder>1</bytesOrder>
-    <blockSize>0</blockSize>
+    <bytesOrder>0</bytesOrder>
+    <blockSize>1</blockSize>
     <blockDefaultOnes>0</blockDefaultOnes>
     <splitToRows>0</splitToRows>
     <compressionRle>0</compressionRle>
@@ -51,7 +61,7 @@
     <codec>latin1</codec>
   </font>
   <templates>
-    <images>C:/lcd-image-converter-beta/sumotoy_icon_1.3.tmpl</images>
+    <images>C:/lcd-image-converter-beta/sumotoy_picture_1.3.tmpl</images>
     <fonts>C:/lcd-image-converter-beta/sumotoy_font_2.3.tmpl</fonts>
   </templates>
 </preset>

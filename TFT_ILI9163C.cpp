@@ -654,12 +654,15 @@ int16_t TFT_ILI9163C::getScrollBottom(void)
 	return _scrollBottom;
 }
 
-//TODO: Currently in fixing! Do not apology....
+
+/*
+tfa:Top Fixed Area
+bfa:Bottom Fixed Area
+*/
 void TFT_ILI9163C::defineScrollArea(int16_t tfa, int16_t bfa)
 {
 	if (_rotation == 1 || _rotation == 3 || _rotation == 2) return;//no scroll for rot 1,3!
 	uint16_t area;
-
 		if (tfa == 0 && bfa == 0) {
 			bfa = 0;//special
 			tfa = TFT_ILI9163C_OFST[_rotation][1];
@@ -673,6 +676,7 @@ void TFT_ILI9163C::defineScrollArea(int16_t tfa, int16_t bfa)
 			bfa = TFT_ILI9163C_CGR_H - bfa - TFT_ILI9163C_OFST[_rotation][1];
 			area = TFT_ILI9163C_CGR_H - tfa - bfa;
 		}
+
     if (area >= 0) {
 		startTransaction();
 		writecommand_cont(CMD_VSCLLDEF);
@@ -693,15 +697,16 @@ void TFT_ILI9163C::setScrollDirection(uint8_t dir)
 {
 	_scrollDir = dir % 2;
 }
+
+
 /*
 Since the value of the Vertical Scrolling Start Address is absolute
 it must not enter the fixed area otherwise undesirable image will be displayed
-//TODO: Currently in fixing! Do not apology....
 */
 boolean TFT_ILI9163C::scroll(uint16_t pointer) 
 {
-	if (_rotation == 1 || _rotation == 3 || _rotation == 2) return 0;
 
+	if (_rotation == 1 || _rotation == 3 || _rotation == 2) return 0;
     if (pointer >= _scrollTop && pointer <= _scrollBottom) {
 		startTransaction();
         writecommand_cont(CMD_VSSTADRS);
@@ -838,7 +843,7 @@ void TFT_ILI9163C::fillScreen(uint16_t color)
 {
 	//12324
 	uint16_t area = _width * _height;
-	
+
 	startTransaction();
 	setAddrWindow_cont(
 				0,
@@ -847,9 +852,12 @@ void TFT_ILI9163C::fillScreen(uint16_t color)
 				_height - 1
 	);
 	
+	//pushColors_cont(color,area);//won't work... Grrr!
+	
 	do { 
 		writedata16_cont(color); 
 	} while (--area > 0);
+	
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_last(CMD_NOP);
 	#else
@@ -979,7 +987,7 @@ void TFT_ILI9163C::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 }
 
 
-//Updated, new way is faster!
+//Updated, new way is fast!!!
 void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color1,uint16_t color2) 
 {
 	//uint16_t colorTemp;
@@ -1004,8 +1012,10 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 			rR = (((1.0 - pos2) * r1) + (pos2 * r2));
 			gG = (((1.0 - pos2) * g1) + (pos2 * g2));
 			bB = (((1.0 - pos2) * b1) + (pos2 * b2));
+			
 			do { writedata16_cont(Color565(rR,gG,bB)); } while (--wtemp > 0);
 			wtemp = w;
+			//pushColors_cont(Color565(rR,gG,bB),(uint8_t)wtemp);
 			pos++;
 		} while (--h > 0);
 	} else {
@@ -1296,6 +1306,7 @@ void TFT_ILI9163C::setArcParams(float arcAngleMax, int arcAngleOffset)
 	_arcAngleMax = arcAngleMax;
 	_arcAngleOffset = arcAngleOffset;
 }
+
 #endif
 
 /**************************************************************************/
@@ -1951,8 +1962,49 @@ void TFT_ILI9163C::pushColor(uint16_t color)
 	endTransaction();
 }
 
+void TFT_ILI9163C::drawIcon(int16_t x, int16_t y,const tIcon *icon,uint8_t scale,uint16_t f,uint16_t b,bool inverse)
+{
+	if (scale < 1) scale = 1;
+	#if defined(_FORCE_PROGMEM__)
+		const uint8_t * iconData;
+		PROGMEM_read(&(icon->data),iconData);//icon data
+		uint8_t		iWidth		= pgm_read_byte(&(icon->image_width))-1;
+		uint8_t		iHeight		= pgm_read_byte(&(icon->image_height)-1);
+		uint16_t	datalen		= pgm_read_word(&(icon->image_datalen));
+		//boolean		dataComp	= pgm_read_word(&(icon->image_comp));//not yet
+	#else
+		const uint8_t * iconData	= icon->data;//icon data
+		uint8_t		iWidth			= icon->image_width-1;
+		uint8_t		iHeight			= icon->image_height-1;
+		uint16_t	datalen			= icon->image_datalen;
+		//uint8_t		dataComp		= icon->image_comp;//not yet
+	#endif
+	if (iWidth < 1 || iHeight < 1) return;//cannot be
+	if ((x + iWidth) * scale >= _width || (y + iHeight) * scale >= _height) return;//cannot be
+	//LGPO Rendering (uncomp)
+	_glyphRender_unc(
+					iconData,
+					x,
+					y,
+					iWidth+1,
+					iHeight+1,
+					scale,
+					scale,
+					datalen,
+					0,
+					f,
+					b,
+					inverse
+	);
+	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		writecommand_last(CMD_NOP);
+	#else
+		disableCS();
+	#endif
+	endTransaction();
+}
 
-void TFT_ILI9163C::drawIcon(int16_t x, int16_t y,const tIcon *icon,const enum ILI9163C_iconMods m,uint16_t b)
+void TFT_ILI9163C::drawImage(int16_t x, int16_t y,const tPicture *img,const enum ILI9163C_iconMods m,uint16_t b)
 {
 	uint16_t px = 0;
 	uint16_t color;
@@ -1960,46 +2012,48 @@ void TFT_ILI9163C::drawIcon(int16_t x, int16_t y,const tIcon *icon,const enum IL
 	uint16_t currentX = 0;
 	bool skip = false;
 	#if defined(_FORCE_PROGMEM__)
-		const uint16_t * iconData;
-		PROGMEM_read(&(icon->data),iconData);//char data
-		uint8_t		iWidth		= pgm_read_byte(&(icon->image_width))-1;
-		uint8_t		iHeight		= pgm_read_byte(&(icon->image_height)-1);
-		uint16_t	datalen		= pgm_read_word(&(icon->image_datalen));
-		//uint8_t		dataDepth	= pgm_read_word(&(icon->image_depth));
-		//boolean		dataComp	= pgm_read_word(&(icon->image_comp));
+		const uint16_t * imageData;
+		PROGMEM_read(&(img->data),imageData);//image data
+		uint8_t		iWidth		= pgm_read_byte(&(img->image_width))-1;
+		uint8_t		iHeight		= pgm_read_byte(&(img->image_height)-1);
+		uint16_t	datalen		= pgm_read_word(&(img->image_datalen));
+		//uint8_t		dataDepth	= pgm_read_word(&(img->image_depth));//not yet
+		//boolean		dataComp	= pgm_read_word(&(img->image_comp));//not yet
 	#else
-		const uint16_t * iconData	= icon->data;//char data
-		uint8_t		iWidth			= icon->image_width-1;
-		uint8_t		iHeight			= icon->image_height-1;
-		uint16_t	datalen			= icon->image_datalen;
-		//uint8_t		dataDepth		= icon->image_depth;
-		//uint8_t		dataComp		= icon->image_comp;
+		const uint16_t * imageData	= img->data;//image data
+		uint8_t		iWidth			= img->image_width-1;
+		uint8_t		iHeight			= img->image_height-1;
+		uint16_t	datalen			= img->image_datalen;
+		//uint8_t		dataDepth		= img->image_depth;//not yet
+		//uint8_t		dataComp		= img->image_comp;//not yet
 	#endif
+	if (iWidth < 1 || iHeight < 1) return;//cannot be
 	if (x + iWidth >= _width || y + iHeight >= _height) return;//cannot be
+	
 	startTransaction();
 	setAddrWindow_cont(x,y,iWidth+x,iHeight+y);
-	do { 
 	
+	do { 
 		if (m == TRANSPARENT){
-			if (iconData[px] <= b) {
+			if (imageData[px] <= b) {
 				skip = true;
 			} else {
-				color = iconData[px];
+				color = imageData[px];
 			}
 		} else if (m == REPLACE){
-			if (iconData[px] <= b) {
-				color = _textBackground;
+			if (imageData[px] <= b) {
+				color = _defaultBgColor;
 			} else {
-				color = iconData[px];
+				color = imageData[px];
 			}
 		} else if (m == BOTH){
-			if (iconData[px] <= b) {
-				color = _textBackground;
+			if (imageData[px] <= b) {
+				color = _defaultBgColor;
 			} else {
-				color = _textForeground;
+				color = _defaultFgColor;
 			}
 		} else {
-			color = iconData[px];
+			color = imageData[px];
 		}
 		
 		if (!skip) {
@@ -2312,13 +2366,50 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 			}
 			//-------------------------Actual single char drawing here -----------------------------------
 			//updated in 1.0p7
+			#if defined(_FORCE_PROGMEM__)
+				const _smCharType * charGlyp;
+				PROGMEM_read(&_currentFont->chars[charIndex].image->data,charGlyp);//char data
+				int			  totalBytes;
+				PROGMEM_read(&_currentFont->chars[charIndex].image->image_datalen,totalBytes);
+			#else
+				const _smCharType * charGlyp = _currentFont->chars[charIndex].image->data;
+				int			  totalBytes = _currentFont->chars[charIndex].image->image_datalen;
+			#endif
 			if (!_portrait){
 				if (_cursorY + (_currentFont->font_height * _textScaleY) > _height) return 1;//too high!
-				_glyphRender_unc(_cursorX,_cursorY,charW,_textScaleX,_textScaleY,charIndex);
+				_glyphRender_unc(
+								charGlyp,
+								_cursorX,
+								_cursorY,
+								charW,
+								_currentFont->font_height,
+								_textScaleX,
+								_textScaleY,
+								totalBytes,
+								_charSpacing,
+								_textForeground,
+								_textBackground,
+								false
+				);
+				//_glyphRender_unc(_cursorX,_cursorY,charW,_textScaleX,_textScaleY,charIndex);
 				_cursorX += (charW * _textScaleX) + (_charSpacing * _textScaleX);//add charW to total
 			} else {
 				if (_cursorX + (_currentFont->font_height * _textScaleX) > _width) return 1;//too high!
-				_glyphRender_unc(_cursorY,_cursorX,charW,_textScaleY,_textScaleX,charIndex);
+				_glyphRender_unc(
+								charGlyp,
+								_cursorY,
+								_cursorX,
+								charW,
+								_currentFont->font_height,
+								_textScaleY,
+								_textScaleX,
+								totalBytes,
+								_charSpacing,
+								_textForeground,
+								_textBackground,
+								false
+				);
+				//_glyphRender_unc(_cursorY,_cursorX,charW,_textScaleY,_textScaleX,charIndex);
 				_cursorY += (charW * _textScaleX) + (_charSpacing * _textScaleY);//add charW to total
 			}
 			return 0;
@@ -2328,24 +2419,28 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 }
 
 /*
+ - LGPO - rendering engine, part 1 (GNU v3)
 This is the draw char function (version for uncompressed font)
 It detects blank and filled lines and render separately, this is the first
 accelleration step of the unique (and currently under commercial licence) sumotoy render engine,
 it's a variation of LPGO font render accelleration used in RA8875 (under GNU v3).
 The lines are not blank or filled are passed to the grouping function that is the second part of the accelleration. 
 */
-void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX,uint8_t scaleY,int index)
+void TFT_ILI9163C::_glyphRender_unc(
+									const 		_smCharType * charGlyp,
+									int16_t 	x,
+									int16_t 	y,
+									int 		charW,
+									int 		charH,
+									uint8_t 	scaleX,
+									uint8_t	 	scaleY,
+									uint16_t 	totalBytes,
+									uint8_t 	cspacing,
+									uint16_t 	foreColor,
+									uint16_t 	backColor,
+									bool 		inverse)
 {
 	//start by getting some glyph data...
-	#if defined(_FORCE_PROGMEM__)
-		const _smCharType * charGlyp;
-		PROGMEM_read(&_currentFont->chars[index].image->data,charGlyp);//char data
-		int			  totalBytes;
-		PROGMEM_read(&_currentFont->chars[index].image->image_datalen,totalBytes);
-	#else
-		const _smCharType * charGlyp = _currentFont->chars[index].image->data;
-		int			  totalBytes = _currentFont->chars[index].image->image_datalen;
-	#endif
 	int i;
 	uint8_t temp = 0;
 	//some basic variable...
@@ -2370,15 +2465,15 @@ void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX
 				currentXposition = 0;//reset the line x position
 				tempYpos = y + (currentYposition * scaleY);
 				if (lineChecksum < 1){//empty line
-					if ((_textForeground != _textBackground) && (currentYposition < _currentFont->font_height)) {
+					if ((foreColor != backColor) && (currentYposition < charH)) {
 							//will fill background till it's legal (added a workaround for malformed data)
 							fillRect_cont(
 								x,
 								tempYpos,
-								(charW * scaleX) + (_charSpacing * scaleX),//now handle _charSpacing!
+								(charW * scaleX) + (cspacing * scaleX),//now handle _charSpacing!
 								scaleY,
-								_textBackground,
-								_textBackground
+								backColor,
+								backColor
 							);
 						
 					}
@@ -2388,8 +2483,8 @@ void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX
 							tempYpos,
 							(charW * scaleX),
 							scaleY,
-							_textForeground,
-							_textBackground
+							foreColor,
+							backColor
 					);
 				} else { //line render
 					_charLineRender(
@@ -2399,14 +2494,23 @@ void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX
 							y,
 							scaleX,
 							scaleY,
-							currentYposition
+							currentYposition,
+							cspacing,
+							foreColor,
+							backColor
 					);
 				}
 				currentYposition++;//next line
 				lineChecksum = 0;//reset checksum
 			}//end exception
 			//-------------------------------------------------------
-			lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
+			if (inverse){
+				lineBuffer[currentXposition] = !bitRead(temp,i);//continue fill line buffer
+			} else {
+				lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
+			}
+			//lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
+			
 			lineChecksum += lineBuffer[currentXposition++];
 		}
 		currentByte++;
@@ -2416,20 +2520,21 @@ void TFT_ILI9163C::_glyphRender_unc(int16_t x,int16_t y,int charW,uint8_t scaleX
 	//why (I suppose it's font converter issue), this is not a problem when no background it's needed
 	//but it's visible when backgound it's on, so this small piece of code fix the problem
 	
-	if (_textForeground != _textBackground && currentYposition < _currentFont->font_height) {
+	if (foreColor != backColor && currentYposition < charH) {
 		fillRect_cont(
 			x,
 			y + (currentYposition * scaleY),
-			(charW * scaleX) + (_charSpacing * scaleX), //now handle _charSpacing!
-			(_currentFont->font_height - currentYposition) * scaleY,
-			_textBackground,
-			_textBackground
+			(charW * scaleX) + (cspacing * scaleX), //now handle _charSpacing!
+			(charH - currentYposition) * scaleY,
+			backColor,
+			backColor
 		);
 	}
 	
 }
 
 /*
+ - LGPO - rendering engine, part 2 (GNU v3)
 LPGO font render accelleration (GNU v3), part 2, pixel grouping.
 the sumotoy proprietary line render engine, please do not steal
 without author permission since there's currently some licence on it!
@@ -2438,7 +2543,17 @@ than any other similar function I ever seen.
 Here has been used to avoid multiple memory addressing but can be inproved, the LPGO shines 
 where harware accelleration it's present but this chip has only direct memory access...
 */
-void TFT_ILI9163C::_charLineRender(bool lineBuffer[],int charW,int16_t x,int16_t y,uint8_t scaleX,uint8_t scaleY,int16_t currentYposition)
+void TFT_ILI9163C::_charLineRender(
+									bool lineBuffer[],
+									int charW,
+									int16_t x,
+									int16_t y,
+									uint8_t scaleX,
+									uint8_t scaleY,
+									int16_t currentYposition,
+									uint8_t cspacing,
+									uint16_t foreColor,
+									uint16_t backColor)
 {
 	int xlinePos = 0;
 	int px;
@@ -2459,19 +2574,19 @@ void TFT_ILI9163C::_charLineRender(bool lineBuffer[],int charW,int16_t x,int16_t
 						y + (currentYposition * scaleY),
 						(endPix * scaleX),
 						scaleY,
-						_textForeground,
-						_textForeground
+						foreColor,
+						foreColor
 					);
 					
 				} else {
-					if (_textForeground != _textBackground) {
+					if (foreColor != backColor) {
 						fillRect_cont(
 							x,
 							y + (currentYposition * scaleY),
-							(endPix * scaleX) + (_charSpacing * scaleX),//now handle _charSpacing!
+							(endPix * scaleX) + (cspacing * scaleX),//now handle _charSpacing!
 							scaleY,
-							_textBackground,
-							_textBackground
+							backColor,
+							backColor
 						);
 					}
 				}

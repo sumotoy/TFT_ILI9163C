@@ -43,6 +43,8 @@ pushColor	KEYWORD2
 startPushData	KEYWORD2
 pushData	KEYWORD2
 endPushData	KEYWORD2
+drawImage	KEYWORD2
+drawIcon	KEYWORD2
 setTextColor	KEYWORD2
 setTextScale	KEYWORD2
 setTextWrap	KEYWORD2

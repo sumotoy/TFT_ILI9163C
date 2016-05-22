@@ -1,13 +1,13 @@
 
 /*******************************************************************************
 
-Null Font v2.2
+Null Font v2.3
 *******************************************************************************/
 
 #if !defined(SUMO_FNT_LIB_nullfont)
 #define SUMO_FNT_LIB_nullfont
 
-#include "../_includes/sumotoy_FontDescription.h"
+#include <stdlib.h>
 
 
 
@@ -34,6 +34,6 @@ const tChar nullfont_array[] = {
 
 //num chars, array, width, height, compression
 
-const tFont nullfont = { 1, nullfont_array,0,9,RLE_no };
+const tFont nullfont = { 1, nullfont_array,0,9,RLE_no, 0 };
 
 #endif
