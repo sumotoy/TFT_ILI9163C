@@ -3,7 +3,6 @@
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's,ESP8266 and more...
 
 <b>Preview of the 1.0p7</b>, the official release 1.0<br>
-**CAUTION!** Wait tomorrow before use this version, I'm currently changing Image/Icon support deeply and will be ready tomorrow<br>
 Current version it's a preview, scroll is not complete and other optimizations coming.<br>
 Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br>
@@ -13,7 +12,8 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 - [ ]  **Added** Icons. Added RLE compression.
 - [ ]  **Added** Fonts. Added RLE compression.
 - [ ]  **Added** setCursor can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
-- [ ]  **Added** New font parameter inside Font File. It allows automatical char reassign (es. minus to capital). Useful for include small font file that uses less resources.
+- [x]  **Added** New font parameter inside Font File. It allows automatical char reassign (es. minus to capital). Useful for include small font file that uses less resources.
+- [ ]  **Added** char reassign using scheme inside font file.
 - [x]  **Added** Multiple instances! There's a setting where you can enable multiple instances support.
 However it uses slight more resources (this is why I add a setting). With multiple instances you can have 2 or more display's (even different type) sharing same pins (apart CS) and fonts!
 - [x]  **Added** Multiple instances. Automatically avoid multiple SPI initializations thanks to an internal instances counter.
@@ -24,11 +24,12 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Added** drawImage!There's a template & preset for converting images (for lcd-image-converter), See examples!
 - [x]  **Added** drawIcon! Got a lot of requests and now working. There's a template & preset for converting images (for lcd-image-converter), See examples!
 - [x]  **Added** drawImage. Added optional parameters (NONE,TRANSPARENT,REPLACE,BOTH)
-- [x]  **Added** drawIcon. Added transparency (set background as foreground and...voilà)
+- [x]  **Added** drawIcon now use LGPO. Added transparency (set background as foreground and...voilà), added inverse.
 - [x]  **Fixed** setCursor now works as it should on any rotation
 - [x]  **Fixed** drawCircle(). better rounded.
-- [x]  **Fixed** Rendering engine issue on background font fixed.
+- [x]  **Fixed** LGPO Rendering engine issue on background font fixed.
 - [x]  **Fixed** fixed almost all compiling errors with some compilers.
+- [x]  **Updated** LGPO now can used to render any sequence of bite formatted image.
 - [x]  **Updated** fillScreen(color1,color2) for create grandient backgrounds. now amazing fast!
 - [x]  **Updated** fillRect(x,y,w,hcolor1,color2) for create grandient rects. now amazing fast!
 - [x]  **Updated** Fonts. Modified template to 2.2.
@@ -36,6 +37,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Updated** scroll Up/Down now possible.
 - [x]  **Updated** changeMode() now handle display on/off and works correctly.
 - [x]  **Updated** all examples revised.
+- [x]  **Updated** ESP8266 code is faster!.
 - [x]  **Deprecated** drawColorBitmap(). use drawIcon().
 - [x]  **Deprecated** display.() use changeMode(DISP_ON/DISP_OFF).
 - [x]  **Deprecated** setTextSize(). use setTextScale().
