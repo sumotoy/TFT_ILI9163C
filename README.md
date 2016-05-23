@@ -21,7 +21,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Added** Display files now handle any possible type of offset and can correct even upside-down screen. This allow you use any type of display without change a line of code.
 - [x]  **Added** getScrollTop and getScrollBottom.
 - [x]  **Added** Draw Arc Disable (#define _ILI9163C_DRAWARC) in settings. Saves resources if not used.
-- [x]  **Added** drawImage!There's a template & preset for converting images (for lcd-image-converter), See examples!
+- [x]  **Added** drawImage! There's a template & preset for converting images (for lcd-image-converter), See examples!
 - [x]  **Added** drawIcon! Got a lot of requests and now working. There's a template & preset for converting images (for lcd-image-converter), See examples!
 - [x]  **Added** drawImage. Added optional parameters (NONE,TRANSPARENT,REPLACE,BOTH)
 - [x]  **Added** drawIcon now use LGPO. Added transparency (set background as foreground and...voilà), added inverse.
@@ -29,18 +29,18 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Fixed** drawCircle(). better rounded.
 - [x]  **Fixed** LGPO Rendering engine issue on background font fixed.
 - [x]  **Fixed** fixed almost all compiling errors with some compilers.
-- [x]  **Updated** LGPO now can used to render any sequence of bite formatted image.
+- [x]  **Updated** LGPO now can used to render any sequence of byte formatted image (also inverted).
 - [x]  **Updated** fillScreen(color1,color2) for create grandient backgrounds. now amazing fast!
 - [x]  **Updated** fillRect(x,y,w,hcolor1,color2) for create grandient rects. now amazing fast!
-- [x]  **Updated** Fonts. Modified template to 2.2.
-- [x]  **Updated** Fonts. Possible change the default font  or even avoid completely to save space
+- [x]  **Updated** Fonts. Modified template to 2.3.
+- [x]  **Updated** Fonts. Possible change the default font or even avoid completely to save space
 - [x]  **Updated** scroll Up/Down now possible.
 - [x]  **Updated** changeMode() now handle display on/off and works correctly.
 - [x]  **Updated** all examples revised.
 - [x]  **Updated** ESP8266 code is faster!.
 - [x]  **Deprecated** drawColorBitmap(). use drawIcon().
-- [x]  **Deprecated** display.() use changeMode(DISP_ON/DISP_OFF).
-- [x]  **Deprecated** setTextSize(). use setTextScale().
+- [x]  **Deprecated** display(). use changeMode(DISP_ON/DISP_OFF) instead.
+- [x]  **Deprecated** setTextSize(). use setTextScale() instead.
 - [x]  **Deprecated** Adafruit-GFX (never again!).
 
 ![ILI9163C](http://i1189.photobucket.com/albums/z437/theamra/libraries/20160419_170251.jpg)
