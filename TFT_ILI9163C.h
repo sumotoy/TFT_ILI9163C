@@ -62,6 +62,7 @@
 	1.0r6.5: Fixed a small parameter error in ..., added fillScreen with grandient and fillRect with grandient
 	1.0r7: Lot of fixes, see https://github.com/sumotoy/TFT_ILI9163C/issues/32
 	1.0p7.3:fixed drawImage,drawIcon, more speed on ESP8266
+	1.0p7.4:added autoremap code for handle fonts with autoremap flag enabled
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
