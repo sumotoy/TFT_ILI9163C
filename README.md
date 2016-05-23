@@ -8,6 +8,7 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br>
 - [ ]  **Bug**  Scroll, should fix for all display's.
 - [ ]  **Bug**  On ESP8266 multinstances doesn't work well. I'm investigating.
+- [x]  **Bug**  Fixed a language typo (horrible, sorry!) grandient is now gradient (thanks Giulio!)
 - [ ]  **Added** RED PCB Display 2.1.
 - [ ]  **Added** Images. Added RLE compression.
 - [ ]  **Added** Icons. Added RLE compression.
