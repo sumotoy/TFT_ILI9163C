@@ -10,7 +10,7 @@ By comment out the define the library will use more resources but you will able 
 in the same time by sharing all pins apart CS!
 Since this will use quite a lot resources (all init code, but fonts and images will be shared)
 you should enable this only if you really need if you have a CPU with small resources!
-Default: commented
+Default: commented (disabled)
 ----------------------------------------------------------------------------------*/
 //#define TFT_ILI9163C_INSTANCES
 /*--------------------------------------------------------------------------------
