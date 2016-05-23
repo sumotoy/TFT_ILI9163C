@@ -13,7 +13,7 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 - [ ]  **Added** Fonts. Added RLE compression.
 - [ ]  **Added** setCursor can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
 - [x]  **Added** New font parameter inside Font File. It allows automatical char reassign (es. minus to capital). Useful for include small font file that uses less resources.
-- [ ]  **Added** char reassign using scheme inside font file.
+- [x]  **Added** char reassign using scheme inside font file.
 - [x]  **Added** Multiple instances! There's a setting where you can enable multiple instances support.
 However it uses slight more resources (this is why I add a setting). With multiple instances you can have 2 or more display's (even different type) sharing same pins (apart CS) and fonts!
 - [x]  **Added** Multiple instances. Automatically avoid multiple SPI initializations thanks to an internal instances counter.
