@@ -1,8 +1,8 @@
 #include "TFT_ILI9163C.h"
 #include "_display/TFT_ILI9163C_ALL.h"
 
-/**********************************************************
-********************** constructors ***********************
+/*********************************************************
+********************** constructors **********************
 **********************************************************/
 
 #if defined (TFT_ILI9163C_INSTANCES)
@@ -677,14 +677,12 @@ void TFT_ILI9163C::defineScrollArea(int16_t tfa, int16_t bfa)
 			area = TFT_ILI9163C_CGR_H - tfa - bfa;
 		}
 
-    if (area > 0) { 
 		startTransaction();
 		writecommand_cont(CMD_VSCLLDEF);
 		writedata16_cont(tfa);
 		writedata16_cont(area);
 		writedata16_last(bfa);
 		endTransaction();
-    }
 }
 
 
@@ -725,12 +723,12 @@ boolean TFT_ILI9163C::scroll(uint16_t pointer)
 
 /**************************************************************************/
 /*!
-	  calculate a grandient color
+	  calculate a gradient color
 	  return a spectrum starting from blue to red (0...127)
 	  From my RA8875 library
 */
 /**************************************************************************/
-uint16_t TFT_ILI9163C::grandient(uint8_t val)
+uint16_t TFT_ILI9163C::gradient(uint8_t val)
 {
 	uint8_t r = 0;
 	uint8_t g = 0;
@@ -869,7 +867,7 @@ void TFT_ILI9163C::fillScreen(uint16_t color)
 
 
 
-//with grandient
+//with gradient
 void TFT_ILI9163C::fillScreen(uint16_t color1,uint16_t color2) 
 {
 	startTransaction();
@@ -967,7 +965,7 @@ void TFT_ILI9163C::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 }
 
 /*
-fill RECT with grandient
+fill RECT with gradient
 */
 void TFT_ILI9163C::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color1,uint16_t color2) 
 {
@@ -1851,19 +1849,19 @@ void TFT_ILI9163C::ringMeter(int val, int minV, int maxV, uint8_t x, uint8_t y, 
 				colour = BLUE;
 				break; // Fixed colour
 			case 3:
-				colour = grandient(map(i, -angle, angle, 0, 127));
+				colour = gradient(map(i, -angle, angle, 0, 127));
 				break; // Full spectrum blue to red
 			case 4:
-				colour = grandient(map(i, -angle, angle, 63, 127));
+				colour = gradient(map(i, -angle, angle, 63, 127));
 				break; // Green to red (high temperature etc)
 			case 5:
-				colour = grandient(map(i, -angle, angle, 127, 63));
+				colour = gradient(map(i, -angle, angle, 127, 63));
 				break; // Red to green (low battery etc)
 			case 6:
-				colour = grandient(map(i, -angle, angle, 127, 0));
+				colour = gradient(map(i, -angle, angle, 127, 0));
 				break; // Red to blue (air cond reverse)
 			case 7:
-				colour = grandient(map(i, -angle, angle, 35, 127));
+				colour = gradient(map(i, -angle, angle, 35, 127));
 				break; // cyan to red 
 			case 8:
 				colour = colorInterpolation(0,0,0,255,255,255,map(i,-angle,angle,0,w),w);

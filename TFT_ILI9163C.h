@@ -59,10 +59,9 @@
 	1.0r6.3: Fixed some commands, erased sleep, idle commands and replaced with changeMode(NORMAL,PARTIAL,IDLE,SLEEP,INVERT)
 	Now the PARTIAL and display OFF commands shows a BLACK screen instead of white.Sleep mode uses 70uA max
 	1.0r6.4: Initialization really fast, now ready in some millisec.
-	1.0r6.5: Fixed a small parameter error in ..., added fillScreen with grandient and fillRect with grandient
+	1.0r6.5: Fixed a small parameter error in ..., added fillScreen with gradient and fillRect with gradient
 	1.0r7: Lot of fixes, see https://github.com/sumotoy/TFT_ILI9163C/issues/32
 	1.0p7.3:fixed drawImage,drawIcon, more speed on ESP8266
-	1.0p7.4:added autoremap code for handle fonts with autoremap flag enabled
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
@@ -227,7 +226,7 @@ class TFT_ILI9163C : public Print {
 	void 		setBitrate(uint32_t n);//will be deprecated
 	#endif
 	//------------------------------- COLOR ----------------------------------------------------
-	uint16_t 		grandient(uint8_t val);
+	uint16_t 		gradient(uint8_t val);
 	uint16_t 		colorInterpolation(uint16_t color1,uint16_t color2,uint16_t pos,uint16_t div=100);
 	uint16_t 		colorInterpolation(uint8_t r1,uint8_t g1,uint8_t b1,uint8_t r2,uint8_t g2,uint8_t b2,uint16_t pos,uint16_t div=100);
 	inline uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);};

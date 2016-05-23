@@ -62,7 +62,7 @@ getScrollDirection	KEYWORD2
 setScrollDirection	KEYWORD2
 getScrollTop	KEYWORD2
 getScrollBottom	KEYWORD2
-grandient	KEYWORD2
+gradient	KEYWORD2
 colorInterpolation	KEYWORD2
 Color565	KEYWORD2
 Color24To565	KEYWORD2
