@@ -13,7 +13,7 @@
 	- Multiple Instances Compatible (just 1 pin more x display)
 	- Can handle any type of display
 
-	https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0r6
+	https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0p7
 
 	Background:
 	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
@@ -61,7 +61,7 @@
 	1.0r6.4: Initialization really fast, now ready in some millisec.
 	1.0r6.5: Fixed a small parameter error in ..., added fillScreen with gradient and fillRect with gradient
 	1.0r7: Lot of fixes, see https://github.com/sumotoy/TFT_ILI9163C/issues/32
-	1.0p7.3:fixed drawImage,drawIcon, more speed on ESP8266
+	1.0p7.3:fixed drawImage,drawIcon, more speed on ESP8266 (but with caution, I have an issue for more than 1 instance with this CPU)
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
