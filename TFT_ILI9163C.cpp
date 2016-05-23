@@ -2186,9 +2186,16 @@ void TFT_ILI9163C::setInternalFont(void)
 int TFT_ILI9163C::_getCharCode(uint8_t ch)
 {
 	int i;
-	for (i = 0;i < _currentFont->length;i++){//search for char code
+	//remap ?
+	if (_fontRemapOffset == 1 && (ch > 96 && ch < 123)){
+		ch -= 32;
+	} else if (_fontRemapOffset == 2 && ((ch > 64 && ch < 91))){
+		ch += 32;
+	}
+	//search for char code
+	for (i = 0;i < _currentFont->length;i++){
 		if (_currentFont->chars[i].char_code == ch) return i;
-	}//i
+	}
 	return -1;
 }
 
@@ -2228,6 +2235,7 @@ int TFT_ILI9163C::_STRlen_helper(const char* buffer,int len)
 void TFT_ILI9163C::setFont(const tFont *font) 
 {
 	_currentFont = font;
+	_fontRemapOffset =  _currentFont->remap_code;
 	//get all needed infos
 	if (_currentFont->font_width > 0){//fixed with font
 		_spaceCharWidth = _currentFont->font_width;
@@ -2544,16 +2552,16 @@ Here has been used to avoid multiple memory addressing but can be inproved, the 
 where harware accelleration it's present but this chip has only direct memory access...
 */
 void TFT_ILI9163C::_charLineRender(
-									bool lineBuffer[],
-									int charW,
-									int16_t x,
-									int16_t y,
-									uint8_t scaleX,
-									uint8_t scaleY,
-									int16_t currentYposition,
-									uint8_t cspacing,
-									uint16_t foreColor,
-									uint16_t backColor)
+									bool 			lineBuffer[],
+									int 			charW,
+									int16_t 		x,
+									int16_t 		y,
+									uint8_t 		scaleX,
+									uint8_t 		scaleY,
+									int16_t 		currentYposition,
+									uint8_t 		cspacing,
+									uint16_t 		foreColor,
+									uint16_t 		backColor)
 {
 	int xlinePos = 0;
 	int px;
