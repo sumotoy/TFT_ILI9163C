@@ -370,7 +370,8 @@ class TFT_ILI9163C : public Print {
 
 		void spiwrite16(uint16_t c)
 		__attribute__((always_inline)) {
-			SPI.transfer(c >> 8); SPI.transfer(c);
+			//SPI.transfer(c >> 8); SPI.transfer(c);
+			SPI.transfer16(c);
 		}
 
 
