@@ -7,6 +7,7 @@ Current version it's a preview, scroll is not complete and other optimizations c
 Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br>
 - [ ]  **Bug**  Scroll, should fix for all display's.
+- [ ]  **Bug**  On ESP8266 multinstances doesn't work well. I'm investigating.
 - [ ]  **Added** RED PCB Display 2.1.
 - [ ]  **Added** Images. Added RLE compression.
 - [ ]  **Added** Icons. Added RLE compression.
@@ -30,8 +31,8 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Fixed** LGPO Rendering engine issue on background font fixed.
 - [x]  **Fixed** fixed almost all compiling errors with some compilers.
 - [x]  **Updated** LGPO now can used to render any sequence of byte formatted image (also inverted).
-- [x]  **Updated** fillScreen(color1,color2) for create grandient backgrounds. now amazing fast!
-- [x]  **Updated** fillRect(x,y,w,hcolor1,color2) for create grandient rects. now amazing fast!
+- [x]  **Updated** fillScreen(color1,color2) for create gradient backgrounds. now amazing fast!
+- [x]  **Updated** fillRect(x,y,w,hcolor1,color2) for create gradient rects. now amazing fast!
 - [x]  **Updated** Fonts. Modified template to 2.3.
 - [x]  **Updated** Fonts. Possible change the default font or even avoid completely to save space
 - [x]  **Updated** scroll Up/Down now possible.
