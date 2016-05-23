@@ -29,11 +29,15 @@ uint8_t errorCode = 0;
   SCLK:D5
   MOSI:D7
 */
-#define __CS 	10
+#if defined(ESP8266)
+#define __CS1   16  //(D0)
+#define __DC    5   //(D1)
+#else
+#define __CS1 	10
 #define __DC 	9
-#define __RST 	14
+#endif
 
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC, __RST);
+TFT_ILI9163C tft = TFT_ILI9163C(__CS1, __DC);
 
 void setup() {
   Serial.begin(38400);

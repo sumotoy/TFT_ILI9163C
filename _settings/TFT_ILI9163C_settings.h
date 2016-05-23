@@ -32,7 +32,7 @@ DrawArc uses a lot of resources, I know, have to modify this soon. On modern ARM
 but in some small CPU's resources are precious, you can try comment this to save resources!
 Default:uncommented
 ----------------------------------------------------------------------------------*/
-//#define _ILI9163C_DRAWARC
+#define _ILI9163C_DRAWARC
 /*--------------------------------------------------------------------------------
 - Default Display Rotation -
 This parameter can be changed in your code but here you can force orientation

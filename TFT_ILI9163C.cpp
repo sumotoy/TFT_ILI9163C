@@ -662,7 +662,7 @@ bfa:Bottom Fixed Area
 void TFT_ILI9163C::defineScrollArea(int16_t tfa, int16_t bfa)
 {
 	if (_rotation == 1 || _rotation == 3 || _rotation == 2) return;//no scroll for rot 1,3!
-	uint16_t area;
+	uint16_t area = 0;
 		if (tfa == 0 && bfa == 0) {
 			bfa = 0;//special
 			tfa = TFT_ILI9163C_OFST[_rotation][1];
@@ -677,7 +677,7 @@ void TFT_ILI9163C::defineScrollArea(int16_t tfa, int16_t bfa)
 			area = TFT_ILI9163C_CGR_H - tfa - bfa;
 		}
 
-    if (area >= 0) {
+    if (area > 0) { 
 		startTransaction();
 		writecommand_cont(CMD_VSCLLDEF);
 		writedata16_cont(tfa);
