@@ -701,7 +701,7 @@ void TFT_ILI9163C::setScrollDirection(uint8_t dir)
 Since the value of the Vertical Scrolling Start Address is absolute
 it must not enter the fixed area otherwise undesirable image will be displayed
 */
-boolean TFT_ILI9163C::scroll(uint16_t pointer) 
+boolean TFT_ILI9163C::scroll(int16_t pointer) 
 {
 
 	if (_rotation == 1 || _rotation == 3 || _rotation == 2) return 0;
@@ -2453,7 +2453,7 @@ void TFT_ILI9163C::_glyphRender_unc(
 	uint8_t currentXposition = 0;//the current position of the writing cursor in the x axis, from 0 to charW
 	uint8_t currentYposition = 0;//the current position of the writing cursor in the y axis, from 0 to _FNTheight
 	uint8_t tempYpos = 0;
-	int currentByte = 0;//the current byte in reading (from 0 to totalBytes)
+	uint16_t currentByte = 0;//the current byte in reading (from 0 to totalBytes)
 	bool lineBuffer[charW];//the temporary line buffer
 	int lineChecksum = 0;//part of the optimizer
 	//the main loop that will read all bytes of the glyph

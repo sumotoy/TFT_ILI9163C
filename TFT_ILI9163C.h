@@ -217,7 +217,7 @@ class TFT_ILI9163C : public Print {
 	//------------------------------- SCROLL ----------------------------------------------------
 	void 		defineScrollArea(int16_t tfa, int16_t bfa);
 
-	boolean		scroll(uint16_t pointer);
+	boolean		scroll(int16_t pointer);
 	uint8_t		getScrollDirection(void);
 	void		setScrollDirection(uint8_t dir);
 	int16_t		getScrollTop(void);

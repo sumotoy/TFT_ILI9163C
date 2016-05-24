@@ -1,5 +1,6 @@
 /*
 Images are flexible! Here's an example that cut the Image background color and set as transparent!
+Caution: This will not run on Arduino UNO or similar, image is too big!
 */
 
 #include <SPI.h>

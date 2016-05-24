@@ -1,5 +1,6 @@
 /*
 Batman
+CAUTION: This is too big for Arduino UNO or similar
 */
 
 #include <SPI.h>

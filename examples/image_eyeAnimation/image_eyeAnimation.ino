@@ -1,5 +1,6 @@
 /*
 	Brrr...It's alive!
+	CAUTION: Too big for arduino UNO or similar...
 */
 
 #include <SPI.h>

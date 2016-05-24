@@ -5,7 +5,7 @@ Icons are flexible! Here's a negative image colored as positive
 #include <SPI.h>
 #include <TFT_ILI9163C.h>
 
-#include "_images/world.c"
+#include "_icons/world.c"
 
 
 #define __CS1 	10
