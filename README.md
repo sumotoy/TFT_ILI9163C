@@ -8,7 +8,8 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br><br>
 ***
 <b>Know Bugs:</b><br>
- - Multi instances <b>do not work</b> with ESP8266 (hard to tell why...sigh)
+ - Multi instances <b>do not work</b> with ESP8266.<br>
+ see https://github.com/sumotoy/TFT_ILI9163C/issues/37<br>
  - Scroll still not working, will fixed soon.
 <br>
 
