@@ -90,13 +90,11 @@ http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 	
 - This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino 5V.<br>
 If you try to connect directly you can burn it very fast so PAY ATTENTION!<br>
-- My display works at 3V3 volt and uses 3V3 for logic but LED background has resistor for 5V. <br>
-Your can be different so carefully check out before connect it.<br>
-- Library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS, or even A0).<br>
-I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
-the reset pin. The initialization routine will automatically use the software reset.<br>
-- Teensy 3 and LC cannot use any pin for CS and RS(DC or A0) but should be choosen as follow:<br>
-pins:2,6,9 or 10,15 or 20,13 for CS and RS.<br>
+- My display works at 3V3 volt and uses 3V3 for logic but LED background has resistor for 5V, hovewer the new one from 2016 has no resistor at all so they needs one and can work at 3v3, try with a 150Ohm first! Before connect display please check this or you will fry the backlight and your TFT will remain dark or change background color forever <br>
+- Library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (called also A0).<br>
+Optionally you can use the reset pin but you can avoid it by pullup with a resistor (anithing between 4k7 to 10K connected at 3v3 will fine), in that case do not set the rst pin in the instance .<br>
+- Teensy 3 and LC cannot use any pin for CS and DC (or A0) but should be choosen as follow:<br>
+ pins:2,6,9 or 10,15 or 20,13 for CS and RS.<br>
 The benchmark.ino example has a routine that can help you to understand if you have choosed the right pin for your Teensy.<br>
 For reset you can use any pin, if you want to save a wire and not use reset, YOU SHOULD CONNECT TO 3V3 OR USE
 A PULLUP RESISTOR (4.7K to 3V3) BUT NOT LEAVE FLOATING!<br>
