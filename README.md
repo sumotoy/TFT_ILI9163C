@@ -164,7 +164,7 @@ https://github.com/greiman/SdFat
 	- Vcc		-->		+3V3V(!!!!)
 	- Gnd		-->		Gnd
 	- CS		-->		CS pin (3v3 level!)
-	- RST		-->		connect to a MCU pin or tie to +3V3 or 10K to 3V3 (do NOT leave float!)
+	- RST		-->		(optional) connect to a MCU pin or tie to +3V3 or 4k7..10K to 3V3 (do NOT leave float!)
 	- A0		-->		DC or RS pin (3v3 level!)
 	- SDA		-->		Mosi (3v3 level!)
 	- SCK		-->		Sclk (3v3 level!)
@@ -174,7 +174,7 @@ https://github.com/greiman/SdFat
 	- Vcc		-->		+3V3V(!!!!)
 	- Gnd		-->		Gnd
 	- CS		-->		D0
-	- RST		-->		D2
+	- RST		-->		D2 (optional) if not used tie to +3V3 or 4k7..10K to 3V3 (do NOT leave float!)
 	- A0		-->		D1
 	- SDA		-->		Mosi (D7)
 	- SCK		-->		Sclk (D5)
@@ -186,17 +186,22 @@ https://github.com/greiman/SdFat
 * Note about led:<br>
 
 Some display have an internal resistor to limit current, you see on the back of the display, following LED pcb
-trace with your eyes and if you see a resistor (100 Ohm mine) you can connect this line directly to +5V.<br>
+trace with your eyes and if you see a resistor (100 Ohm mine) you can connect this line directly to +5V (but try first 3V3!!!).<br>
 But be careful <u>do not try connect to 5V before you check the presence of this resistor on pcb</u>, you can try first by using a resistor of 220 ohm, if the image looks very dark, try 100 and if still very dark, use lower values.<br>
 The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the backlight, try use 100Ohm resistor.<br>
 
 <b>Utility included:</b><br>
 
-Included you will find the templates for riuson lcd-image-converter to convert in code a 24bit image.<br>
-You will find also the preset for font conversion (last beta of lcd-image-converter has support for preset).<br>
-You will find also the original font files that you can load with lcd-image-converter!<br>
+Included you will find:
+ - the template for riuson lcd-image-converter to convert in code a 24bit image.
+ - preset for Images.
+ - the template for Font Conversion.
+ - preset for font conversion (last beta of lcd-image-converter has support for preset).
+ - the template for riuson lcd-image-converter to convert in Icons an image.
+ - the preset for convert icons.
+ - the original library font files in LCD Image Converter format.
+ - <br>
 Use the last beta of lcd-image-converter!!!<br>
-ILI9163C datasheet.<br>
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	<br><b>Download lcd-image-converter here:</b><br>
 	http://www.riuson.com/lcd-image-converter/download
