@@ -74,57 +74,58 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 <b>Features:</b>
 	
 	- Very FAST!, expecially with Teensy 3.x where uses hyper fast SPI.
-	- Proprietary GPO fast font rendering engine.
+	- Proprietary LGPO fast font rendering engine.
 	- Tools for font conversion included.
 	- Tons of examples !!!
 	- It uses just 4 wires (2 shared with other devices).
 	- SPI transaction compatible (where supported, otherwise legacy used)
 	- Working with IDE 1.6.8 (or newer)
 	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1, Teensy 3.2, Teensy LC, ESP8266
-	- A Fast SPI DMA for Nucleo F411RE porting from MasudaNaika https://github.com/MasudaNaika (old version)
-	- NEW: Support for user fonts and Icons! Using proprietary rendering engine (used in some other libraries I've done here)
+	- Multiple instances possible (actually not on ESP8266)
+	- ICON support (with template for LCD Image Converter)
+	- IMAGE support (with template for LCD Image Converter)
 	
 http://developer.mbed.org/users/peu605/code/TFT_ILI9163C/
 
-<b>Pay Attention to connections!!!!:</b>
+<b>Pay Attention to connections!!!!:</b><br>
 	
-	- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino 5V.
-	If you try to connect directly you can burn it very fast so PAY ATTENTION!
-	- My display works at 3V3 volt and uses 3V3 for logic but LED background has resistor for 5V. 
-	Your can be different so carefully check out before connect it.
-	- Library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS, or even A0).
-	I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
-	the reset pin. The initialization routine will automatically use the software reset.
+- This display has logic at 3V3 volt so YOU NEED A VOLTAGE CONVERTER if you plan to use with arduino 5V.<br>
+If you try to connect directly you can burn it very fast so PAY ATTENTION!<br>
+- My display works at 3V3 volt and uses 3V3 for logic but LED background has resistor for 5V. <br>
+Your can be different so carefully check out before connect it.<br>
+- Library works only in SPI mode by using MOSI,SCLK and a CS pin plus an additional pin for DC (or RS, or even A0).<br>
+I've used also the reset pin but you can save it by connect it at 3V3 volt and use the constructor without
+the reset pin. The initialization routine will automatically use the software reset.<br>
+- Teensy 3 and LC cannot use any pin for CS and RS(DC or A0) but should be choosen as follow:<br>
+pins:2,6,9 or 10,15 or 20,13 for CS and RS.<br>
+The benchmark.ino example has a routine that can help you to understand if you have choosed the right pin for your Teensy.<br>
+For reset you can use any pin, if you want to save a wire and not use reset, YOU SHOULD CONNECT TO 3V3 OR USE
+A PULLUP RESISTOR (4.7K to 3V3) BUT NOT LEAVE FLOATING!<br>
 
-	- Teensy 3 and LC cannot use any pin for CS and RS(DC or A0) but should be choosen as follow:
-	pins:2,6,9 or 10,15 or 20,13 for CS and RS.
-	The benchmark.ino example has a routine that can help you to understand if you have choosed the right pin for your Teensy.
-	For reset you can use any pin, if you want to save a wire and not use reset, YOU SHOULD CONNECT TO 3V3 OR USE
-	A PULLUP RESISTOR (4.7K to 3V3) BUT NOT LEAVE FLOATING!
-
-<b>Fonts:</b>
-	This is a preview that uses the new font rendering engine, faster than old one. However it's still a 'preview'
-	so the fonts folder contain just a few fonts. I've included as testing purposes and may contain some error,
-	if you want to try convert your fonts please look the wiki and learn to use the program conversion but
-	remember that I'm not the font converter program developer so don't start any Issue Request about this!
-	Just analize my font file, follow wiki and try yourself!
-	You want to use font file from other libraries? No, don't ask me. I've choosed this way because strong reasons
-	and belive me, it uses less resources than many others.
-
-<b>Backgrounds:</b>
+<b>IDE and compilers:</b><br>
 	
-	I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
-	any working library so I decided to work on it. ILI9163C looks pretty similar to other 
-	display driver but it uses it's own commands so it's tricky to work with it unlsess you
-	carefully fight with his gigantic and confused datasheet.
-	My display it's a 1.44"", 128x128 that suppose to substitute Nokia 5110 LCD and here's the 
-	first confusion! Many sellers claim that it's compatible with Nokia 5110 (that use a philips
-	controller) but the only similarity it's the pin names since that this one it's color and
-	have totally different controller that's not compatible. Altrough I discovered that it's not
-	128x128 but 128x160 with offset (!??)... Check links below to see if it's similar to yours.
-	UPDATE:
-	Some chinese seller connected the TFT aligned to bottom, other aligned to top, there's not a sure
-	way to discover witch is yours so better try one of the configurations.
+I have succesfully tested with Arduino IDE 1.6.9, latest Teensyduino, VisualStudio 2015 with Arduino plugin.
+Potentially any IDE should work but be sure is not too old! Arduino prior 1.5 should be avoided since there's not
+SPI transaction support and lack of many fixes<br>
+
+<b>Fonts:</b><br>
+
+From this version fonts, icons and images can be shared between all my display libraries, working in the xact same way. To convert you own font, follow wiki!<br>
+I provide templates and presets for LCD Image Converter inside _utilities folder.<br>
+
+<b>Backgrounds:</b><br>
+	
+I got one of those displays from a chinese ebay seller but unfortunatly I cannot get
+any working library so I decided to work on it. ILI9163C looks pretty similar to other 
+display driver but it uses it's own commands so it's tricky to work with it unlsess you
+carefully fight with his gigantic and confused datasheet.
+My display it's a 1.44"", 128x128 that suppose to substitute Nokia 5110 LCD and here's the 
+first confusion! Many sellers claim that it's compatible with Nokia 5110 (that use a philips
+controller) but the only similarity it's the pin names since that this one it's color and
+have totally different controller that's not compatible. Altrough I discovered that it's not
+128x128 but 128x160 with offset (!??)... Check links below to see if it's similar to yours.
+UPDATE:<br>
+Some chinese seller use is own way to connect display to the TFT and since ILI chip is on TFT flat cable is not easy to discover, the library currently support any version at the time I'm writing this but library is able to support any possible future version, if you have any other strain of this display let me know!<br>
 	
 An example of the old RED PCB One:<br>
 
@@ -185,20 +186,20 @@ https://github.com/greiman/SdFat
 	Use the last version of ESP8266 or it will probably fail, it works much better
 	with SPI and it's overall better than stable version.
 	
-* Note about led:
+* Note about led:<br>
 
 Some display have an internal resistor to limit current, you see on the back of the display, following LED pcb
-trace with your eyes and if you see a resistor (100 Ohm mine) you can connect this line directly to +5V.
-But be careful <u>do not try connect to 5V before you check the presence of this resistor on pcb</u>, you can try first by using a resistor of 220 ohm, if the image looks very dark, try 100 and if still very dark, use lower values.
-The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the backlight, try use 100Ohm resistor.
+trace with your eyes and if you see a resistor (100 Ohm mine) you can connect this line directly to +5V.<br>
+But be careful <u>do not try connect to 5V before you check the presence of this resistor on pcb</u>, you can try first by using a resistor of 220 ohm, if the image looks very dark, try 100 and if still very dark, use lower values.<br>
+The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the backlight, try use 100Ohm resistor.<br>
 
-<b>Utility included:</b>
+<b>Utility included:</b><br>
 
-	Included you will find the templates for riuson lcd-image-converter to convert in code a 24bit image.
-	You will find also the preset for font conversion (last beta of lcd-image-converter has support for preset).
-	You will find also the original font files that you can load with lcd-image-converter!
-	Use the last beta of lcd-image-converter!!!
-	ILI9163C datasheet.<br>
+Included you will find the templates for riuson lcd-image-converter to convert in code a 24bit image.<br>
+You will find also the preset for font conversion (last beta of lcd-image-converter has support for preset).<br>
+You will find also the original font files that you can load with lcd-image-converter!<br>
+Use the last beta of lcd-image-converter!!!<br>
+ILI9163C datasheet.<br>
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	<br><b>Download lcd-image-converter here:</b><br>
 	http://www.riuson.com/lcd-image-converter/download
