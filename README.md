@@ -6,6 +6,11 @@ A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's
 Current version it's a preview, scroll is not complete and other optimizations coming.<br>
 Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br>
+<b>Know Bugs:</b><br>
+ - Multi instances <b>do not work</b> with ESP8266
+ - Scroll still not working, will fixed soon.
+<br>
+<b>Version Features:</b><br>
 - [ ]  **Bug**  Scroll, should fix for all display's.
 - [ ]  **Bug**  On ESP8266 multinstances doesn't work well. I'm investigating.
 - [x]  **Bug**  Fixed a language typo (horrible, sorry!) grandient is now gradient (thanks Giulio!)
