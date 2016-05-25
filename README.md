@@ -14,7 +14,7 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 
 ***
 
-<b>Version Features:</b><br>
+<b>1.0p7 Version Features, Fixes and Updates:</b><br>
 - [ ]  **Bug**  Scroll, should fix for all display's.
 - [ ]  **Bug**  On ESP8266 multinstances doesn't work well. I'm investigating.
 - [x]  **Bug**  Fixed a language typo (horrible, sorry!) grandient is now gradient (thanks Giulio!)
