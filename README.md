@@ -200,7 +200,7 @@ Included you will find:
  - the template for riuson lcd-image-converter to convert in Icons an image.
  - the preset for convert icons.
  - the original library font files in LCD Image Converter format.
- - <br>
+<br>
 Use the last beta of lcd-image-converter!!!<br>
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	<br><b>Download lcd-image-converter here:</b><br>
