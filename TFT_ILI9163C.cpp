@@ -13,7 +13,7 @@
 	TFT_ILI9163C::TFT_ILI9163C(const enum ILI9163C_dispType d,const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin,const uint8_t mosi,const uint8_t sclk)
 	{
 		_cs   = cspin;
-		_rs   = dcpin;
+		_dc   = dcpin;
 		_rst  = rstpin;
 		_mosi = mosi;
 		_sclk = sclk;
@@ -23,7 +23,7 @@
 	TFT_ILI9163C::TFT_ILI9163C(const enum ILI9163C_dispType d,const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin,const uint8_t mosi,const uint8_t sclk)
 	{
 		_cs   = cspin;
-		_rs   = dcpin;
+		_dc   = dcpin;
 		_rst  = rstpin;
 		_mosi = mosi;
 		_sclk = sclk;
@@ -35,7 +35,7 @@
 	TFT_ILI9163C::TFT_ILI9163C(const enum ILI9163C_dispType d,const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin)
 	{
 		_cs   = cspin;
-		_rs   = dcpin;
+		_dc   = dcpin;
 		_rst  = rstpin;
 		TFT_ILI9163C_DISP = d;
 	}
@@ -45,7 +45,7 @@
 	TFT_ILI9163C::TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin,const uint8_t mosi,const uint8_t sclk)
 	{
 		_cs   = cspin;
-		_rs   = dcpin;
+		_dc   = dcpin;
 		_rst  = rstpin;
 		_mosi = mosi;
 		_sclk = sclk;
@@ -54,7 +54,7 @@
 	TFT_ILI9163C::TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin,const uint8_t mosi,const uint8_t sclk)
 	{
 		_cs   = cspin;
-		_rs   = dcpin;
+		_dc   = dcpin;
 		_rst  = rstpin;
 		_mosi = mosi;
 		_sclk = sclk;
@@ -65,7 +65,7 @@
 	TFT_ILI9163C::TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin)
 	{
 		_cs   = cspin;
-		_rs   = dcpin;
+		_dc   = dcpin;
 		_rst  = rstpin;
 	}
 	#endif
@@ -200,14 +200,13 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	#if defined(SPI_HAS_TRANSACTION)
 		_ILI9163CSPI = SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0);
 	#endif
-#if defined(__AVR__)
-//(avr) Any 8Bit AVR
-	pinMode(_rs, OUTPUT);
+#if defined(__AVR__)//(avr) Any 8Bit AVR
+	pinMode(_dc, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	csport    = portOutputRegister(digitalPinToPort(_cs));
-	rsport    = portOutputRegister(digitalPinToPort(_rs));
+	rsport    = portOutputRegister(digitalPinToPort(_dc));
 	cspinmask = digitalPinToBitMask(_cs);
-	rspinmask = digitalPinToBitMask(_rs);
+	rspinmask = digitalPinToBitMask(_dc);
     if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		if (!avoidSPIinit){
@@ -218,14 +217,13 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	#endif
 	*csport |= cspinmask;//hi
 	enableDataStream();
-#elif defined(__SAM3X8E__)
-//(arm) DUE
-	pinMode(_rs, OUTPUT);
+#elif defined(__SAM3X8E__)//(arm) DUE
+	pinMode(_dc, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	csport    = digitalPinToPort(_cs);
-	rsport    = digitalPinToPort(_rs);
+	rsport    = digitalPinToPort(_dc);
 	cspinmask = digitalPinToBitMask(_cs);
-	rspinmask = digitalPinToBitMask(_rs);
+	rspinmask = digitalPinToBitMask(_dc);
     if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		if (!avoidSPIinit){
@@ -236,9 +234,8 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	#endif
 	csport->PIO_SODR  |=  cspinmask;//HI
 	enableDataStream();
-#elif defined(__MKL26Z64__)
-//(arm) Teensy LC (preliminary)
-	pinMode(_rs, OUTPUT);
+#elif defined(__MKL26Z64__)//(arm) Teensy LC (preliminary)
+	pinMode(_dc, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	if (_useSPI1){
 		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) {//identify alternate SPI channel 1 (24Mhz)
@@ -273,18 +270,15 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 		csportSet    	= portSetRegister(digitalPinToPort(_cs));
 		csportClear     = portClearRegister(digitalPinToPort(_cs));
 		cspinmask 		= digitalPinToBitMask(_cs);
-		dcportSet       = portSetRegister(digitalPinToPort(_rs));
-		dcportClear     = portClearRegister(digitalPinToPort(_rs));
-		dcpinmask	    = digitalPinToBitMask(_rs);
+		dcportSet       = portSetRegister(digitalPinToPort(_dc));
+		dcportClear     = portClearRegister(digitalPinToPort(_dc));
+		dcpinmask	    = digitalPinToBitMask(_dc);
+		*csportSet = cspinmask;
+	#else
+		digitalWriteFast(_cs,HIGH);
 	#endif
-		#if !defined(_TEENSYLC_FASTPORT)
-			digitalWriteFast(_cs,HIGH);
-		#else
-			*csportSet = cspinmask;
-		#endif
 		enableDataStream();
-#elif defined(__MK20DX128__) || defined(__MK20DX256__)
-//(arm) Teensy 3.0, 3.1, 3.2
+#elif defined(__MK20DX128__) || defined(__MK20DX256__)//(arm) Teensy 3.0, 3.1, 3.2
 	if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
         SPI.setMOSI(_mosi);
         SPI.setSCK(_sclk);
@@ -293,18 +287,17 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 		return;
 	}
 	if (!avoidSPIinit) SPI.begin();
-	if (SPI.pinIsChipSelect(_cs, _rs)) {
+	if (SPI.pinIsChipSelect(_cs, _dc)) {
 		pcs_data = SPI.setCS(_cs);
-		pcs_command = pcs_data | SPI.setCS(_rs);
+		pcs_command = pcs_data | SPI.setCS(_dc);
 	} else {
 		pcs_data = 0;
 		pcs_command = 0;
 		bitSet(_initError,1);
 		return;
 	}
-#elif defined(ESP8266)
-//(arm) XTENSA ESP8266
-	pinMode(_rs, OUTPUT);
+#elif defined(ESP8266)//(arm) XTENSA ESP8266
+	pinMode(_dc, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
@@ -320,9 +313,8 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 		GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_cs));//H
 	#endif
 	enableDataStream();
-#else
-//(xxx) Rest of CPU
-	pinMode(_rs, OUTPUT);
+#else//(xxx) Rest of CPU
+	pinMode(_dc, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
@@ -1969,17 +1961,19 @@ void TFT_ILI9163C::drawIcon(int16_t x, int16_t y,const tIcon *icon,uint8_t scale
 	#if defined(_FORCE_PROGMEM__)
 		const uint8_t * iconData;
 		PROGMEM_read(&(icon->data),iconData);//icon data
-		uint8_t		iWidth		= pgm_read_byte(&(icon->image_width))-1;
-		uint8_t		iHeight		= pgm_read_byte(&(icon->image_height)-1);
+		uint8_t		iWidth		= pgm_read_byte(&(icon->image_width));
+		uint8_t		iHeight		= pgm_read_byte(&(icon->image_height));
 		uint16_t	datalen		= pgm_read_word(&(icon->image_datalen));
 		//boolean		dataComp	= pgm_read_word(&(icon->image_comp));//not yet
 	#else
 		const uint8_t * iconData	= icon->data;//icon data
-		uint8_t		iWidth			= icon->image_width-1;
-		uint8_t		iHeight			= icon->image_height-1;
+		uint8_t		iWidth			= icon->image_width;
+		uint8_t		iHeight			= icon->image_height;
 		uint16_t	datalen			= icon->image_datalen;
 		//uint8_t		dataComp		= icon->image_comp;//not yet
 	#endif
+	iWidth -= 1;
+	iHeight -= 1;
 	if (iWidth < 1 || iHeight < 1) return;//cannot be
 	if ((x + iWidth) * scale >= _width || (y + iHeight) * scale >= _height) return;//cannot be
 	//LGPO Rendering (uncomp)
@@ -2015,19 +2009,21 @@ void TFT_ILI9163C::drawImage(int16_t x, int16_t y,const tPicture *img,const enum
 	#if defined(_FORCE_PROGMEM__)
 		const uint16_t * imageData;
 		PROGMEM_read(&(img->data),imageData);//image data
-		uint8_t		iWidth		= pgm_read_byte(&(img->image_width))-1;
-		uint8_t		iHeight		= pgm_read_byte(&(img->image_height)-1);
+		uint8_t		iWidth		= pgm_read_byte(&(img->image_width));
+		uint8_t		iHeight		= pgm_read_byte(&(img->image_height));
 		uint16_t	datalen		= pgm_read_word(&(img->image_datalen));
 		//uint8_t		dataDepth	= pgm_read_word(&(img->image_depth));//not yet
 		//boolean		dataComp	= pgm_read_word(&(img->image_comp));//not yet
 	#else
 		const uint16_t * imageData	= img->data;//image data
-		uint8_t		iWidth			= img->image_width-1;
-		uint8_t		iHeight			= img->image_height-1;
+		uint8_t		iWidth			= img->image_width;
+		uint8_t		iHeight			= img->image_height;
 		uint16_t	datalen			= img->image_datalen;
 		//uint8_t		dataDepth		= img->image_depth;//not yet
 		//uint8_t		dataComp		= img->image_comp;//not yet
 	#endif
+	iWidth -= 1;
+	iHeight -= 1;
 	if (iWidth < 1 || iHeight < 1) return;//cannot be
 	if (x + iWidth >= _width || y + iHeight >= _height) return;//cannot be
 	

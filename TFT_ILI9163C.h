@@ -63,6 +63,7 @@
 	1.0r7: Lot of fixes, see https://github.com/sumotoy/TFT_ILI9163C/issues/32
 	1.0p7.3:fixed drawImage,drawIcon, more speed on ESP8266 (but with caution, I have an issue for more than 1 instance with this CPU)
 	1.0p7.4:SPI.settings now static, slight faster
+	1.0p7.5:fixed a couple of error in icon/image for PROGMEM
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
@@ -109,6 +110,8 @@
 #if defined(SPI_HAS_TRANSACTION)
 	static SPISettings _ILI9163CSPI;
 #endif
+
+
 
 #define CENTER 				9998
 
@@ -215,7 +218,7 @@ class TFT_ILI9163C : public Print {
 	virtual size_t 	write(uint8_t b) { _textWrite((const char *)&b, 1); return 1;}
 	virtual size_t  write(const uint8_t *buffer, size_t size) {_textWrite((const char *)buffer, size); return size;}
 	//void		getStringBox(int16_t &w,int16_t &h);
-
+	inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
     //------------------------------- CURSOR ----------------------------------------------------
 	void		setCursor(int16_t x,int16_t y);
 	void		getCursor(int16_t &x,int16_t &y);
@@ -263,8 +266,8 @@ class TFT_ILI9163C : public Print {
 	uint8_t					_initError;
 	uint8_t					_sleep;
 	#if defined(_ILI9163C_DRAWARC)
-	float 					_arcAngleMax;
-	int 					_arcAngleOffset;
+		float 					_arcAngleMax;
+		int 					_arcAngleOffset;
 	#endif
 	uint8_t					_currentMode;
 	int16_t					_scrollTop;
@@ -277,7 +280,8 @@ class TFT_ILI9163C : public Print {
 	volatile uint8_t		_Mactrl_Data;
 	uint16_t				_defaultBgColor;
 	uint16_t				_defaultFgColor;
-	uint8_t 				_rs,_rst;
+
+	uint8_t 				_dc,_rst;
 	uint8_t					_bklPin;
 		//Variable holders for init parameters
 	#if defined (TFT_ILI9163C_INSTANCES)
@@ -415,12 +419,12 @@ class TFT_ILI9163C : public Print {
 /* ----------------- ARM (Teensy LC) ------------------------*/
 	#elif defined(__MKL26Z64__)
 		uint8_t 			_mosi, _sclk;
-		#if defined(_TEENSYLC_FASTPORT)
-		    volatile uint8_t *dcportSet, *dcportClear, *csportSet, *csportClear;
-			uint8_t  cspinmask, dcpinmask;
-		#endif
 		bool				_useSPI1;
 		uint8_t 			_cs;
+		volatile uint8_t *dcportSet, *dcportClear, *csportSet, *csportClear;
+		uint8_t  cspinmask, dcpinmask;
+
+		
 
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -443,7 +447,7 @@ class TFT_ILI9163C : public Print {
 		void enableCommandStream(void)
 		__attribute__((always_inline)) {
 				#if !defined(_TEENSYLC_FASTPORT)
-					digitalWriteFast(_rs,LOW);
+					digitalWriteFast(_dc,LOW);
 				#else
 					*dcportClear = dcpinmask;
 				#endif
@@ -452,7 +456,7 @@ class TFT_ILI9163C : public Print {
 		void enableDataStream(void)
 		__attribute__((always_inline)) {
 				#if !defined(_TEENSYLC_FASTPORT)
-					digitalWriteFast(_rs,HIGH);
+					digitalWriteFast(_dc,HIGH);
 				#else
 					*dcportSet = dcpinmask;
 				#endif
@@ -623,18 +627,18 @@ class TFT_ILI9163C : public Print {
 		void enableCommandStream(void)
 		__attribute__((always_inline)) {
 				#if defined(_ESP8266_STANDARDMODE)
-					digitalWrite(_rs,LOW);
+					digitalWrite(_dc,LOW);
 				#else
-					GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_rs));//L
+					GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, _pinRegister(_dc));//L
 				#endif
 		}
 
 		void enableDataStream(void)
 		__attribute__((always_inline)) {
 				#if defined(_ESP8266_STANDARDMODE)
-					digitalWrite(_rs,HIGH);
+					digitalWrite(_dc,HIGH);
 				#else
-					GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_rs));//H
+					GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, _pinRegister(_dc));//H
 				#endif
 		}
 
@@ -683,12 +687,12 @@ class TFT_ILI9163C : public Print {
 
 		void enableCommandStream(void)
 		__attribute__((always_inline)) {
-			digitalWrite(_rs,LOW);
+			digitalWrite(_dc,LOW);
 		}
 
 		void enableDataStream(void)
 		__attribute__((always_inline)) {
-			digitalWrite(_rs,HIGH);
+			digitalWrite(_dc,HIGH);
 		}
 
 		void startTransaction(void)
@@ -807,7 +811,9 @@ class TFT_ILI9163C : public Print {
 	
 /* ========================================================================*/
  private:
-	inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
+
+ 
+	
 
 /* ========================================================================
 					       Helpers
