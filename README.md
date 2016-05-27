@@ -8,7 +8,7 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br><br>
 ***
 <b>Know Bugs:</b><br>
- - Multi instances <b>do not work</b> with ESP8266,Teensy LC.<br>
+ - Multi instances <b>do not work</b> with ESP8266,Teensy LC (and probably DUE) if sharing DC pin.<br>
  see https://github.com/sumotoy/TFT_ILI9163C/issues/37<br>
  - Scroll still not working, will fixed soon.
 <br>
@@ -17,7 +17,7 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 
 <b>1.0p7 Version Features, Fixes and Updates:</b><br>
 - [ ]  **Bug**  Scroll, should fix for all display's.
-- [ ]  **Bug**  On ESP8266 multinstances doesn't work well. I'm investigating.
+- [ ]  **Bug**  On ESP8266,Teensy LC and probably DUE multinstances doesn't work well if sharing DC pin!
 - [x]  **Bug**  Fixed a language typo (horrible, sorry!) grandient is now gradient (thanks Giulio!)
 - [ ]  **Added** Images. Added RLE compression.
 - [ ]  **Added** Icons. Added RLE compression.
