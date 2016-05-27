@@ -197,6 +197,9 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 		//avoid multiple SPI initializations ?
 		if (ILI9163C_instance > 1) avoidSPIinit = true;
 	#endif
+	#if defined(SPI_HAS_TRANSACTION)
+		_ILI9163CSPI = SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0);
+	#endif
 #if defined(__AVR__)
 //(avr) Any 8Bit AVR
 	pinMode(_rs, OUTPUT);

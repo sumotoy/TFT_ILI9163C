@@ -10,9 +10,9 @@ By comment out the define the library will use more resources but you will able 
 in the same time by sharing all pins apart CS!
 Since this will use quite a lot resources (all init code, but fonts and images will be shared)
 you should enable this only if you really need if you have a CPU with small resources!
-Default: commented (disabled)
+Default: commented
 ----------------------------------------------------------------------------------*/
-//#define TFT_ILI9163C_INSTANCES
+//#define TFT_ILI9163C_INSTANCES		1
 /*--------------------------------------------------------------------------------
 Select your display here ..........................
 You have a RED PCB, BLACK PCB or what?
@@ -32,7 +32,7 @@ DrawArc uses a lot of resources, I know, have to modify this soon. On modern ARM
 but in some small CPU's resources are precious, you can try comment this to save resources!
 Default:uncommented
 ----------------------------------------------------------------------------------*/
-#define _ILI9163C_DRAWARC
+#define _ILI9163C_DRAWARC			1
 /*--------------------------------------------------------------------------------
 - Default Display Rotation -
 This parameter can be changed in your code but here you can force orientation
@@ -70,7 +70,9 @@ the same SPI lines try to comment the line nelow...
 The library default uses Direct Port Manipulation (that it's slight faster)
 Default:uncommented
 ----------------------------------------------------------------------------------*/
-#define _TEENSYLC_FASTPORT
+#if defined(__MKL26Z64__)
+	#define _TEENSYLC_FASTPORT	1
+#endif
 /*--------------------------------------------------------------------------------
 - ESP8266 Compatibility mode -
 This force library to use an alternative way to trigger ESP8266 GPIO, if you uncomment
@@ -78,11 +80,19 @@ the line it will use the standard digitaWrite wich is slow, this help debuggin.
 NOTE: This is MUCH slower!
 Default:commented
 ----------------------------------------------------------------------------------*/
-//#define _ESP8266_STANDARDMODE
+#if defined(ESP8266)
+	//#define _ESP8266_STANDARDMODE	1
+#endif
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*---------------------------------------------------------------------------------
  							 END OF USER SETTINGS
 ----------------------------------------------------------------------------------*/
+//due a bug is ESP8266 GPIO handle, using TFT_ILI9163C_INSTANCES in ESP8266
+//need the use of standard GPIO access. This limit speed but it's the only way
+//to fix the issue and it's temporary until I find a solution.
+#if defined(ESP8266) && defined(TFT_ILI9163C_INSTANCES) && !defined(_ESP8266_STANDARDMODE)
+	#define _ESP8266_STANDARDMODE	1//force!
+#endif
 #if !defined (TFT_ILI9163C_INSTANCES)
 /* GAMMA SET DEFINITIONS ----------------------------------------------------------*/
 	#if (TFT_ILI9163C_GAMMASET == 1)

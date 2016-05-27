@@ -16,18 +16,18 @@
 		#if defined(SPI_HAS_TRANSACTION)
 			static const uint32_t TFT_ILI9163C_SPI_SPEED 	= 80000000;
 		#endif
-		#define _SPI_MULTITRANSFER//enable burst multy byte transfer
+		#define _SPI_MULTITRANSFER	1//enable burst multy byte transfer
 	#elif defined(__AVR__)
 		#include <avr/pgmspace.h>
-		#define _FORCE_PROGMEM__
+		#define _FORCE_PROGMEM__	1
 		#define _smCharType	uint8_t
 		#if defined(SPI_HAS_TRANSACTION)
 			static const uint32_t TFT_ILI9163C_SPI_SPEED 	= 8000000;
 		#endif
-		#define _SPI_MULTITRANSFER//enable burst multy byte transfer
+		#define _SPI_MULTITRANSFER	1//enable burst multy byte transfer
 	#elif defined(__SAM3X8E__)
 		#include <include/pio.h>
-		#define _FORCE_PROGMEM__
+		#define _FORCE_PROGMEM__	1
 		#define PROGMEM
 		#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 		#define pgm_read_word(addr) (*(const unsigned short *)(addr))
@@ -36,14 +36,14 @@
 		#if defined(SPI_HAS_TRANSACTION)
 			const uint32_t TFT_ILI9163C_SPI_SPEED 			= 24000000;
 		#endif
-		#define _SPI_MULTITRANSFER//enable burst multy byte transfer
+		#define _SPI_MULTITRANSFER	1//enable burst multy byte transfer
 	#elif defined(__MKL26Z64__)	|| defined(__MK20DX128__) || defined(__MK20DX256__)
 		//#include <avr/pgmspace.h>
 		//#define _FORCE_PROGMEM__
 		#define _smCharType	unsigned char
 		static const uint32_t TFT_ILI9163C_SPI_SPEED 		= 30000000;
 		#if !defined(__MKL26Z64__)
-			#define _SPI_MULTITRANSFER//enable burst multy byte transfer
+			#define _SPI_MULTITRANSFER	1//enable burst multy byte transfer
 		#endif
 	#else//all the rest
 		#define _smCharType	uint8_t

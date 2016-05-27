@@ -62,6 +62,7 @@
 	1.0r6.5: Fixed a small parameter error in ..., added fillScreen with gradient and fillRect with gradient
 	1.0r7: Lot of fixes, see https://github.com/sumotoy/TFT_ILI9163C/issues/32
 	1.0p7.3:fixed drawImage,drawIcon, more speed on ESP8266 (but with caution, I have an issue for more than 1 instance with this CPU)
+	1.0p7.4:SPI.settings now static, slight faster
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
@@ -103,6 +104,10 @@
 
 #if defined(ESP8266) && !defined(_ESP8266_STANDARDMODE)
 	#include <eagle_soc.h>
+#endif
+
+#if defined(SPI_HAS_TRANSACTION)
+	static SPISettings _ILI9163CSPI;
 #endif
 
 #define CENTER 				9998
@@ -341,7 +346,7 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
-				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
+				SPI.beginTransaction(_ILI9163CSPI);
 			#endif
 				*csport &= ~cspinmask;//low
 		}
@@ -352,6 +357,8 @@ class TFT_ILI9163C : public Print {
 				SPI.endTransaction();
 			#endif
 		}
+
+
 
 		void disableCS(void)
 		__attribute__((always_inline)) {
@@ -388,7 +395,7 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
-				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
+				SPI.beginTransaction(_ILI9163CSPI);
 			#endif
 				csport->PIO_CODR |=  cspinmask;//LO
 		}
@@ -454,9 +461,9 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			if (_useSPI1){
-				SPI1.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
+				SPI1.beginTransaction(_ILI9163CSPI);
 			} else {
-				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
+				SPI.beginTransaction(_ILI9163CSPI);
 			}
 			#if !defined(_TEENSYLC_FASTPORT)
 				digitalWriteFast(_cs,LOW);
@@ -491,7 +498,7 @@ class TFT_ILI9163C : public Print {
 
 		void startTransaction(void)
 		__attribute__((always_inline)) {
-			SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
+			SPI.beginTransaction(_ILI9163CSPI);
 		}
 
 		void endTransaction(void)
@@ -634,7 +641,7 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
-				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
+				SPI.beginTransaction(_ILI9163CSPI);
 			#endif
 			#if defined(_ESP8266_STANDARDMODE)
 				digitalWrite(_cs,LOW);
@@ -687,7 +694,7 @@ class TFT_ILI9163C : public Print {
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
-				SPI.beginTransaction(SPISettings(TFT_ILI9163C_SPI_SPEED, MSBFIRST, SPI_MODE0));
+				SPI.beginTransaction(_ILI9163CSPI);
 			#endif
 				digitalWrite(_cs,LOW);
 		}

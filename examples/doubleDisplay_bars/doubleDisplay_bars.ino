@@ -53,7 +53,7 @@ if color = 0 it will create a value sensitive spectrum color
 */
 void drawVerticalVU(uint8_t disp,uint8_t x, uint8_t y, uint8_t w, uint8_t val, uint16_t color) {
 	uint8_t h = map(val, 0, 255, tft[disp].height() - y, 0);
-	if (color < 1) color = tft[disp].grandient(map(val, 0, 255, 0, tft[disp].height()));
+	if (color < 1) color = tft[disp].gradient(map(val, 0, 255, 0, tft[disp].height()));
 	tft[disp].fillRect(x, 0, w, h, DARK_GREY);
 	if (val > 4) tft[disp].fillRect(x, h + 1, w, tft[disp].height() - (h + y + 2), color);
 }
