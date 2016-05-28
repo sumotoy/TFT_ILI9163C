@@ -16,12 +16,13 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 ***
 
 <b>1.0p7 Version Features, Fixes and Updates:</b><br>
-- [ ]  **Bug**  Scroll, should fix for all display's.
-- [ ]  **Bug**  On ESP8266,Teensy LC and probably DUE multinstances doesn't work well if sharing DC pin!
-- [x]  **Bug**  Fixed a language typo (horrible, sorry!) grandient is now gradient (thanks Giulio!)
+- [ ]  **Bug Fix**  Scroll, should fix for all display's.
+- [ ]  **Bug Fix**  On ESP8266,Teensy LC and probably DUE multinstances doesn't work well if sharing DC pin!
+- [x]  **Bug Fix**  Fixed a language typo (horrible, sorry!) grandient is now gradient (thanks Giulio!)
 - [ ]  **Added** Images. Added RLE compression.
 - [ ]  **Added** Icons. Added RLE compression.
 - [ ]  **Added** Fonts. Added RLE compression.
+- [x]  **Added** AVR code fixed, added a parameter in user setting to optimize the size of the code in AVR.
 - [ ]  **Added** setCursor can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
 - [x]  **Added** New font parameter inside Font File. It allows automatical char reassign (es. minus to capital). Useful for include small font file that uses less resources.
 - [x]  **Added** char reassign using scheme inside font file.
@@ -40,6 +41,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Fixed** drawCircle(). better rounded.
 - [x]  **Fixed** LGPO Rendering engine issue on background font fixed.
 - [x]  **Fixed** fixed almost all compiling errors with some compilers.
+- [x]  **Fixed** Handle correctly PROGMEM, fixed Avr code side.
 - [x]  **Updated** LGPO now can used to render any sequence of byte formatted image (also inverted).
 - [x]  **Updated** fillScreen(color1,color2) for create gradient backgrounds. now amazing fast!
 - [x]  **Updated** fillRect(x,y,w,hcolor1,color2) for create gradient rects. now amazing fast!
@@ -48,6 +50,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Updated** scroll Up/Down now possible.
 - [x]  **Updated** changeMode() now handle display on/off and works correctly.
 - [x]  **Updated** all examples revised.
+- [x]  **Updated** AVR code faster, user can decide optimizations speed/size
 - [x]  **Updated** ESP8266 code is faster!.
 - [x]  **Deprecated** drawColorBitmap(). use drawIcon().
 - [x]  **Deprecated** display(). use changeMode(DISP_ON/DISP_OFF) instead.
