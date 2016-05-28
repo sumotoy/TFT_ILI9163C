@@ -27,7 +27,7 @@
 
 
 
-static const uint8_t image_data_wifi[126]
+static const _smCharType image_data_wifi[126]
 #if defined(_FORCE_PROGMEM__)
  PROGMEM 
 #endif

@@ -27,7 +27,7 @@
 
 
 
-static const uint8_t image_data_spkOff[94]
+static const _smCharType image_data_spkOff[94]
 #if defined(_FORCE_PROGMEM__)
  PROGMEM 
 #endif

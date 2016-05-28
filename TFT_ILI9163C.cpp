@@ -186,10 +186,8 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	_defaultFgColor = _ILI9163C_FOREGROUND;
 	_textForeground = _textBackground = _defaultFgColor;//text transparent
 	_textWrap      = true;
-	#if defined(_ILI9163C_DRAWARC)
 	_arcAngleMax = 360;
 	_arcAngleOffset = -90;
-	#endif
 	_bklPin = 255;
 	_Mactrl_Data = 0b00000000;
 	#if defined (TFT_ILI9163C_INSTANCES)
@@ -445,7 +443,6 @@ uint8_t TFT_ILI9163C::getErrorCode(void)
 
 void TFT_ILI9163C::clearMemory(void)
 {
-	uint16_t area = TFT_ILI9163C_CGRAM;
 	startTransaction();
 	setAddrWindow_cont(
 				0,
@@ -453,10 +450,7 @@ void TFT_ILI9163C::clearMemory(void)
 				TFT_ILI9163C_CGR_W,
 				TFT_ILI9163C_CGR_H
 	);
-	
-	do { 
-		writedata16_cont(_defaultBgColor); 
-	} while (--area > 0);
+	_pushColors_cont(_defaultBgColor,TFT_ILI9163C_CGRAM);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_last(CMD_NOP);
 	#else
@@ -834,9 +828,6 @@ void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color)
 
 void TFT_ILI9163C::fillScreen(uint16_t color) 
 {
-	//12324
-	uint16_t area = _width * _height;
-
 	startTransaction();
 	setAddrWindow_cont(
 				0,
@@ -844,13 +835,7 @@ void TFT_ILI9163C::fillScreen(uint16_t color)
 				_width - 1,
 				_height - 1
 	);
-	
-	//pushColors_cont(color,area);//won't work... Grrr!
-	
-	do { 
-		writedata16_cont(color); 
-	} while (--area > 0);
-	
+	_pushColors_cont(color,_width * _height);
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_last(CMD_NOP);
 	#else
@@ -875,10 +860,7 @@ void TFT_ILI9163C::fillScreen(uint16_t color1,uint16_t color2)
 				_width - 1,
 				_height - 1
 		);
-		uint16_t area = _width * _height;
-		do { 
-			writedata16_cont(color1); 
-		} while (--area > 0);
+		_pushColors_cont(color1,_width * _height);
 	}
 	#if defined(__MK20DX128__) || defined(__MK20DX256__)
 		writecommand_last(CMD_NOP);
@@ -987,10 +969,7 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 	if (w < 2 && h < 2){ drawPixel_cont(x,y,color1); return; }
 	if (h < 2) { drawFastHLine_cont(x,y,w,color1); return; }
 	if (w < 2) { drawFastVLine_cont(x,y,h,color1); return; }
-	
 	setAddrWindow_cont(x,y,(x+w)-1,(y+h)-1);
-	
-	uint16_t area = w*h;
 	if (color1 != color2){
 		uint16_t pos = 0;
 		uint8_t r1,r2,g1,g2,b1,b2;
@@ -1005,16 +984,18 @@ void TFT_ILI9163C::fillRect_cont(int16_t x, int16_t y, int16_t w, int16_t h, uin
 			rR = (((1.0 - pos2) * r1) + (pos2 * r2));
 			gG = (((1.0 - pos2) * g1) + (pos2 * g2));
 			bB = (((1.0 - pos2) * b1) + (pos2 * b2));
-			
-			do { writedata16_cont(Color565(rR,gG,bB)); } while (--wtemp > 0);
-			wtemp = w;
-			//pushColors_cont(Color565(rR,gG,bB),(uint8_t)wtemp);
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				do { 
+					writedata16_cont(Color565(rR,gG,bB)); 
+				} while (--wtemp > 0);
+				wtemp = w;
+			#else
+				_pushColors_cont(Color565(rR,gG,bB),wtemp);
+			#endif
 			pos++;
 		} while (--h > 0);
 	} else {
-		do { 
-			writedata16_cont(color1); 
-		} while (--area > 0);
+		_pushColors_cont(color1,w*h);
 	}
 }
 
@@ -1131,7 +1112,7 @@ void TFT_ILI9163C::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
 	endTransaction();
 }
 
-#if defined(_ILI9163C_DRAWARC)
+
 void TFT_ILI9163C::drawArcHelper(uint16_t cx, uint16_t cy, uint16_t radius, uint16_t thickness, float start, float end, uint16_t color) 
 {
 	int16_t xmin = 65535;
@@ -1300,7 +1281,7 @@ void TFT_ILI9163C::setArcParams(float arcAngleMax, int arcAngleOffset)
 	_arcAngleOffset = arcAngleOffset;
 }
 
-#endif
+
 
 /**************************************************************************/
 /*!	
@@ -1957,32 +1938,33 @@ void TFT_ILI9163C::pushColor(uint16_t color)
 
 void TFT_ILI9163C::drawIcon(int16_t x, int16_t y,const tIcon *icon,uint8_t scale,uint16_t f,uint16_t b,bool inverse)
 {
-	if (scale < 1) scale = 1;
 	#if defined(_FORCE_PROGMEM__)
-		const uint8_t * iconData;
-		PROGMEM_read(&(icon->data),iconData);//icon data
-		uint8_t		iWidth		= pgm_read_byte(&(icon->image_width));
-		uint8_t		iHeight		= pgm_read_byte(&(icon->image_height));
-		uint16_t	datalen		= pgm_read_word(&(icon->image_datalen));
-		//boolean		dataComp	= pgm_read_word(&(icon->image_comp));//not yet
+		const _smCharType * iconData 	= PROGMEM_read(&icon->data);
+		uint8_t		iWidth				= pgm_read_byte(&(icon->image_width));	//AVR ok
+		uint8_t		iHeight				= pgm_read_byte(&(icon->image_height)); //AVR ok
+		uint16_t	datalen				= pgm_read_word(&(icon->image_datalen));//AVR ok
+		//boolean	dataComp			= PROGMEM_read(&icon->image_comp);//not yet
 	#else
-		const uint8_t * iconData	= icon->data;//icon data
-		uint8_t		iWidth			= icon->image_width;
-		uint8_t		iHeight			= icon->image_height;
-		uint16_t	datalen			= icon->image_datalen;
+		const _smCharType * iconData	= icon->data;//icon data
+		uint8_t		iWidth				= icon->image_width;
+		uint8_t		iHeight				= icon->image_height;
+		uint16_t	datalen				= icon->image_datalen;
 		//uint8_t		dataComp		= icon->image_comp;//not yet
 	#endif
-	iWidth -= 1;
-	iHeight -= 1;
 	if (iWidth < 1 || iHeight < 1) return;//cannot be
+	//iWidth -= 1;
+	//iHeight -= 1;
+	if (scale < 1) scale = 1;
 	if ((x + iWidth) * scale >= _width || (y + iHeight) * scale >= _height) return;//cannot be
+	startTransaction();
+	setAddrWindow_cont(x,y,iWidth+x,iHeight+y);
 	//LGPO Rendering (uncomp)
 	_glyphRender_unc(
 					iconData,
 					x,
 					y,
-					iWidth+1,
-					iHeight+1,
+					iWidth,//iWidth+1,
+					iHeight,//iHeight+1,
 					scale,
 					scale,
 					datalen,
@@ -2007,21 +1989,21 @@ void TFT_ILI9163C::drawImage(int16_t x, int16_t y,const tPicture *img,const enum
 	uint16_t currentX = 0;
 	bool skip = false;
 	#if defined(_FORCE_PROGMEM__)
-		const uint16_t * imageData;
-		PROGMEM_read(&(img->data),imageData);//image data
-		uint8_t		iWidth		= pgm_read_byte(&(img->image_width));
-		uint8_t		iHeight		= pgm_read_byte(&(img->image_height));
-		uint16_t	datalen		= pgm_read_word(&(img->image_datalen));
-		//uint8_t		dataDepth	= pgm_read_word(&(img->image_depth));//not yet
-		//boolean		dataComp	= pgm_read_word(&(img->image_comp));//not yet
+		const uint16_t * imageData  = PROGMEM_read(&img->data);
+		uint8_t		iWidth			= pgm_read_byte(&img->image_width);
+		uint8_t		iHeight			= pgm_read_byte(&img->image_height);
+		uint16_t	datalen			= pgm_read_word(&img->image_datalen);
+		//uint8_t		dataDepth	= pgm_read_byte(&img->image_depth);//not yet
+		//boolean		dataComp	= pgm_read_byte(&(img->image_comp);//not yet
 	#else
 		const uint16_t * imageData	= img->data;//image data
 		uint8_t		iWidth			= img->image_width;
 		uint8_t		iHeight			= img->image_height;
 		uint16_t	datalen			= img->image_datalen;
-		//uint8_t		dataDepth		= img->image_depth;//not yet
-		//uint8_t		dataComp		= img->image_comp;//not yet
+		//uint8_t		dataDepth	= img->image_depth;//not yet
+		//uint8_t		dataComp	= img->image_comp;//not yet
 	#endif
+	
 	iWidth -= 1;
 	iHeight -= 1;
 	if (iWidth < 1 || iHeight < 1) return;//cannot be
@@ -2031,26 +2013,21 @@ void TFT_ILI9163C::drawImage(int16_t x, int16_t y,const tPicture *img,const enum
 	setAddrWindow_cont(x,y,iWidth+x,iHeight+y);
 	
 	do { 
+		#if defined(_FORCE_PROGMEM__)
+			color = pgm_read_word(&imageData[px]);
+		#else
+			color = imageData[px];
+		#endif
 		if (m == TRANSPARENT){
-			if (imageData[px] <= b) {
-				skip = true;
-			} else {
-				color = imageData[px];
-			}
+			if (imageData[px] <= b) skip = true;
 		} else if (m == REPLACE){
-			if (imageData[px] <= b) {
-				color = _defaultBgColor;
-			} else {
-				color = imageData[px];
-			}
+			if (imageData[px] <= b) color = _defaultBgColor;
 		} else if (m == BOTH){
 			if (imageData[px] <= b) {
 				color = _defaultBgColor;
 			} else {
 				color = _defaultFgColor;
 			}
-		} else {
-			color = imageData[px];
 		}
 		
 		if (!skip) {
@@ -2372,10 +2349,15 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 			//-------------------------Actual single char drawing here -----------------------------------
 			//updated in 1.0p7
 			#if defined(_FORCE_PROGMEM__)
+				/*
 				const _smCharType * charGlyp;
 				PROGMEM_read(&_currentFont->chars[charIndex].image->data,charGlyp);//char data
 				int			  totalBytes;
 				PROGMEM_read(&_currentFont->chars[charIndex].image->image_datalen,totalBytes);
+				*/
+				const _smCharType * charGlyp = PROGMEM_read(&_currentFont->chars[charIndex].image->data);//char data
+				//int	 totalBytes = PROGMEM_read(&_currentFont->chars[charIndex].image->image_datalen);
+				int	 totalBytes = pgm_read_word(&(_currentFont->chars[charIndex].image->image_datalen));
 			#else
 				const _smCharType * charGlyp = _currentFont->chars[charIndex].image->data;
 				int			  totalBytes = _currentFont->chars[charIndex].image->image_datalen;
@@ -2432,7 +2414,7 @@ it's a variation of LPGO font render accelleration used in RA8875 (under GNU v3)
 The lines are not blank or filled are passed to the grouping function that is the second part of the accelleration. 
 */
 void TFT_ILI9163C::_glyphRender_unc(
-									const 		_smCharType * charGlyp,
+									const 		_smCharType * pixelsArray,
 									int16_t 	x,
 									int16_t 	y,
 									int 		charW,
@@ -2459,10 +2441,11 @@ void TFT_ILI9163C::_glyphRender_unc(
 	while (currentByte < totalBytes){
 		//read n byte
 		#if defined(_FORCE_PROGMEM__)
-			temp = pgm_read_byte(&(charGlyp[currentByte]));
+			temp = pgm_read_byte(&(pixelsArray[currentByte]));
 		#else
-			temp = charGlyp[currentByte];
+			temp = pixelsArray[currentByte];
 		#endif
+		if (inverse) temp = ~temp;//byte inverted
 		for (i = 7; i >= 0; i--){
 			//----------------------------------- exception
 			if (currentXposition == charW){
@@ -2480,7 +2463,6 @@ void TFT_ILI9163C::_glyphRender_unc(
 								backColor,
 								backColor
 							);
-						
 					}
 				} else if (lineChecksum == charW){//full line
 					fillRect_cont(
@@ -2509,13 +2491,7 @@ void TFT_ILI9163C::_glyphRender_unc(
 				lineChecksum = 0;//reset checksum
 			}//end exception
 			//-------------------------------------------------------
-			if (inverse){
-				lineBuffer[currentXposition] = !bitRead(temp,i);//continue fill line buffer
-			} else {
-				lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
-			}
-			//lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
-			
+			lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
 			lineChecksum += lineBuffer[currentXposition++];
 		}
 		currentByte++;
@@ -2604,3 +2580,128 @@ void TFT_ILI9163C::_charLineRender(
 		}
 	}//while
 }
+
+
+#if defined(__AVR__)
+	void TFT_ILI9163C::_pushColors_cont(uint16_t data,uint16_t times){
+		uint8_t i;
+		enableDataStream();
+		while(times--) {
+			for (i=0;i<2;i++){
+				while(!(SPSR & (1 << SPIF)));
+				SPDR = (data >> (8 - (i*8)));
+			}
+		}
+		while(!(SPSR & (1 << SPIF)));
+	}
+#elif defined(__SAM3X8E__)
+	void TFT_ILI9163C::_pushColors_cont(uint16_t data,uint16_t times)
+	{
+		enableDataStream();
+		while(times--) { SPI.transfer16(data); }
+	}
+#elif defined(__MKL26Z64__)
+	void TFT_ILI9163C::_pushColors_cont(uint16_t data,uint16_t times)
+	{
+		enableDataStream();
+		while(times--) {
+			if (_useSPI1){
+				SPI1.transfer16(data);
+			} else {
+				SPI.transfer16(data);
+			}
+		}
+	}
+#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+	void TFT_ILI9163C::_pushColors_cont(uint16_t data,uint16_t times)
+	{
+		do { 
+			writedata16_cont(data); 
+		} while (--times > 0);
+	}
+#elif defined(ESP8266)
+	void TFT_ILI9163C::_pushColors_cont(uint16_t data,uint16_t times)
+	{
+		enableDataStream();
+		while(times--) { spiwrite16(data); }
+		//alternative faster (but currently not work at 80Mhz)
+		//uint8_t pattern[2] = { (uint8_t)(data >> 8), (uint8_t)(data >> 0) };
+		//SPI.writePattern(pattern, 2, times);
+	}
+#else
+	void TFT_ILI9163C::_pushColors_cont(uint16_t data,uint16_t times)
+	{
+		enableDataStream();
+			while(times--) {
+			SPI.transfer(data >> 8); SPI.transfer(data);
+		}
+	}
+#endif
+
+#if defined(_ILI9163C_SIZEOPTIMIZER)
+	void TFT_ILI9163C::setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool disComp)
+	{
+		if (!disComp){//if false, offset compensate?
+			x0 += TFT_ILI9163C_OFST[_rotation][0];
+			x1 += TFT_ILI9163C_OFST[_rotation][0];
+			y0 += TFT_ILI9163C_OFST[_rotation][1];
+			y1 += TFT_ILI9163C_OFST[_rotation][1];
+		}
+		writecommand_cont(CMD_CLMADRS); //Column
+		writedata16_cont(x0); writedata16_cont(x1);
+		writecommand_cont(CMD_PGEADRS); //Page
+		writedata16_cont(y0); writedata16_cont(y1);
+		writecommand_cont(CMD_RAMWR); //Into ILI Ram
+	}
+	
+	
+	void TFT_ILI9163C::drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color)
+	{
+		setAddrWindow_cont(x, y, x + w - 1, y);
+		do { writedata16_cont(color); } while (--w > 0);
+	}
+
+	void TFT_ILI9163C::drawFastVLine_cont(int16_t x, int16_t y, int16_t h, uint16_t color)
+	{
+		setAddrWindow_cont(x, y, x, y + h - 1);
+		do { writedata16_cont(color); } while (--h > 0);
+	}
+
+	void TFT_ILI9163C::drawPixel_cont(int16_t x, int16_t y, uint16_t color)
+	{
+		setAddrWindow_cont(x, y, x + 1, y + 1);
+		writedata16_cont(color);
+	}
+
+	bool TFT_ILI9163C::boundaryCheck(int16_t x,int16_t y)
+	{
+		if ((x >= _width) || (y >= _height)) return true;
+		return false;
+	}
+
+	int16_t TFT_ILI9163C::sizeCheck(int16_t origin,int16_t len,int16_t maxVal)
+	{
+		if (((origin + len) - 1) >= maxVal) len = maxVal - origin;
+		return len;
+	}
+#endif
+
+/*
+void TFT_ILI9163C::printPacket(word data,uint8_t count){
+  for (int i=count-1; i>=0; i--){
+    if (bitRead(data,i)==1){
+      Serial.print("1");
+    } 
+    else {
+      Serial.print("0");
+    }
+  }
+  Serial.print(" -> 0x");
+  if (count == 8){
+	  Serial.print((byte)data,HEX);
+  } else {
+	  Serial.print(data,HEX);
+  }
+  Serial.print("\n");
+}
+*/

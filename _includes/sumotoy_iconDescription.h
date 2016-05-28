@@ -1,5 +1,5 @@
 /*
- Sumotoy universal Icon Description structure version 1.3
+ Sumotoy universal Icon Description structure version 1.3.1
 */
 
 #ifndef __SUMOTOY_ICON_H
@@ -9,15 +9,15 @@
 	
 	#if defined(_FORCE_PROGMEM__)
 		typedef struct PROGMEM {
-			const uint8_t 	*data;//B&W
-			uint8_t 		image_width;
-			uint8_t			image_height;
-			uint16_t		image_datalen;
-			boolean			image_comp;
+			const _smCharType 	*data;//B&W
+			unsigned char 		image_width;
+			unsigned char		image_height;
+			uint16_t			image_datalen;
+			unsigned char		image_comp;
 		} tIcon;
 	#else
 		typedef struct {
-			const uint8_t 	*data;//B&W
+			const _smCharType 	*data;//B&W
 			uint8_t 		image_width;
 			uint8_t			image_height;
 			uint16_t		image_datalen;

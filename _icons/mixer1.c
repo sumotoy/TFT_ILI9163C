@@ -27,7 +27,7 @@
 
 
 
-static const uint8_t image_data_mixer1[113]
+static const _smCharType image_data_mixer1[113]
 #if defined(_FORCE_PROGMEM__)
  PROGMEM 
 #endif

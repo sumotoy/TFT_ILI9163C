@@ -12,7 +12,7 @@ Since this will use quite a lot resources (all init code, but fonts and images w
 you should enable this only if you really need if you have a CPU with small resources!
 Default: commented
 ----------------------------------------------------------------------------------*/
-//#define TFT_ILI9163C_INSTANCES		1
+//#define TFT_ILI9163C_INSTANCES		
 /*--------------------------------------------------------------------------------
 Select your display here ..........................
 You have a RED PCB, BLACK PCB or what?
@@ -27,12 +27,16 @@ Default: #include "../_display/TFT_ILI9163C_RED_PCB_OLD.h"
 	#include "../_display/TFT_ILI9163C_RED_PCB_YPIN.h"//the infamous 2016 yellow pin/red pcb one
 #endif
 /*--------------------------------------------------------------------------------
-- Draw Arc Disable (uses resources) -
-DrawArc uses a lot of resources, I know, have to modify this soon. On modern ARM is not a problem
-but in some small CPU's resources are precious, you can try comment this to save resources!
-Default:uncommented
+- Size Reducing (decrease slight performances) -
+Ignored for Teensy 3.x, DUE
+Small CPU like UNO have very small resources and code optimizations uses lot of.
+Uncomment _ILI9163C_SIZEOPTIMIZER will decrease space needed by code but some performance
+will suffer a bit, however it can be usefult in many cases!
+Default:uncommented (automatically on for certain CPU)
 ----------------------------------------------------------------------------------*/
-#define _ILI9163C_DRAWARC			1
+#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__SAM3X8E__)
+#define _ILI9163C_SIZEOPTIMIZER			
+#endif		
 /*--------------------------------------------------------------------------------
 - Default Display Rotation -
 This parameter can be changed in your code but here you can force orientation
@@ -71,7 +75,7 @@ The library default uses Direct Port Manipulation (that it's slight faster)
 Default:uncommented
 ----------------------------------------------------------------------------------*/
 #if defined(__MKL26Z64__)
-	#define _TEENSYLC_FASTPORT	1
+	#define _TEENSYLC_FASTPORT	
 #endif
 /*--------------------------------------------------------------------------------
 - ESP8266 Compatibility mode -
@@ -81,7 +85,7 @@ NOTE: This is MUCH slower!
 Default:commented
 ----------------------------------------------------------------------------------*/
 #if defined(ESP8266)
-	//#define _ESP8266_STANDARDMODE	1
+	//#define _ESP8266_STANDARDMODE	
 #endif
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*---------------------------------------------------------------------------------
@@ -91,7 +95,7 @@ Default:commented
 //need the use of standard GPIO access. This limit speed but it's the only way
 //to fix the issue and it's temporary until I find a solution.
 #if defined(ESP8266) && defined(TFT_ILI9163C_INSTANCES) && !defined(_ESP8266_STANDARDMODE)
-	#define _ESP8266_STANDARDMODE	1//force!
+	#define _ESP8266_STANDARDMODE	//force!
 #endif
 #if !defined (TFT_ILI9163C_INSTANCES)
 /* GAMMA SET DEFINITIONS ----------------------------------------------------------*/

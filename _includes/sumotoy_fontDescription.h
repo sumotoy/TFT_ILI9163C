@@ -4,7 +4,6 @@
 
 #ifndef __SUMOTOY_FONTD_H
 	#define __SUMOTOY_FONTD_H
-	//#include "TFT_ILI9163C.h"
 	#include <stdio.h>
 
 	#if defined(_FORCE_PROGMEM__)
