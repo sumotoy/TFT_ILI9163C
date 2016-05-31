@@ -176,6 +176,8 @@ void setup() {
   }
   fftTime = 0;
   Serial.print("\n\n  starting ....");
+  ClearVerticalVU( BLACK );
+  ClearVerticalVU2( BLACK );
   LabelWrite( 1 );
   LabelWrite( 2 );
 #ifdef ILI9341
@@ -362,19 +364,31 @@ uint16_t ColorGradient( uint16_t val ) {
 #define colorgrad( a )  tft.gradient( a )
 #endif
 
-
+void ClearVerticalVU(uint16_t bgcolor) {
+  if (_BARSPACE)
+    tft.fillRect(dLEFT , dTOP, dLEFT + (_BARS * (_BARS * _BARSPACE)), dTOP + dHEIGHT, bgcolor);
+  else
+    tft.fillRect(dLEFT , dTOP, dLEFT + (_BARS * (_BARS )), dTOP + dHEIGHT, bgcolor);
+}
+void ClearVerticalVU2(uint16_t bgcolor) {
+  if (_BARSPACE2)
+    tft.fillRect(ddLEFT , ddTOP, ddLEFT + (_BARS2 * (_BARS2 * _BARSPACE2)), ddTOP + ddHEIGHT, bgcolor);
+  else
+    tft.fillRect(ddLEFT , ddTOP, ddLEFT + (_BARS2 * (_BARS2)), ddTOP + ddHEIGHT, bgcolor);
+}
 /*
   if color = 0 it will create a value sensitive spectrum color
 */
-// BUGBUG : These 255's should be display defined MAX_HEIGHT :: map(val, 0, 255, ...);
 void drawVerticalVU(uint16_t x, uint16_t y, uint16_t w, uint16_t val, uint16_t color) {
   uint16_t h = map(val, 0, 255, dHEIGHT - y, 0);
   x += dLEFT;
-  if (color < 1) color = colorgrad(map(val, 0, 255, 0, 127));
-  if ( 0xFFFF != lastBar[x] && h > lastBar[x] )
-    tft.fillRect(x, dTOP + lastBar[x], w, (y + h - lastBar[x] ), BLACK);
+  uint16_t lB = lastBar[x];
+  if ( h == lB ) return;
+  if ( h > lB )
+    tft.fillRect(x , dTOP + lB, w, (y + h - lB ), BLACK);
   if (val > 4) {
-    tft.fillRect(x, dTOP + h + 1, w, dHEIGHT - (h + y), color);
+    if (color < 1) color = colorgrad(map(val, 0, 255, 0, 127));
+    tft.fillRect(x , dTOP + h, w, dHEIGHT - (h + y), color);
     lastBar[x] = h;
   }
   else
@@ -384,11 +398,13 @@ void drawVerticalVU(uint16_t x, uint16_t y, uint16_t w, uint16_t val, uint16_t c
 void drawVerticalVU2(uint16_t x, uint16_t y, uint16_t w, uint16_t val, uint16_t color) {
   uint16_t h = map(val, 0, 255, ddHEIGHT - y, 0);
   x += ddLEFT;
-  if (color < 1) color = colorgrad(map(val, 0, 255, 0, 127));
-  if ( 0xFFFF != lastBar2[x] && h > lastBar2[x] )
-    tft.fillRect(x, ddTOP + lastBar2[x], w, (y + h - lastBar2[x] ), BLACK);
+  uint16_t lB = lastBar2[x];
+  if ( h == lB ) return;
+  if ( h > lB )
+    tft.fillRect(x , ddTOP + lB, w, (y + h - lB ), BLACK);
   if (val > 4) {
-    tft.fillRect(x, ddTOP + h + 1, w, ddHEIGHT - (h + y), color);
+    if (color < 1) color = colorgrad(map(val, 0, 255, 0, 127));
+    tft.fillRect(x , ddTOP + h, w, ddHEIGHT - (h + y), color);
     lastBar2[x] = h;
   }
   else
