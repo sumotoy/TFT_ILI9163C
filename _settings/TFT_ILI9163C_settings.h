@@ -7,14 +7,14 @@
 Allow multiple instances ..........................
 Do you need more than one display at the same time?
 By comment out the define the library will use more resources but you will able to have 2 or more display
-in the same time by sharing all pins apart CS!
-Since this will use quite a lot resources (all init code, but fonts and images will be shared)
+in the same time by sharing all pins apart CS and DC! (On Teensy 3.x DC can be shared)
+Since this will use slight more code (all init code, but fonts and images will be shared)
 you should enable this only if you really need if you have a CPU with small resources!
-Default: commented
+Default: commented (disabled)
 ----------------------------------------------------------------------------------*/
 //#define TFT_ILI9163C_INSTANCES		
 /*--------------------------------------------------------------------------------
-Select your display here ..........................
+Select your display here (ONLY when TFT_ILI9163C_INSTANCES commented, otherwise has no effect)
 You have a RED PCB, BLACK PCB or what?
 Note: If you have enabled Multiple Instances option this will be ignored since you should select your display
 in the instance!
@@ -25,6 +25,16 @@ Default: #include "../_display/TFT_ILI9163C_RED_PCB_OLD.h"
 	//#include "../_display/TFT_ILI9163C_BLACK_PCB.h"
 	//#include "../_display/TFT_ILI9163C_RED_PCB_OLD.h"
 	#include "../_display/TFT_ILI9163C_RED_PCB_YPIN.h"//the infamous 2016 yellow pin/red pcb one
+	
+	//you can add further display files here but remember to add in TFT_ILI9163C_ALL.h as well
+	
+	//do not touch this, is for lazy people that forget that just one include allowed!
+	#if defined(_TFT_ILI9163C_RED_PCB_OLD_H) && defined(_TFT_ILI9163C_RED_PCB_YPIN_H) || \
+	defined(_TFT_ILI9163C_RED_PCB_YPIN_H) && defined(_TFT_ILI9163C_BLACK_PCB_1_H) || \
+	defined(_TFT_ILI9163C_BLACK_PCB_1_H) && defined(_TFT_ILI9163C_RED_PCB_OLD_H) || \
+	defined(_TFT_ILI9163C_RED_PCB_OLD_H) && defined(_TFT_ILI9163C_RED_PCB_YPIN_H) && defined(_TFT_ILI9163C_BLACK_PCB_1_H)
+		#error "only one display included allowed! Please correct!"
+	#endif
 #endif
 /*--------------------------------------------------------------------------------
 - Size Reducing (decrease slight performances) -
@@ -32,9 +42,9 @@ Ignored for Teensy 3.x, DUE
 Small CPU like UNO have very small resources and code optimizations uses lot of.
 Uncomment _ILI9163C_SIZEOPTIMIZER will decrease space needed by code but some performance
 will suffer a bit, however it can be usefult in many cases!
-Default:uncommented (automatically on for certain CPU)
+Default:uncommented (automatically enabled for some CPU)
 ----------------------------------------------------------------------------------*/
-#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__SAM3X8E__)
+#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__SAM3X8E__)// && !defined(ESP8266)
 #define _ILI9163C_SIZEOPTIMIZER			
 #endif		
 /*--------------------------------------------------------------------------------
@@ -80,8 +90,8 @@ Default:uncommented
 /*--------------------------------------------------------------------------------
 - ESP8266 Compatibility mode -
 This force library to use an alternative way to trigger ESP8266 GPIO, if you uncomment
-the line it will use the standard digitaWrite wich is slow, this help debuggin.
-NOTE: This is MUCH slower!
+the line it will use the standard digitaWrite wich is slow, this help debugging.
+NOTE: uncomment this, code is MUCH slower!
 Default:commented
 ----------------------------------------------------------------------------------*/
 #if defined(ESP8266)
