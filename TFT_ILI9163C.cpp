@@ -204,7 +204,7 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	csport    = portOutputRegister(digitalPinToPort(_cs));
 	rsport    = portOutputRegister(digitalPinToPort(_dc));
 	cspinmask = digitalPinToBitMask(_cs);
-	rspinmask = digitalPinToBitMask(_dc);
+	dcpinmask = digitalPinToBitMask(_dc);
     if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		if (!avoidSPIinit){
@@ -221,7 +221,7 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	csport    = digitalPinToPort(_cs);
 	rsport    = digitalPinToPort(_dc);
 	cspinmask = digitalPinToBitMask(_cs);
-	rspinmask = digitalPinToBitMask(_dc);
+	dcpinmask = digitalPinToBitMask(_dc);
     if (!avoidSPIinit) SPI.begin();
 	#if !defined(SPI_HAS_TRANSACTION)
 		if (!avoidSPIinit){
@@ -1952,8 +1952,6 @@ void TFT_ILI9163C::drawIcon(int16_t x, int16_t y,const tIcon *icon,uint8_t scale
 		//uint8_t		dataComp		= icon->image_comp;//not yet
 	#endif
 	if (iWidth < 1 || iHeight < 1) return;//cannot be
-	//iWidth -= 1;
-	//iHeight -= 1;
 	if (scale < 1) scale = 1;
 	if ((x + iWidth) * scale >= _width || (y + iHeight) * scale >= _height) return;//cannot be
 	startTransaction();
@@ -1963,8 +1961,8 @@ void TFT_ILI9163C::drawIcon(int16_t x, int16_t y,const tIcon *icon,uint8_t scale
 					iconData,
 					x,
 					y,
-					iWidth,//iWidth+1,
-					iHeight,//iHeight+1,
+					iWidth,
+					iHeight,
 					scale,
 					scale,
 					datalen,
@@ -2349,14 +2347,7 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 			//-------------------------Actual single char drawing here -----------------------------------
 			//updated in 1.0p7
 			#if defined(_FORCE_PROGMEM__)
-				/*
-				const _smCharType * charGlyp;
-				PROGMEM_read(&_currentFont->chars[charIndex].image->data,charGlyp);//char data
-				int			  totalBytes;
-				PROGMEM_read(&_currentFont->chars[charIndex].image->image_datalen,totalBytes);
-				*/
 				const _smCharType * charGlyp = PROGMEM_read(&_currentFont->chars[charIndex].image->data);//char data
-				//int	 totalBytes = PROGMEM_read(&_currentFont->chars[charIndex].image->image_datalen);
 				int	 totalBytes = pgm_read_word(&(_currentFont->chars[charIndex].image->image_datalen));
 			#else
 				const _smCharType * charGlyp = _currentFont->chars[charIndex].image->data;
@@ -2378,7 +2369,6 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 								_textBackground,
 								false
 				);
-				//_glyphRender_unc(_cursorX,_cursorY,charW,_textScaleX,_textScaleY,charIndex);
 				_cursorX += (charW * _textScaleX) + (_charSpacing * _textScaleX);//add charW to total
 			} else {
 				if (_cursorX + (_currentFont->font_height * _textScaleX) > _width) return 1;//too high!
@@ -2396,7 +2386,6 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 								_textBackground,
 								false
 				);
-				//_glyphRender_unc(_cursorY,_cursorX,charW,_textScaleY,_textScaleX,charIndex);
 				_cursorY += (charW * _textScaleX) + (_charSpacing * _textScaleY);//add charW to total
 			}
 			return 0;
@@ -2582,6 +2571,9 @@ void TFT_ILI9163C::_charLineRender(
 }
 
 
+/*
+ ----------------- PushColor stream --------------------------------
+*/
 #if defined(__AVR__)
 	void TFT_ILI9163C::_pushColors_cont(uint16_t data,uint16_t times){
 		uint8_t i;
@@ -2624,7 +2616,7 @@ void TFT_ILI9163C::_charLineRender(
 	{
 		enableDataStream();
 		while(times--) { spiwrite16(data); }
-		//alternative faster (but currently not work at 80Mhz)
+		//alternative faster (but currently not work at 80Mhz or more)
 		//uint8_t pattern[2] = { (uint8_t)(data >> 8), (uint8_t)(data >> 0) };
 		//SPI.writePattern(pattern, 2, times);
 	}
@@ -2637,8 +2629,68 @@ void TFT_ILI9163C::_charLineRender(
 		}
 	}
 #endif
+/* -------------------------------------------------------------------------------------------
+++++++++++++++++++++++++++++++++ Size Optimizations ++++++++++++++++++++++++++++++++++++++++++
+always inline routines dublicate the entire function inside chunks of code for speed during
+compiling, this is acceptable for cpu with lot of code space (like Teensy 3.x, DUE) but
+can increase dramatically the amount of code for UNO and similar.
+For this reason some function are now normal for all CPU, this decrease a fraction of the
+overall speed but decrease the amount of space occupied by code.
+In addition, there's an user option to decrease a lot the space, enabled for small resources CPU.
+I'm sorry for the complicated preprocessor #if #else and the amount of code inside library for 
+fix this but is the only 'fast way' I found to acieve this!
+--------------------------------------------------------------------------------------------*/
+
 
 #if defined(_ILI9163C_SIZEOPTIMIZER)
+/* ========================================================================
+	-------------------- Common low level commands ------------------------
+	Teensy 3.x uses different functions, This are for all the rest of MCU's
+   ========================================================================*/
+	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
+		void TFT_ILI9163C::writecommand_cont(const uint8_t c)
+		{
+			enableCommandStream();
+			spiwrite(c);
+		}
+
+		void TFT_ILI9163C::writedata8_cont(uint8_t c)
+		{
+			enableDataStream();
+			spiwrite(c);
+		}
+
+		void TFT_ILI9163C::writedata16_cont(uint16_t d)
+		{
+			enableDataStream();
+			spiwrite16(d);
+		}
+
+		void TFT_ILI9163C::writecommand_last(const uint8_t c)
+		{
+			enableCommandStream();
+			spiwrite(c);
+			disableCS();
+		}
+
+
+		void TFT_ILI9163C::writedata8_last(uint8_t c)
+		{
+			enableDataStream();
+			spiwrite(c);
+			disableCS();
+		}
+
+		void TFT_ILI9163C::writedata16_last(uint16_t d)
+		{
+			enableDataStream();
+			spiwrite16(d);
+			disableCS();
+		}
+	#endif
+/* ========================================================================
+					    Fast Common Graphic Primitives
+   ========================================================================*/
 	void TFT_ILI9163C::setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool disComp)
 	{
 		if (!disComp){//if false, offset compensate?
