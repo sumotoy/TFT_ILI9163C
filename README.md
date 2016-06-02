@@ -8,8 +8,6 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br><br>
 ***
 <b>Know Bugs:</b><br>
- - Multi instances <b>do not work</b> with ESP8266,Teensy LC (and probably DUE) if sharing DC pin.<br>
- see https://github.com/sumotoy/TFT_ILI9163C/issues/37<br>
  - Scroll still not working, will fixed soon.
 <br>
 
@@ -52,6 +50,7 @@ However it uses slight more resources (this is why I add a setting). With multip
 - [x]  **Updated** all examples revised.
 - [x]  **Updated** AVR code faster, user can decide optimizations speed/size
 - [x]  **Updated** ESP8266 code is faster!.
+- [x]  **Updated** Multiple instances fixed with all CPU (but you need separate DC and CS for each display).
 - [x]  **Deprecated** drawColorBitmap(). use drawIcon().
 - [x]  **Deprecated** display(). use changeMode(DISP_ON/DISP_OFF) instead.
 - [x]  **Deprecated** setTextSize(). use setTextScale() instead.
@@ -65,8 +64,8 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 
 	Tested with:
 	Teensy 3.0 	-> really fast (1.0p7 confirmed)
-	Teensy 3.1 	-> really fast (1.0p7 confirmed)
-	Teensy 3.2 	-> blazing fast (1.0p7 confirmed)
+	Teensy 3.1 	-> rocket fast (1.0p7 confirmed)
+	Teensy 3.2 	-> rocket fast (1.0p7 confirmed)
 	Teensy LC  	-> fast (1.0p7 not tested yet)
 	UNO and similar -> fast (1.0p7 not tested yet)
 	DUE 		-> fast (1.0p7 not tested yet)
@@ -84,7 +83,7 @@ https://www.youtube.com/watch?v=y5f-VNBxgEk&feature=youtu.be
 	- SPI transaction compatible (where supported, otherwise legacy used)
 	- Working with IDE 1.6.8 (or newer)
 	- Working with Arduino's (8 and 32 bit), Teensy 3, Teensy 3.1, Teensy 3.2, Teensy LC, ESP8266
-	- Multiple instances possible (actually not on ESP8266)
+	- Multiple instances possible
 	- ICON support (with template for LCD Image Converter)
 	- IMAGE support (with template for LCD Image Converter)
 	
@@ -189,10 +188,14 @@ https://github.com/greiman/SdFat
 	
 * Note about led:<br>
 
+
 Some display have an internal resistor to limit current, you see on the back of the display, following LED pcb
 trace with your eyes and if you see a resistor (100 Ohm mine) you can connect this line directly to +5V (but try first 3V3!!!).<br>
 But be careful <u>do not try connect to 5V before you check the presence of this resistor on pcb</u>, you can try first by using a resistor of 220 ohm, if the image looks very dark, try 100 and if still very dark, use lower values.<br>
 The yellow pin RED PCB has a weak resistor, do not tie to 5V or you destroy the backlight, try use 100Ohm resistor.<br>
+
+<b>Just a note about ESP8266:</b><br>
+I've recently discovered that ESP8266 (NodeMCU 0.9 and NodeMCU 1.0 boards at list) has a weak SCLK output that vary from module to module, I really don't know why but voltage goes around 1.7 to 2.5 volt max. This should not be a problem for a SPI device but connecting more devices or some type of chip buffer can be problem! My 74HC125N for example do not work well. It's just a note ut I will investigate in future but please if you connect several SPI devices and not nothing work take count of this and do not apology!<br>
 
 <b>Utility included:</b><br>
 
