@@ -33,8 +33,9 @@
 	typedef struct {
 			uint8_t 		length;
 			const tChar 	*chars;
-			uint8_t			font_width;
+			boolean			font_widthType;
 			uint8_t			font_height;
+			uint8_t			font_descent;
 			boolean 		rle;
 			uint8_t 		remap_code;
 	} tFont;

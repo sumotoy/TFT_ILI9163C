@@ -24,7 +24,7 @@ $(start_block_header)
 *  inverse: $(pre_inverse)
 * ------------------------------------------------------------------------------
 * Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y.
-* Font template version: 2.3
+* Font template version: 2.4
 * Note: Font height should be fixed and all glyps must have the same height!
 * ------------------------------------------------------------------------------
 *******************************************************************************/
@@ -46,8 +46,7 @@ const tImage $(doc_name_ws)_0x$(out_char_code)
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif 
-= { image_data_$(doc_name_ws)_0x$(out_char_code),
-    $(out_image_width), $(out_blocks_count)};//character: '$(out_char_text)' , height: $(out_image_height), (charW,total bytes)
+= { image_data_$(doc_name_ws)_0x$(out_char_code), $(out_image_width), $(out_blocks_count)};//character: '$(out_char_text)' (charW,total bytes)
 $(end_block_images_table)
 
 const tChar $(doc_name_ws)_array[] = {
@@ -57,7 +56,7 @@ $(start_block_images_table)
 $(end_block_images_table)
 };
 
-//num chars, array, width, height, compression, char remap code
+//num chars, array, width, height, descent, compression, char remap code
 /*
 	char remap code:
 	0:no remap
@@ -65,7 +64,7 @@ $(end_block_images_table)
 	2:remap CAPITAL to minus
 */
 $(start_block_font_def)
-const tFont $(doc_name_ws) = { $(out_images_count), $(doc_name_ws)_array,0,$(out_image_height), RLE_$(img_rle), 0 };
+const tFont $(doc_name_ws) = { $(out_images_count), $(doc_name_ws)_array, RLE_$(fnt_width_type), $(out_image_height), 0, RLE_$(img_rle), 0 };
 $(end_block_font_def)
 
 #endif

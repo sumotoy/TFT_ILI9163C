@@ -4,6 +4,8 @@
 	//this are for the LCD Image Converter as workaround
 	#define RLE_no  (0)
 	#define RLE_yes (1)
+	#define RLE_proportional (0)
+	#define RLE_monospaced (1)
 	/*
 		_SPI_MULTITRANSFER
 		Spi burst multy byte transfer support (experimental)

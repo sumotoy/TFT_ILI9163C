@@ -24,7 +24,7 @@
 *  inverse: yes
 * ------------------------------------------------------------------------------
 * Created by a custom template of LCD-Image-Converter for .s.u.m.o.t.o.y.
-* Font template version: 2.3
+* Font template version: 2.4
 * Note: Font height should be fixed and all glyps must have the same height!
 * ------------------------------------------------------------------------------
 *******************************************************************************/
@@ -32,1256 +32,1161 @@
 #if !defined(SUMO_FNT_LIB_defaultFont)
 #define SUMO_FNT_LIB_defaultFont
 
-#include <stdlib.h>
+#include <stdint.h>
 
 
-static const _smCharType image_data_defaultFont_0x20[1]
+
+const _smCharType image_data_defaultFont_0x20[2] 
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
 #endif  
- = { 0x00};////character: ' '
+= { 0x00, 0x00 };//character: ' '
 
 const tImage defaultFont_0x20 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x20,
-    2, 1};//character: ' ' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x21[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x20, 2, 2};//character: ' ' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x21[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xaa, 0x88, 0x00 };////character: '!'
+= { 0xaa, 0x88 };//character: '!'
 
 const tImage defaultFont_0x21 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x21,
-    2, 3};//character: '!' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x22[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x21, 2, 2};//character: '!' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x22[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xaa, 0xa0, 0x00, 0x00, 0x00 };////character: '"'
+= { 0xaa, 0xa0, 0x00, 0x00 };//character: '"'
 
 const tImage defaultFont_0x22 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x22,
-    4, 5};//character: '"' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x23[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x22, 4, 4};//character: '"' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x23[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x51, 0x4f, 0x94, 0xf9, 0x45, 0x00, 0x00 };////character: '#'
+= { 0x51, 0x4f, 0x94, 0xf9, 0x45, 0x00 };//character: '#'
 
 const tImage defaultFont_0x23 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x23,
-    6, 7};//character: '#' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x24[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x23, 6, 6};//character: '#' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x24[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x21, 0xca, 0x3e, 0x2a, 0xa7, 0x08, 0x00 };////character: '$'
+= { 0x21, 0xca, 0x3e, 0x2a, 0xa7, 0x08 };//character: '$'
 
 const tImage defaultFont_0x24 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x24,
-    6, 7};//character: '$' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x25[9]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x24, 6, 6};//character: '$' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x25[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x44, 0xa4, 0xa8, 0x54, 0x1a, 0x2a, 0x44, 0x00, 0x00 };////character: '%'
+= { 0x44, 0xa4, 0xa8, 0x54, 0x1a, 0x2a, 0x44, 0x00 };//character: '%'
 
 const tImage defaultFont_0x25 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x25,
-    8, 9};//character: '%' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x26[8]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x25, 8, 8};//character: '%' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x26[7] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x30, 0x90, 0xc3, 0x09, 0x51, 0x5d, 0x00, 0x00 };////character: '&'
+= { 0x30, 0x90, 0xc3, 0x09, 0x51, 0x5d, 0x00 };//character: '&'
 
 const tImage defaultFont_0x26 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x26,
-    7, 8};//character: '&' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x27[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x26, 7, 7};//character: '&' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x27[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xa8, 0x00, 0x00 };////character: '''
+= { 0xa8, 0x00 };//character: '''
 
 const tImage defaultFont_0x27 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x27,
-    2, 3};//character: ''' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x28[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x27, 2, 2};//character: ''' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x28[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x24, 0x88, 0x88, 0x84, 0x20 };////character: '('
+= { 0x24, 0x88, 0x84, 0x20 };//character: '('
 
 const tImage defaultFont_0x28 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x28,
-    4, 5};//character: '(' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x29[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x28, 4, 4};//character: '(' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x29[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x42, 0x11, 0x11, 0x12, 0x40 };////character: ')'
+= { 0x42, 0x11, 0x12, 0x40 };//character: ')'
 
 const tImage defaultFont_0x29 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x29,
-    4, 5};//character: ')' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x2a[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x29, 4, 4};//character: ')' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x2a[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xa4, 0xa0, 0x00, 0x00, 0x00 };////character: '*'
+= { 0xa4, 0xa0, 0x00, 0x00 };//character: '*'
 
 const tImage defaultFont_0x2a 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x2a,
-    4, 5};//character: '*' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x2b[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x2a, 4, 4};//character: '*' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x2b[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x82, 0x3e, 0x20, 0x80, 0x00, 0x00 };////character: '+'
+= { 0x00, 0x82, 0x3e, 0x20, 0x80, 0x00 };//character: '+'
 
 const tImage defaultFont_0x2b 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x2b,
-    6, 7};//character: '+' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x2c[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x2b, 6, 6};//character: '+' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x2c[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x0a, 0x00 };////character: ','
+= { 0x00, 0x0a };//character: ','
 
 const tImage defaultFont_0x2c 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x2c,
-    2, 3};//character: ',' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x2d[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x2c, 2, 2};//character: ',' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x2d[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x00, 0x3e, 0x00, 0x00, 0x00, 0x00 };////character: '-'
+= { 0x00, 0x00, 0x3e, 0x00, 0x00, 0x00 };//character: '-'
 
 const tImage defaultFont_0x2d 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x2d,
-    6, 7};//character: '-' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x2e[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x2d, 6, 6};//character: '-' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x2e[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x08, 0x00 };////character: '.'
+= { 0x00, 0x08 };//character: '.'
 
 const tImage defaultFont_0x2e 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x2e,
-    2, 3};//character: '.' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x2f[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x2e, 2, 2};//character: '.' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x2f[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x22, 0x44, 0x48, 0x80, 0x00 };////character: '/'
+= { 0x22, 0x44, 0x48, 0x80 };//character: '/'
 
 const tImage defaultFont_0x2f 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x2f,
-    4, 5};//character: '/' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x30[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x2f, 4, 4};//character: '/' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x30[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x28, 0xa2, 0x8a, 0x27, 0x00, 0x00 };////character: '0'
+= { 0x72, 0x28, 0xa2, 0x8a, 0x27, 0x00 };//character: '0'
 
 const tImage defaultFont_0x30 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x30,
-    6, 7};//character: '0' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x31[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x30, 6, 6};//character: '0' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x31[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x26, 0xa2, 0x22, 0x20, 0x00 };////character: '1'
+= { 0x26, 0xa2, 0x22, 0x20 };//character: '1'
 
 const tImage defaultFont_0x31 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x31,
-    4, 5};//character: '1' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x32[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x31, 4, 4};//character: '1' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x32[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x20, 0x84, 0x21, 0x0f, 0x80, 0x00 };////character: '2'
+= { 0x72, 0x20, 0x84, 0x21, 0x0f, 0x80 };//character: '2'
 
 const tImage defaultFont_0x32 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x32,
-    6, 7};//character: '2' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x33[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x32, 6, 6};//character: '2' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x33[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x20, 0x8c, 0x0a, 0x27, 0x00, 0x00 };////character: '3'
+= { 0x72, 0x20, 0x8c, 0x0a, 0x27, 0x00 };//character: '3'
 
 const tImage defaultFont_0x33 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x33,
-    6, 7};//character: '3' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x34[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x33, 6, 6};//character: '3' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x34[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x10, 0xc5, 0x24, 0xf8, 0x41, 0x00, 0x00 };////character: '4'
+= { 0x10, 0xc5, 0x24, 0xf8, 0x41, 0x00 };//character: '4'
 
 const tImage defaultFont_0x34 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x34,
-    6, 7};//character: '4' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x35[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x34, 6, 6};//character: '4' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x35[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x79, 0x0f, 0x22, 0x0a, 0x27, 0x00, 0x00 };////character: '5'
+= { 0x79, 0x0f, 0x22, 0x0a, 0x27, 0x00 };//character: '5'
 
 const tImage defaultFont_0x35 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x35,
-    6, 7};//character: '5' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x36[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x35, 6, 6};//character: '5' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x36[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x0f, 0x22, 0x8a, 0x27, 0x00, 0x00 };////character: '6'
+= { 0x72, 0x0f, 0x22, 0x8a, 0x27, 0x00 };//character: '6'
 
 const tImage defaultFont_0x36 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x36,
-    6, 7};//character: '6' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x37[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x36, 6, 6};//character: '6' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x37[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xf8, 0x21, 0x08, 0x21, 0x04, 0x00, 0x00 };////character: '7'
+= { 0xf8, 0x21, 0x08, 0x21, 0x04, 0x00 };//character: '7'
 
 const tImage defaultFont_0x37 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x37,
-    6, 7};//character: '7' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x38[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x37, 6, 6};//character: '7' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x38[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x28, 0x9c, 0x8a, 0x27, 0x00, 0x00 };////character: '8'
+= { 0x72, 0x28, 0x9c, 0x8a, 0x27, 0x00 };//character: '8'
 
 const tImage defaultFont_0x38 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x38,
-    6, 7};//character: '8' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x39[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x38, 6, 6};//character: '8' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x39[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x28, 0xa2, 0x78, 0x27, 0x00, 0x00 };////character: '9'
+= { 0x72, 0x28, 0xa2, 0x78, 0x27, 0x00 };//character: '9'
 
 const tImage defaultFont_0x39 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x39,
-    6, 7};//character: '9' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x3a[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x39, 6, 6};//character: '9' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x3a[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x08, 0x08, 0x00 };////character: ':'
+= { 0x08, 0x08 };//character: ':'
 
 const tImage defaultFont_0x3a 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x3a,
-    2, 3};//character: ':' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x3b[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x3a, 2, 2};//character: ':' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x3b[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x08, 0x0a, 0x00 };////character: ';'
+= { 0x08, 0x0a };//character: ';'
 
 const tImage defaultFont_0x3b 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x3b,
-    2, 3};//character: ';' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x3c[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x3b, 2, 2};//character: ';' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x3c[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x99, 0x06, 0x08, 0x00, 0x00 };////character: '<'
+= { 0x00, 0x99, 0x06, 0x08, 0x00 };//character: '<'
 
 const tImage defaultFont_0x3c 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x3c,
-    5, 6};//character: '<' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x3d[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x3c, 5, 5};//character: '<' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x3d[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x0f, 0x80, 0xf8, 0x00, 0x00, 0x00 };////character: '='
+= { 0x00, 0x0f, 0x80, 0xf8, 0x00, 0x00 };//character: '='
 
 const tImage defaultFont_0x3d 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x3d,
-    6, 7};//character: '=' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x3e[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x3d, 6, 6};//character: '=' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x3e[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x04, 0x18, 0x26, 0x40, 0x00, 0x00 };////character: '>'
+= { 0x04, 0x18, 0x26, 0x40, 0x00 };//character: '>'
 
 const tImage defaultFont_0x3e 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x3e,
-    5, 6};//character: '>' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x3f[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x3e, 5, 5};//character: '>' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x3f[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x20, 0x8c, 0x20, 0x02, 0x00, 0x00 };////character: '?'
+= { 0x72, 0x20, 0x8c, 0x20, 0x02, 0x00 };//character: '?'
 
 const tImage defaultFont_0x3f 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x3f,
-    6, 7};//character: '?' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x40[12]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x3f, 6, 6};//character: '?' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x40[10] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x3e, 0x10, 0x49, 0xaa, 0x9a, 0xa4, 0xa9, 0x49, 0xe1, 0x06, 0x3e, 0x00 };////character: '\x0040'
+= { 0x3e, 0x10, 0x49, 0xaa, 0x9a, 0xa5, 0x26, 0x88, 0x19, 0xf8 };//character: '\x0040'
 
 const tImage defaultFont_0x40 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x40,
-    10, 12};//character: '\x0040' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x41[8]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x40, 10, 10};//character: '\x0040' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x41[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x10, 0x50, 0xa2, 0x27, 0xc8, 0xa0, 0x80, 0x00 };////character: 'A'
+= { 0x72, 0x28, 0xa2, 0xfa, 0x28, 0x80 };//character: 'A'
 
 const tImage defaultFont_0x41 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x41,
-    7, 8};//character: 'A' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x42[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x41, 6, 6};//character: 'A' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x42[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xf2, 0x28, 0xbe, 0x8a, 0x2f, 0x00, 0x00 };////character: 'B'
+= { 0xf2, 0x28, 0xbe, 0x8a, 0x2f, 0x00 };//character: 'B'
 
 const tImage defaultFont_0x42 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x42,
-    6, 7};//character: 'B' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x43[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x42, 6, 6};//character: 'B' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x43[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x28, 0x20, 0x82, 0x27, 0x00, 0x00 };////character: 'C'
+= { 0x72, 0x28, 0x20, 0x82, 0x27, 0x00 };//character: 'C'
 
 const tImage defaultFont_0x43 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x43,
-    6, 7};//character: 'C' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x44[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x43, 6, 6};//character: 'C' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x44[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xe2, 0x48, 0xa2, 0x8a, 0x4e, 0x00, 0x00 };////character: 'D'
+= { 0xe2, 0x48, 0xa2, 0x8a, 0x4e, 0x00 };//character: 'D'
 
 const tImage defaultFont_0x44 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x44,
-    6, 7};//character: 'D' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x45[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x44, 6, 6};//character: 'D' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x45[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xfa, 0x08, 0x3e, 0x82, 0x0f, 0x80, 0x00 };////character: 'E'
+= { 0xfa, 0x08, 0x3e, 0x82, 0x0f, 0x80 };//character: 'E'
 
 const tImage defaultFont_0x45 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x45,
-    6, 7};//character: 'E' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x46[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x45, 6, 6};//character: 'E' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x46[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xf4, 0x21, 0xc8, 0x42, 0x00, 0x00 };////character: 'F'
+= { 0xf4, 0x21, 0xc8, 0x42, 0x00 };//character: 'F'
 
 const tImage defaultFont_0x46 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x46,
-    5, 6};//character: 'F' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x47[8]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x46, 5, 5};//character: 'F' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x47[7] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x30, 0x92, 0x04, 0xe8, 0x49, 0x0c, 0x00, 0x00 };////character: 'G'
+= { 0x30, 0x92, 0x04, 0xe8, 0x49, 0x0c, 0x00 };//character: 'G'
 
 const tImage defaultFont_0x47 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x47,
-    7, 8};//character: 'G' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x48[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x47, 7, 7};//character: 'G' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x48[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x8a, 0x28, 0xbe, 0x8a, 0x28, 0x80, 0x00 };////character: 'H'
+= { 0x8a, 0x28, 0xbe, 0x8a, 0x28, 0x80 };//character: 'H'
 
 const tImage defaultFont_0x48 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x48,
-    6, 7};//character: 'H' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x49[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x48, 6, 6};//character: 'H' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x49[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xaa, 0xa8, 0x00 };////character: 'I'
+= { 0xaa, 0xa8 };//character: 'I'
 
 const tImage defaultFont_0x49 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x49,
-    2, 3};//character: 'I' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x4a[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x49, 2, 2};//character: 'I' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x4a[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x10, 0x84, 0x21, 0x49, 0x80, 0x00 };////character: 'J'
+= { 0x10, 0x84, 0x21, 0x49, 0x80 };//character: 'J'
 
 const tImage defaultFont_0x4a 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x4a,
-    5, 6};//character: 'J' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x4b[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x4a, 5, 5};//character: 'J' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x4b[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x86, 0x29, 0x28, 0xd2, 0x28, 0x40, 0x00 };////character: 'K'
+= { 0x8a, 0x29, 0x28, 0xd2, 0x28, 0x80 };//character: 'K'
 
 const tImage defaultFont_0x4b 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x4b,
-    6, 7};//character: 'K' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x4c[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x4b, 6, 6};//character: 'K' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x4c[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x82, 0x08, 0x20, 0x82, 0x0f, 0x80, 0x00 };////character: 'L'
+= { 0x82, 0x08, 0x20, 0x82, 0x0f, 0x80 };//character: 'L'
 
 const tImage defaultFont_0x4c 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x4c,
-    6, 7};//character: 'L' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x4d[9]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x4c, 6, 6};//character: 'L' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x4d[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x82, 0xc6, 0xc6, 0xaa, 0xaa, 0xaa, 0x92, 0x00, 0x00 };////character: 'M'
+= { 0x82, 0xc6, 0xc6, 0xaa, 0xaa, 0xaa, 0x92, 0x00 };//character: 'M'
 
 const tImage defaultFont_0x4d 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x4d,
-    8, 9};//character: 'M' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x4e[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x4d, 8, 8};//character: 'M' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x4e[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x8b, 0x2c, 0xaa, 0x9a, 0x68, 0x80, 0x00 };////character: 'N'
+= { 0x8b, 0x2c, 0xaa, 0x9a, 0x68, 0x80 };//character: 'N'
 
 const tImage defaultFont_0x4e 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x4e,
-    6, 7};//character: 'N' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x4f[8]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x4e, 6, 6};//character: 'N' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x4f[7] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x79, 0x0a, 0x14, 0x28, 0x50, 0x9e, 0x00, 0x00 };////character: 'O'
+= { 0x79, 0x0a, 0x14, 0x28, 0x50, 0x9e, 0x00 };//character: 'O'
 
 const tImage defaultFont_0x4f 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x4f,
-    7, 8};//character: 'O' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x50[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x4f, 7, 7};//character: 'O' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x50[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xf2, 0x28, 0xbc, 0x82, 0x08, 0x00, 0x00 };////character: 'P'
+= { 0xf2, 0x28, 0xbc, 0x82, 0x08, 0x00 };//character: 'P'
 
 const tImage defaultFont_0x50 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x50,
-    6, 7};//character: 'P' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x51[8]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x50, 6, 6};//character: 'P' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x51[7] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x79, 0x0a, 0x14, 0x28, 0x53, 0x1b, 0x00, 0x00 };////character: 'Q'
+= { 0x79, 0x0a, 0x14, 0x28, 0x53, 0x1b, 0x00 };//character: 'Q'
 
 const tImage defaultFont_0x51 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x51,
-    7, 8};//character: 'Q' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x52[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x51, 7, 7};//character: 'Q' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x52[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xf2, 0x28, 0xbc, 0x92, 0x28, 0x80, 0x00 };////character: 'R'
+= { 0xf2, 0x28, 0xbc, 0x92, 0x28, 0x80 };//character: 'R'
 
 const tImage defaultFont_0x52 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x52,
-    6, 7};//character: 'R' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x53[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x52, 6, 6};//character: 'R' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x53[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x72, 0x28, 0x1c, 0x0a, 0x27, 0x00, 0x00 };////character: 'S'
+= { 0x72, 0x28, 0x1c, 0x0a, 0x27, 0x00 };//character: 'S'
 
 const tImage defaultFont_0x53 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x53,
-    6, 7};//character: 'S' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x54[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x53, 6, 6};//character: 'S' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x54[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xf8, 0x82, 0x08, 0x20, 0x82, 0x00, 0x00 };////character: 'T'
+= { 0xf8, 0x82, 0x08, 0x20, 0x82, 0x00 };//character: 'T'
 
 const tImage defaultFont_0x54 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x54,
-    6, 7};//character: 'T' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x55[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x54, 6, 6};//character: 'T' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x55[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x8a, 0x28, 0xa2, 0x8a, 0x27, 0x00, 0x00 };////character: 'U'
+= { 0x8a, 0x28, 0xa2, 0x8a, 0x27, 0x00 };//character: 'U'
 
 const tImage defaultFont_0x55 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x55,
-    6, 7};//character: 'U' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x56[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x55, 6, 6};//character: 'U' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x56[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x8a, 0x28, 0xa2, 0x51, 0x42, 0x00, 0x00 };////character: 'V'
+= { 0x8a, 0x28, 0xa2, 0x51, 0x42, 0x00 };//character: 'V'
 
 const tImage defaultFont_0x56 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x56,
-    6, 7};//character: 'V' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x57[11]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x56, 6, 6};//character: 'V' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x57[9] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x88, 0xca, 0x55, 0x4a, 0xa5, 0x52, 0xa8, 0x88, 0x00, 0x00, 0x00 };////character: 'W'
+= { 0x88, 0xca, 0x55, 0x4a, 0xa5, 0x52, 0xa8, 0x88, 0x00 };//character: 'W'
 
 const tImage defaultFont_0x57 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x57,
-    9, 11};//character: 'W' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x58[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x57, 9, 9};//character: 'W' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x58[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x8a, 0x25, 0x08, 0x52, 0x28, 0x80, 0x00 };////character: 'X'
+= { 0x8a, 0x25, 0x08, 0x52, 0x28, 0x80 };//character: 'X'
 
 const tImage defaultFont_0x58 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x58,
-    6, 7};//character: 'X' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x59[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x58, 6, 6};//character: 'X' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x59[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x8a, 0x25, 0x08, 0x20, 0x82, 0x00, 0x00 };////character: 'Y'
+= { 0x8a, 0x25, 0x08, 0x20, 0x82, 0x00 };//character: 'Y'
 
 const tImage defaultFont_0x59 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x59,
-    6, 7};//character: 'Y' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x5a[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x59, 6, 6};//character: 'Y' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x5a[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xf8, 0x21, 0x08, 0x42, 0x0f, 0x80, 0x00 };////character: 'Z'
+= { 0xf8, 0x21, 0x08, 0x42, 0x0f, 0x80 };//character: 'Z'
 
 const tImage defaultFont_0x5a 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x5a,
-    6, 7};//character: 'Z' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x5b[4]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x5a, 6, 6};//character: 'Z' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x5b[3] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xd2, 0x49, 0x24, 0xc0 };////character: '['
+= { 0xd2, 0x49, 0x30 };//character: '['
 
 const tImage defaultFont_0x5b 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x5b,
-    3, 4};//character: '[' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x5c[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x5b, 3, 3};//character: '[' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x5c[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x88, 0x44, 0x42, 0x20, 0x00 };////character: '\'
+= { 0x88, 0x44, 0x42, 0x20 };//character: '\'
 
 const tImage defaultFont_0x5c 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x5c,
-    4, 5};//character: '\' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x5d[4]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x5c, 4, 4};//character: '\' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x5d[3] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xc9, 0x24, 0x92, 0xc0 };////character: ']'
+= { 0xc9, 0x24, 0xb0 };//character: ']'
 
 const tImage defaultFont_0x5d 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x5d,
-    3, 4};//character: ']' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x5e[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x5d, 3, 3};//character: ']' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x5e[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x22, 0x95, 0x10, 0x00, 0x00, 0x00 };////character: '^'
+= { 0x22, 0x95, 0x10, 0x00, 0x00 };//character: '^'
 
 const tImage defaultFont_0x5e 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x5e,
-    5, 6};//character: '^' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x5f[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x5e, 5, 5};//character: '^' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x5f[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8 };////character: '_'
+= { 0x00, 0x00, 0x00, 0x03, 0xe0 };//character: '_'
 
 const tImage defaultFont_0x5f 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x5f,
-    5, 6};//character: '_' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x60[4]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x5f, 5, 5};//character: '_' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x60[3] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x88, 0x00, 0x00, 0x00 };////character: '`'
+= { 0x88, 0x00, 0x00 };//character: '`'
 
 const tImage defaultFont_0x60 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x60,
-    3, 4};//character: '`' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x61[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x60, 3, 3};//character: '`' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x61[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x1c, 0x27, 0x4b, 0xc0, 0x00 };////character: 'a'
+= { 0x00, 0x1c, 0x27, 0x4b, 0xc0 };//character: 'a'
 
 const tImage defaultFont_0x61 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x61,
-    5, 6};//character: 'a' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x62[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x61, 5, 5};//character: 'a' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x62[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x84, 0x39, 0x29, 0x4b, 0x80, 0x00 };////character: 'b'
+= { 0x84, 0x39, 0x29, 0x4b, 0x80 };//character: 'b'
 
 const tImage defaultFont_0x62 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x62,
-    5, 6};//character: 'b' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x63[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x62, 5, 5};//character: 'b' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x63[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x19, 0x28, 0x49, 0x80, 0x00 };////character: 'c'
+= { 0x00, 0x19, 0x28, 0x49, 0x80 };//character: 'c'
 
 const tImage defaultFont_0x63 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x63,
-    5, 6};//character: 'c' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x64[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x63, 5, 5};//character: 'c' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x64[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x10, 0x9d, 0x29, 0x49, 0xc0, 0x00 };////character: 'd'
+= { 0x10, 0x9d, 0x29, 0x49, 0xc0 };//character: 'd'
 
 const tImage defaultFont_0x64 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x64,
-    5, 6};//character: 'd' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x65[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x64, 5, 5};//character: 'd' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x65[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x19, 0x2f, 0x41, 0xc0, 0x00 };////character: 'e'
+= { 0x00, 0x19, 0x2f, 0x41, 0xc0 };//character: 'e'
 
 const tImage defaultFont_0x65 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x65,
-    5, 6};//character: 'e' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x66[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x65, 5, 5};//character: 'e' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x66[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x24, 0xe4, 0x44, 0x40, 0x00 };////character: 'f'
+= { 0x24, 0xe4, 0x44, 0x40 };//character: 'f'
 
 const tImage defaultFont_0x66 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x66,
-    4, 5};//character: 'f' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x67[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x66, 4, 4};//character: 'f' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x67[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x1d, 0x29, 0x49, 0xd2, 0x60 };////character: 'g'
+= { 0x00, 0x1d, 0x29, 0x38, 0x4c };//character: 'g'
 
 const tImage defaultFont_0x67 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x67,
-    5, 6};//character: 'g' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x68[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x67, 5, 5};//character: 'g' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x68[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x84, 0x39, 0x29, 0x4a, 0x40, 0x00 };////character: 'h'
+= { 0x84, 0x39, 0x29, 0x4a, 0x40 };//character: 'h'
 
 const tImage defaultFont_0x68 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x68,
-    5, 6};//character: 'h' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x69[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x68, 5, 5};//character: 'h' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x69[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x8a, 0xa8, 0x00 };////character: 'i'
+= { 0x8a, 0xa8 };//character: 'i'
 
 const tImage defaultFont_0x69 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x69,
-    2, 3};//character: 'i' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x6a[4]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x69, 2, 2};//character: 'i' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x6a[3] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x41, 0x24, 0x92, 0x80 };////character: 'j'
+= { 0x41, 0x24, 0x94 };//character: 'j'
 
 const tImage defaultFont_0x6a 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x6a,
-    3, 4};//character: 'j' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x6b[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x6a, 3, 3};//character: 'j' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x6b[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x84, 0x25, 0x4e, 0x52, 0x40, 0x00 };////character: 'k'
+= { 0x84, 0x25, 0x4e, 0x52, 0x40 };//character: 'k'
 
 const tImage defaultFont_0x6b 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x6b,
-    5, 6};//character: 'k' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x6c[3]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x6b, 5, 5};//character: 'k' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x6c[2] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xaa, 0xa8, 0x00 };////character: 'l'
+= { 0xaa, 0xa8 };//character: 'l'
 
 const tImage defaultFont_0x6c 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x6c,
-    2, 3};//character: 'l' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x6d[9]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x6c, 2, 2};//character: 'l' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x6d[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x00, 0xfc, 0x92, 0x92, 0x92, 0x92, 0x00, 0x00 };////character: 'm'
+= { 0x00, 0x00, 0xfc, 0x92, 0x92, 0x92, 0x92, 0x00 };//character: 'm'
 
 const tImage defaultFont_0x6d 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x6d,
-    8, 9};//character: 'm' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x6e[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x6d, 8, 8};//character: 'm' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x6e[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x39, 0x29, 0x4a, 0x40, 0x00 };////character: 'n'
+= { 0x00, 0x39, 0x29, 0x4a, 0x40 };//character: 'n'
 
 const tImage defaultFont_0x6e 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x6e,
-    5, 6};//character: 'n' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x6f[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x6e, 5, 5};//character: 'n' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x6f[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x19, 0x29, 0x49, 0x80, 0x00 };////character: 'o'
+= { 0x00, 0x19, 0x29, 0x49, 0x80 };//character: 'o'
 
 const tImage defaultFont_0x6f 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x6f,
-    5, 6};//character: 'o' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x70[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x6f, 5, 5};//character: 'o' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x70[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x39, 0x29, 0x4b, 0x90, 0x80 };////character: 'p'
+= { 0x00, 0x39, 0x29, 0x72, 0x10 };//character: 'p'
 
 const tImage defaultFont_0x70 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x70,
-    5, 6};//character: 'p' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x71[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x70, 5, 5};//character: 'p' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x71[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x1d, 0x29, 0x49, 0xc2, 0x10 };////character: 'q'
+= { 0x00, 0x1d, 0x29, 0x38, 0x42 };//character: 'q'
 
 const tImage defaultFont_0x71 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x71,
-    5, 6};//character: 'q' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x72[4]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x71, 5, 5};//character: 'q' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x72[3] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x03, 0x49, 0x20, 0x00 };////character: 'r'
+= { 0x03, 0x49, 0x20 };//character: 'r'
 
 const tImage defaultFont_0x72 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x72,
-    3, 4};//character: 'r' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x73[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x72, 3, 3};//character: 'r' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x73[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x1d, 0x06, 0x0b, 0x80, 0x00 };////character: 's'
+= { 0x00, 0x1d, 0x06, 0x0b, 0x80 };//character: 's'
 
 const tImage defaultFont_0x73 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x73,
-    5, 6};//character: 's' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x74[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x73, 5, 5};//character: 's' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x74[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x44, 0xe4, 0x44, 0x60, 0x00 };////character: 't'
+= { 0x44, 0xe4, 0x44, 0x60 };//character: 't'
 
 const tImage defaultFont_0x74 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x74,
-    4, 5};//character: 't' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x75[6]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x74, 4, 4};//character: 't' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x75[5] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x25, 0x29, 0x49, 0xc0, 0x00 };////character: 'u'
+= { 0x00, 0x25, 0x29, 0x49, 0xc0 };//character: 'u'
 
 const tImage defaultFont_0x75 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x75,
-    5, 6};//character: 'u' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x76[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x75, 5, 5};//character: 'u' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x76[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x08, 0x94, 0x51, 0x42, 0x00, 0x00 };////character: 'v'
+= { 0x00, 0x08, 0x94, 0x51, 0x42, 0x00 };//character: 'v'
 
 const tImage defaultFont_0x76 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x76,
-    6, 7};//character: 'v' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x77[9]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x76, 6, 6};//character: 'v' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x77[8] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x00, 0x92, 0xaa, 0xaa, 0xaa, 0x44, 0x00, 0x00 };////character: 'w'
+= { 0x00, 0x00, 0x92, 0xaa, 0xaa, 0xaa, 0x44, 0x00 };//character: 'w'
 
 const tImage defaultFont_0x77 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x77,
-    8, 9};//character: 'w' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x78[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x77, 8, 8};//character: 'w' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x78[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x08, 0x94, 0x21, 0x48, 0x80, 0x00 };////character: 'x'
+= { 0x00, 0x08, 0x94, 0x21, 0x48, 0x80 };//character: 'x'
 
 const tImage defaultFont_0x78 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x78,
-    6, 7};//character: 'x' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x79[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x78, 6, 6};//character: 'x' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x79[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x08, 0x94, 0x51, 0x42, 0x08, 0x40 };////character: 'y'
+= { 0x00, 0x08, 0x94, 0x51, 0x42, 0x10 };//character: 'y'
 
 const tImage defaultFont_0x79 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x79,
-    6, 7};//character: 'y' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x7a[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x79, 6, 6};//character: 'y' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x7a[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x0f, 0x84, 0x21, 0x0f, 0x80, 0x00 };////character: 'z'
+= { 0x00, 0x0f, 0x84, 0x21, 0x0f, 0x80 };//character: 'z'
 
 const tImage defaultFont_0x7a 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x7a,
-    6, 7};//character: 'z' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x7b[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x7a, 6, 6};//character: 'z' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x7b[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x64, 0x44, 0x84, 0x44, 0x60 };////character: '{'
+= { 0x64, 0x48, 0x44, 0x60 };//character: '{'
 
 const tImage defaultFont_0x7b 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x7b,
-    4, 5};//character: '{' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x7c[4]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x7b, 4, 4};//character: '{' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x7c[3] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x49, 0x24, 0x92, 0x40 };////character: '|'
+= { 0x49, 0x24, 0x90 };//character: '|'
 
 const tImage defaultFont_0x7c 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x7c,
-    3, 4};//character: '|' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x7d[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x7c, 3, 3};//character: '|' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x7d[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xc4, 0x44, 0x24, 0x44, 0xc0 };////character: '}'
+= { 0xc4, 0x42, 0x44, 0xc0 };//character: '}'
 
 const tImage defaultFont_0x7d 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x7d,
-    4, 5};//character: '}' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0x7e[7]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x7d, 4, 4};//character: '}' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0x7e[6] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0x00, 0x00, 0x3a, 0xb8, 0x00, 0x00, 0x00 };////character: '~'
+= { 0x00, 0x00, 0x3a, 0xb8, 0x00, 0x00 };//character: '~'
 
 const tImage defaultFont_0x7e 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
-#endif 
- = { image_data_defaultFont_0x7e,
-    6, 7};//character: '~' , height: 9, (charW,total bytes)
-
-static const _smCharType image_data_defaultFont_0xb0[5]
 #if defined(_FORCE_PROGMEM__) 
- PROGMEM 
+PROGMEM 
+#endif 
+= { image_data_defaultFont_0x7e, 6, 6};//character: '~' (charW,total bytes)
+
+const _smCharType image_data_defaultFont_0xb0[4] 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif  
- = { 0xea, 0xe0, 0x00, 0x00, 0x00 };////character: '°'
+= { 0xea, 0xe0, 0x00, 0x00 };//character: '°'
 
 const tImage defaultFont_0xb0 
-#if defined(_FORCE_PROGMEM__)
- PROGMEM 
+#if defined(_FORCE_PROGMEM__) 
+PROGMEM 
 #endif 
- = { image_data_defaultFont_0xb0,
-    4, 5};//character: '°' , height: 9, (charW,total bytes)
+= { image_data_defaultFont_0xb0, 4, 4};//character: '°' (charW,total bytes)
 
 
 const tChar defaultFont_array[] = {
@@ -1576,7 +1481,7 @@ const tChar defaultFont_array[] = {
 
 };
 
-//num chars, array, width, height, compression, char remap code
+//num chars, array, width, height, descent, compression, char remap code
 /*
 	char remap code:
 	0:no remap
@@ -1584,7 +1489,7 @@ const tChar defaultFont_array[] = {
 	2:remap CAPITAL to minus
 */
 
-const tFont defaultFont = { 96, defaultFont_array,0,9, RLE_no, 0 };
+const tFont defaultFont = { 96, defaultFont_array, RLE_proportional, 8, 0, RLE_no, 0 };
 
 
 #endif

@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 
-Null Font v2.3
+Null Font v2.4
 *******************************************************************************/
 
 #if !defined(SUMO_FNT_LIB_nullfont)
@@ -32,8 +32,8 @@ const tChar nullfont_array[] = {
 
 };
 
-//num chars, array, width, height, compression
+//num chars, array, width, height, descent, compression
 
-const tFont nullfont = { 1, nullfont_array,0,9,RLE_no, 0 };
+const tFont nullfont = { 1, nullfont_array, RLE_monospaced, 9, 0, RLE_no, 0 };
 
 #endif

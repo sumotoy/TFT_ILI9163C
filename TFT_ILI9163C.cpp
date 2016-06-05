@@ -178,6 +178,7 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	_initError = 0b00000000;
 	_cursorY  = _cursorX = 0;
 	_textScaleX = _textScaleY = 1;
+	_centerText = false;
 	_scrollTop = 0;
 	_scrollBottom = 0;
 	_fontInterline = 0;
@@ -2090,13 +2091,40 @@ void TFT_ILI9163C::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_
 /*********************************************************
 ********************  Text Functions *********************
 **********************************************************/
-void TFT_ILI9163C::setCursor(int16_t x, int16_t y) 
+void TFT_ILI9163C::setCursor(int16_t x, int16_t y,enum ILI9163C_centerMode c) 
 {
-	if (boundaryCheck(x,y)) return;
+	if (c == NORM){// No centering
+		if (x == CENTER || y == CENTER) setCursor(x,y,SCREEN);
+		if (boundaryCheck(x,y)) return;//cannot be
+	} else if (c == SCREEN){// Absolute x,y or both center screen mode
+		if (x == CENTER && y == CENTER) {//center x,y
+			x = y = 0;//better reset since value is calculated in textWrite
+			_centerText = 3;
+		} else if (x == CENTER && y != CENTER) {//center on x
+			if (y > _height) return;//cannot be
+			x = 0;//better reset since value is calculated in textWrite
+			_centerText = 1;
+		} else if (y == CENTER && x != CENTER) {//center on y
+			if (x > _width) return;//cannot be
+			y = 0;//better reset since value is calculated in textWrite
+			_centerText = 2;
+		} else {
+			setCursor(x,y,NORM);
+		}
+	} else {// Relative to x,y or both center mode
+		if (x == CENTER || y == CENTER) setCursor(x,y,SCREEN);
+		if (c == REL_X){//relative to X
+			_centerText = 4;
+		} else if (c == REL_Y){//relative to Y
+			_centerText = 5;
+		} else if (c == REL_XY){//relative XY
+			_centerText = 6;
+		}
+	}
 	if (_portrait) swap(x,y);
-	setArea(0x0000,0x0000,x,y);
 	_cursorX = x;
 	_cursorY = y;
+	setArea(0x0000,0x0000,x,y);
 }
 
 void TFT_ILI9163C::getCursor(int16_t &x, int16_t &y) 
@@ -2179,9 +2207,9 @@ int TFT_ILI9163C::_STRlen_helper(const char* buffer,int len)
 {
 	int charIndex = -1;
 	int i;
-	if (len < 1) len = strlen(buffer);		//try to get data from string
-	if (len < 1) return 0;					//better stop here
-	if (_currentFont->font_width > 0){		// fixed width font
+	//if (len < 1) len = strlen(buffer);		//try to get data from string
+	//if (len < 1) return 0;					//better stop here
+	if (_currentFont->font_widthType != 0){		// fixed width font
 		return ((len * _spaceCharWidth));
 	} else {								// variable width, need to loop trough entire string!
 		int totW = 0;
@@ -2196,6 +2224,7 @@ int TFT_ILI9163C::_STRlen_helper(const char* buffer,int len)
 					#else
 						totW += (_currentFont->chars[charIndex].image->image_width);
 					#endif
+					totW += _charSpacing;
 				}
 			}//inside permitted chars
 		}//buffer loop
@@ -2209,27 +2238,22 @@ void TFT_ILI9163C::setFont(const tFont *font)
 	_currentFont = font;
 	_fontRemapOffset =  _currentFont->remap_code;
 	//get all needed infos
-	if (_currentFont->font_width > 0){//fixed with font
-		_spaceCharWidth = _currentFont->font_width;
+	// We just get the space width now...
+	int temp = _getCharCode(0x20);
+	if (temp > -1){
+		#if defined(_FORCE_PROGMEM__)
+			_spaceCharWidth = pgm_read_byte(&(_currentFont->chars[temp].image->image_width));
+		#else
+			_spaceCharWidth = (_currentFont->chars[temp].image->image_width);
+		#endif
 	} else {
-		//_fontWidth will be 0 to inform other functions that this it's a variable w font
-		// We just get the space width now...
-		int temp = _getCharCode(0x20);
-		if (temp > -1){
-			#if defined(_FORCE_PROGMEM__)
-				_spaceCharWidth = pgm_read_byte(&(_currentFont->chars[temp].image->image_width));
-			#else
-				_spaceCharWidth = (_currentFont->chars[temp].image->image_width);
-			#endif
-		} else {
-			//font malformed, doesn't have needed space parameter will return to system font
-			#if defined(_ILI9163C_DEF_FONT_PATH)
-				setFont(&_ILI9163C_DEF_FONT_NAME);
-			#else
-				setFont(&nullfont);
-			#endif
-			return;
-		}
+		//font malformed, doesn't have needed space parameter will return to system font
+		#if defined(_ILI9163C_DEF_FONT_PATH)
+			setFont(&_ILI9163C_DEF_FONT_NAME);
+		#else
+			setFont(&nullfont);
+		#endif
+		return;
 	}
 }
 
@@ -2241,6 +2265,52 @@ void TFT_ILI9163C::_textWrite(const char* buffer, uint16_t len)
 	uint16_t i;
 	if (len < 1) len = strlen(buffer);//try get the info from the buffer
 	if (len < 1) return;//better stop here, the string it's really empty!
+	
+	// Center text flag enabled
+	if (_centerText > 0){
+		uint8_t stringWide = (_STRlen_helper(buffer,len) * _textScaleX) / 2;
+		uint8_t strMidHeight = (((_currentFont->font_height - _currentFont->font_descent) * _textScaleY) / 2);
+		switch(_centerText){
+			case 2: //y   (screen)
+				if (_portrait){
+					_cursorX = (_width / 2) - strMidHeight;
+				} else {
+					_cursorY = (_height / 2) - strMidHeight;
+				}
+				break;
+			case 1: //x   (screen)
+			case 3: //x,y (screen)
+				if (_portrait){
+					if (_centerText == 3) _cursorX = (_width / 2) - strMidHeight;
+					_cursorY = (_height / 2) - stringWide;
+				} else {
+					if (_centerText == 3) _cursorY = (_height / 2) - strMidHeight;
+					_cursorX = (_width / 2) - stringWide;
+				}
+				break;
+			case 4: //x   (relative)
+			case 6: //x,y (relative)
+				if (_portrait){
+					if (_centerText == 6) _cursorX = _cursorX - strMidHeight;
+					_cursorY = _cursorY - stringWide;
+				} else {
+					if (_centerText == 6) _cursorY = _cursorY - strMidHeight;
+					_cursorX = _cursorX - stringWide;
+				}
+				break;
+			case 5: //y   (relative)
+				if (_portrait){
+					_cursorX = _cursorX - strMidHeight;
+				} else {
+					_cursorY = _cursorY - strMidHeight;
+				}
+				break;
+		}
+		if (_cursorX < 0)_cursorX = 0;
+		if (_cursorY < 0)_cursorY = 0;
+		_centerText = 0;//reset
+	}//end center flag
+
 	//Loop trough every char and write them one by one until end (or a break!)
 	startTransaction();
 	for (i=0;i<len;i++){
@@ -2378,8 +2448,8 @@ bool TFT_ILI9163C::_renderSingleChar(const char c)
 								_cursorX,
 								charW,
 								_currentFont->font_height,
-								_textScaleY,
 								_textScaleX,
+								_textScaleY,
 								totalBytes,
 								_charSpacing,
 								_textForeground,
@@ -2403,11 +2473,11 @@ it's a variation of LPGO font render accelleration used in RA8875 (under GNU v3)
 The lines are not blank or filled are passed to the grouping function that is the second part of the accelleration. 
 */
 void TFT_ILI9163C::_glyphRender_unc(
-									const 		_smCharType * pixelsArray,
+									const 		_smCharType *pixelsArray,
 									int16_t 	x,
 									int16_t 	y,
-									int 		charW,
-									int 		charH,
+									int 		glyphWidth,
+									int 		glyphHeight,
 									uint8_t 	scaleX,
 									uint8_t	 	scaleY,
 									uint16_t 	totalBytes,
@@ -2420,12 +2490,14 @@ void TFT_ILI9163C::_glyphRender_unc(
 	int i;
 	uint8_t temp = 0;
 	//some basic variable...
-	uint8_t currentXposition = 0;//the current position of the writing cursor in the x axis, from 0 to charW
+	uint8_t currentXposition = 0;//the current position of the writing cursor in the x axis, from 0 to glyphWidth
 	uint8_t currentYposition = 0;//the current position of the writing cursor in the y axis, from 0 to _FNTheight
 	uint8_t tempYpos = 0;
 	uint16_t currentByte = 0;//the current byte in reading (from 0 to totalBytes)
-	bool lineBuffer[charW];//the temporary line buffer
+	bool lineBuffer[glyphWidth+1];//the temporary line buffer
 	int lineChecksum = 0;//part of the optimizer
+	//Fill background if needed.
+	if (foreColor != backColor) fillRect_cont(x,y,((glyphWidth * scaleX) + (_charSpacing * scaleX)),(glyphHeight * scaleY),backColor,backColor);
 	//the main loop that will read all bytes of the glyph
 	while (currentByte < totalBytes){
 		//read n byte
@@ -2434,38 +2506,33 @@ void TFT_ILI9163C::_glyphRender_unc(
 		#else
 			temp = pixelsArray[currentByte];
 		#endif
-		if (inverse) temp = ~temp;//byte inverted
+		if (inverse) temp = ~temp;//invert byte if needed
+		//read current bits inside current byte
 		for (i = 7; i >= 0; i--){
+			lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
+			lineChecksum += lineBuffer[currentXposition++];
 			//----------------------------------- exception
-			if (currentXposition == charW){
+			if (currentXposition == glyphWidth){
 				//line buffer has been filled!
 				currentXposition = 0;//reset the line x position
 				tempYpos = y + (currentYposition * scaleY);
-				if (lineChecksum < 1){//empty line
-					if ((foreColor != backColor) && (currentYposition < charH)) {
-							//will fill background till it's legal (added a workaround for malformed data)
-							fillRect_cont(
-								x,
-								tempYpos,
-								(charW * scaleX) + (cspacing * scaleX),//now handle _charSpacing!
-								scaleY,
-								backColor,
-								backColor
-							);
-					}
-				} else if (lineChecksum == charW){//full line
+				if (lineChecksum < 1){
+					//do nothing
+				} else if (lineChecksum == glyphWidth){
+					//full line
 					fillRect_cont(
 							x,
 							tempYpos,
-							(charW * scaleX),
+							(glyphWidth * scaleX),
 							scaleY,
 							foreColor,
 							backColor
 					);
-				} else { //line render
+				} else { 
+					//line render
 					_charLineRender(
 							lineBuffer,
-							charW,
+							glyphWidth,
 							x,
 							y,
 							scaleX,
@@ -2479,28 +2546,9 @@ void TFT_ILI9163C::_glyphRender_unc(
 				currentYposition++;//next line
 				lineChecksum = 0;//reset checksum
 			}//end exception
-			//-------------------------------------------------------
-			lineBuffer[currentXposition] = bitRead(temp,i);//continue fill line buffer
-			lineChecksum += lineBuffer[currentXposition++];
-		}
+		}//end reading single byte
 		currentByte++;
 	}
-	// missed bottom space line...
-	//For some reason some glyph missed one blank line, this happen rarely and I really don't know
-	//why (I suppose it's font converter issue), this is not a problem when no background it's needed
-	//but it's visible when backgound it's on, so this small piece of code fix the problem
-	
-	if (foreColor != backColor && currentYposition < charH) {
-		fillRect_cont(
-			x,
-			y + (currentYposition * scaleY),
-			(charW * scaleX) + (cspacing * scaleX), //now handle _charSpacing!
-			(charH - currentYposition) * scaleY,
-			backColor,
-			backColor
-		);
-	}
-	
 }
 
 /*
@@ -2549,16 +2597,7 @@ void TFT_ILI9163C::_charLineRender(
 					);
 					
 				} else {
-					if (foreColor != backColor) {
-						fillRect_cont(
-							x,
-							y + (currentYposition * scaleY),
-							(endPix * scaleX) + (cspacing * scaleX),//now handle _charSpacing!
-							scaleY,
-							backColor,
-							backColor
-						);
-					}
+					//do nothing
 				}
 				//reset and update some vals
 				xlinePos += endPix;

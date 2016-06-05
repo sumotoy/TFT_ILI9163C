@@ -67,6 +67,7 @@
 	1.0p7.6:More speed for fills (filledRect,fillScreen), fixed PROGMEM issues, fixed memory leak, added settings
 	1.0p7.7:Even more optimizations, code on AVR even smaller.
 	1.0p7.8:Slight optimized AVR code (less space and tiny slower)
+	1.0p7.9:Fixed LGPO issue, added autocenter flag to setCursor, updated font template, updated font file format
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
@@ -115,6 +116,13 @@
 	static SPISettings _ILI9163CSPI;
 #endif
 
+#if !defined(swap)
+	#if defined(ESP8266)
+		#define swap(a, b) { int16_t t = a; a = b; b = t; }
+	#else
+		#define swap(a, b) { typeof(a) t = a; a = b; b = t; }
+	#endif
+#endif
 
 
 #define CENTER 				9998
@@ -123,6 +131,7 @@
 enum ILI9163C_modes { NORMAL=0,PARTIAL,IDLE,SLEEP,INVERT,DISP_ON,DISP_OFF };//0,1,2,3,4,5,6
 enum ILI9163C_dispType { REDPCB_NEW=0,REDPCB_OLD,BLACKPCB_OLD};//0,1,2
 enum ILI9163C_iconMods { NONE=0,TRANSPARENT,REPLACE,BOTH};//0,1,2,3
+enum ILI9163C_centerMode { NORM=0,SCREEN,REL_X,REL_Y,REL_XY};//0,1,2,3,4
 
 #ifdef __cplusplus
 class TFT_ILI9163C : public Print {
@@ -222,9 +231,9 @@ class TFT_ILI9163C : public Print {
 	virtual size_t 	write(uint8_t b) { _textWrite((const char *)&b, 1); return 1;}
 	virtual size_t  write(const uint8_t *buffer, size_t size) {_textWrite((const char *)buffer, size); return size;}
 	//void		getStringBox(int16_t &w,int16_t &h);
-	inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
+	//inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
     //------------------------------- CURSOR ----------------------------------------------------
-	void		setCursor(int16_t x,int16_t y);
+	void		setCursor(int16_t x,int16_t y,enum ILI9163C_centerMode c=NORM);
 	void		getCursor(int16_t &x,int16_t &y);
 	//------------------------------- SCROLL ----------------------------------------------------
 	void 		defineScrollArea(int16_t tfa, int16_t bfa);
@@ -257,6 +266,7 @@ class TFT_ILI9163C : public Print {
 	uint16_t 				_textBackground;
 	uint8_t					_textScaleX;
 	uint8_t					_textScaleY;
+	uint8_t					_centerText;
 	uint8_t					_fontInterline;
 	boolean 				_textWrap; // If set, 'wrap' text at right edge of display
 	uint8_t					_fontRemapOffset;
