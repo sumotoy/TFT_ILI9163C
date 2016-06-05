@@ -1,11 +1,12 @@
 #include "TFT_ILI9163C.h"
-#include "_display/TFT_ILI9163C_ALL.h"
+
 
 /*********************************************************
 ********************** constructors **********************
 **********************************************************/
 
 #if defined (TFT_ILI9163C_INSTANCES)
+#include "_display/TFT_ILI9163C_ALL.h"
 
 	uint8_t TFT_ILI9163C::ILI9163C_instance = 0;
 
