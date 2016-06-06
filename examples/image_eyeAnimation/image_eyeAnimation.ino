@@ -26,7 +26,7 @@
 #include "_images/eye/eye17.c"
 #include "_images/eye/eye93.c"
 
-const tIcon animation[19] = {
+const tPicture animation[19] = {
 	eye0, eye1, eye2, eye3, eye4, eye5, eye6, eye7,
 	eye8, eye9, eye10, eye11, eye12, eye13, eye14, eye15, eye16,
 	eye17, eye93
