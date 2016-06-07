@@ -425,6 +425,7 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 	#else
 		setFont(&nullfont);
 	#endif
+	delay(30);
 }
 
 /*********************************************************
@@ -2266,46 +2267,28 @@ void TFT_ILI9163C::_textWrite(const char* buffer, uint16_t len)
 	uint16_t i;
 	if (len < 1) len = strlen(buffer);//try get the info from the buffer
 	if (len < 1) return;//better stop here, the string it's really empty!
-	
 	// Center text flag enabled
 	if (_centerText > 0){
 		uint8_t stringWide = (_STRlen_helper(buffer,len) * _textScaleX) / 2;
 		uint8_t strMidHeight = (((_currentFont->font_height - _currentFont->font_descent) * _textScaleY) / 2);
-		switch(_centerText){
-			case 2: //y   (screen)
-				if (_portrait){
-					_cursorX = (_width / 2) - strMidHeight;
-				} else {
-					_cursorY = (_height / 2) - strMidHeight;
-				}
-				break;
-			case 1: //x   (screen)
-			case 3: //x,y (screen)
-				if (_portrait){
-					if (_centerText == 3) _cursorX = (_width / 2) - strMidHeight;
-					_cursorY = (_height / 2) - stringWide;
-				} else {
-					if (_centerText == 3) _cursorY = (_height / 2) - strMidHeight;
-					_cursorX = (_width / 2) - stringWide;
-				}
-				break;
-			case 4: //x   (relative)
-			case 6: //x,y (relative)
-				if (_portrait){
-					if (_centerText == 6) _cursorX = _cursorX - strMidHeight;
-					_cursorY = _cursorY - stringWide;
-				} else {
-					if (_centerText == 6) _cursorY = _cursorY - strMidHeight;
-					_cursorX = _cursorX - stringWide;
-				}
-				break;
-			case 5: //y   (relative)
-				if (_portrait){
-					_cursorX = _cursorX - strMidHeight;
-				} else {
-					_cursorY = _cursorY - strMidHeight;
-				}
-				break;
+		if (_centerText < 4) {
+			//absolute
+			if (_portrait){
+				if (_centerText > 1)  _cursorX = (_height / 2) - strMidHeight;
+				if (_centerText != 2) _cursorY = (_width / 2) - stringWide;
+			} else {
+				if (_centerText > 1)  _cursorY = (_height / 2) - strMidHeight;
+				if (_centerText != 2) _cursorX = (_width / 2) - stringWide;
+			}
+		} else {
+			//relative
+			if (_portrait){
+				if (_centerText > 4)  _cursorX = _cursorX - strMidHeight;
+				if (_centerText != 5) _cursorY = _cursorY - stringWide;
+			} else {
+				if (_centerText > 4)  _cursorY = _cursorY - strMidHeight;
+				if (_centerText != 5) _cursorX = _cursorX - stringWide;
+			}
 		}
 		if (_cursorX < 0)_cursorX = 0;
 		if (_cursorY < 0)_cursorY = 0;
