@@ -610,7 +610,7 @@ void TFT_ILI9163C::setRotation(uint8_t m)
 	 writecommand_cont(CMD_MADCTL);
 	 writedata8_last(_Mactrl_Data);
 	endTransaction();
-	if (_portrait) swap(_width,_height);
+	if (_portrait) swapVals(_width,_height);
 }
 
 
@@ -1038,8 +1038,8 @@ void TFT_ILI9163C::drawLine_cont(int16_t x0, int16_t y0,int16_t x1, int16_t y1, 
 	}
 
 	bool steep = abs(y1 - y0) > abs(x1 - x0);
-	if (steep) {swap(x0, y0); swap(x1, y1);}
-	if (x0 > x1) {swap(x0, x1); swap(y0, y1);}
+	if (steep) {swapVals(x0, y0); swapVals(x1, y1);}
+	if (x0 > x1) {swapVals(x0, x1); swapVals(y0, y1);}
 
 	int16_t dx, dy;
 	dx = x1 - x0;
@@ -1653,9 +1653,9 @@ void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t 
 {
 	int16_t a, b, y, last;
 
-	if (y0 > y1) {swap(y0, y1); swap(x0, x1);}
-	if (y1 > y2) {swap(y2, y1); swap(x2, x1);}
-	if (y0 > y1) {swap(y0, y1); swap(x0, x1);}
+	if (y0 > y1) {swapVals(y0, y1); swapVals(x0, x1);}
+	if (y1 > y2) {swapVals(y2, y1); swapVals(x2, x1);}
+	if (y0 > y1) {swapVals(y0, y1); swapVals(x0, x1);}
 
 	if (y0 == y2) {
 		a = b = x0;
@@ -1695,7 +1695,7 @@ void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t 
 		b   = x0 + sb / dy02;
 		sa += dx01;
 		sb += dx02;
-		if (a > b) swap(a,b);
+		if (a > b) swapVals(a,b);
 		drawFastHLine_cont(a, y, b-a+1, color);
 	}
 
@@ -1706,7 +1706,7 @@ void TFT_ILI9163C::fillTriangle_cont(int16_t x0, int16_t y0,int16_t x1, int16_t 
 		b   = x0 + sb / dy02;
 		sa += dx12;
 		sb += dx02;
-		if (a > b) swap(a,b);
+		if (a > b) swapVals(a,b);
 		drawFastHLine_cont(a, y, b-a+1, color);
 	}
 }
@@ -2122,7 +2122,7 @@ void TFT_ILI9163C::setCursor(int16_t x, int16_t y,enum ILI9163C_centerMode c)
 			_centerText = 6;
 		}
 	}
-	if (_portrait) swap(x,y);
+	if (_portrait) swapVals(x,y);
 	_cursorX = x;
 	_cursorY = y;
 	setArea(0x0000,0x0000,x,y);
