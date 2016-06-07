@@ -88,6 +88,15 @@ Default:uncommented
 	#define _TEENSYLC_FASTPORT	
 #endif
 /*--------------------------------------------------------------------------------
+- ESP8266 Faster SPI -
+This force library to use the SPI.write method instead the legacy SPI.transfer.
+As result is much faster. (Thanks Reaper7)
+Default:uncommented
+----------------------------------------------------------------------------------*/
+#if defined(ESP8266)
+	#define _ESP8266_SPIFAST	
+#endif
+/*--------------------------------------------------------------------------------
 - ESP8266 Compatibility mode -
 This force library to use an alternative way to trigger ESP8266 GPIO, if you uncomment
 the line it will use the standard digitaWrite wich is slow, this help debugging.

@@ -51,6 +51,7 @@
 	Special Thanks:
 	Thanks to Paul Stoffregen for his beautiful Teensy3 and DMA SPI.
 	Thanks to Jnmattern & Marek Buriak for drawArc!
+	Thanks to reaper7 for point me to ESP8266 SPI.write
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Version:
 	1.0r6: Fixed compatibility with a new TFT with RED PCB with yellow pin, library structure update
@@ -611,22 +612,27 @@ class TFT_ILI9163C : public Print {
 
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
-			SPI.transfer(c);
+			#if defined(_ESP8266_SPIFAST)
+				SPI.write(c);
+			#else
+				SPI.transfer(c);
+			#endif
 		}
 		
 
 		void spiwrite16(uint16_t c)
 		__attribute__((always_inline)) {
-			
-			#if defined(_SPI_MULTITRANSFER)
-			   //last version of ESP8266 for arduino support this
-				uint8_t pattern[2] = { (uint8_t)(c >> 8), (uint8_t)(c >> 0) };
-				SPI.writePattern(pattern, 2, (uint8_t)1);
+			#if defined(_ESP8266_SPIFAST)
+				SPI.write16(c);
 			#else
-				SPI.transfer(c >> 8); SPI.transfer(c >> 0);
+				#if defined(_SPI_MULTITRANSFER)
+					//last version of ESP8266 for arduino support this
+					uint8_t pattern[2] = { (uint8_t)(c >> 8), (uint8_t)(c >> 0) };
+					SPI.writePattern(pattern, 2, (uint8_t)1);
+				#else
+					SPI.transfer(c >> 8); SPI.transfer(c >> 0);
+				#endif
 			#endif
-			
-			//SPI.transfer(c >> 8); SPI.transfer(c >> 0);
 		}
 		
 		void enableCommandStream(void)
@@ -885,9 +891,7 @@ class TFT_ILI9163C : public Print {
 											uint8_t 	scaleX,
 											uint8_t 	scaleY,
 											int16_t 	currentYposition,
-											uint8_t 	cspacing,
-											uint16_t 	foreColor,
-											uint16_t 	backColor
+											uint16_t 	foreColor
 							);
 };
 #endif

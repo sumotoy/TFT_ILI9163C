@@ -2498,7 +2498,7 @@ void TFT_ILI9163C::_glyphRender_unc(
 	bool lineBuffer[glyphWidth+1];//the temporary line buffer
 	int lineChecksum = 0;//part of the optimizer
 	//Fill background if needed.
-	if (foreColor != backColor) fillRect_cont(x,y,((glyphWidth * scaleX) + (_charSpacing * scaleX)),(glyphHeight * scaleY),backColor,backColor);
+	if (foreColor != backColor) fillRect_cont(x,y,((glyphWidth * scaleX) + (cspacing * scaleX)),(glyphHeight * scaleY),backColor,backColor);
 	//the main loop that will read all bytes of the glyph
 	while (currentByte < totalBytes){
 		//read n byte
@@ -2539,9 +2539,7 @@ void TFT_ILI9163C::_glyphRender_unc(
 							scaleX,
 							scaleY,
 							currentYposition,
-							cspacing,
-							foreColor,
-							backColor
+							foreColor
 					);
 				}
 				currentYposition++;//next line
@@ -2570,9 +2568,8 @@ void TFT_ILI9163C::_charLineRender(
 									uint8_t 		scaleX,
 									uint8_t 		scaleY,
 									int16_t 		currentYposition,
-									uint8_t 		cspacing,
-									uint16_t 		foreColor,
-									uint16_t 		backColor)
+									uint16_t 		foreColor
+									)
 {
 	int xlinePos = 0;
 	int px;
