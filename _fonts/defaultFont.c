@@ -1489,7 +1489,7 @@ const tChar defaultFont_array[] = {
 	2:remap CAPITAL to minus
 */
 
-const tFont defaultFont = { 96, defaultFont_array, RLE_proportional, 8, 0, RLE_no, 0 };
+const tFont defaultFont = { 96, defaultFont_array, RLE_proportional, 8, 1, RLE_no, 0 };
 
 
 #endif

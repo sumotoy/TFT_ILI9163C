@@ -724,7 +724,7 @@ const tChar akasha_cap_array[] = {
 	2:remap CAPITAL to minus
 */
 
-const tFont akasha_cap = { 45, akasha_cap_array, RLE_proportional, 11, 1, RLE_no, 1 };
+const tFont akasha_cap = { 45, akasha_cap_array, RLE_proportional, 11, 0, RLE_no, 0 };
 
 
 #endif
