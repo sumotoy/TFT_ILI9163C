@@ -69,6 +69,7 @@
 	1.0p7.7:Even more optimizations, code on AVR even smaller.
 	1.0p7.8:Slight optimized AVR code (less space and tiny slower)
 	1.0p7.9:Fixed LGPO issue, added autocenter flag to setCursor, updated font template, updated font file format
+	1.0p8: Compatibility with Teensy (codename)3.4 and 3.5
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
@@ -139,7 +140,7 @@ class TFT_ILI9163C : public Print {
 
  public:
 	#if defined (TFT_ILI9163C_INSTANCES)
-		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		#if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 			TFT_ILI9163C(const enum ILI9163C_dispType d, const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin=255,const uint8_t mosi=11,const uint8_t sclk=13);
 		#elif defined(__MKL26Z64__)
 			TFT_ILI9163C(const enum ILI9163C_dispType d, const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin=255,const uint8_t mosi=11,const uint8_t sclk=13);
@@ -148,7 +149,7 @@ class TFT_ILI9163C : public Print {
 		#endif
 	static uint8_t ILI9163C_instance;//used to keep track of the instances
 	#else
-		#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		#if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 			TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin=255,const uint8_t mosi=11,const uint8_t sclk=13);
 		#elif defined(__MKL26Z64__)
 			TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin=255,const uint8_t mosi=11,const uint8_t sclk=13);
@@ -510,8 +511,8 @@ class TFT_ILI9163C : public Print {
 			#endif
 		}
 
-/* ----------------- ARM (Teensy 3.0, Teensy 3.1, Teensy 3.2) ------------------------*/
-	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+/* ----------------- ARM (Teensy 3.0, Teensy 3.1, Teensy 3.2), Teensy (codename)3.4 and 3.5*/
+	#elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 		uint8_t 			pcs_data, pcs_command;
 		uint8_t 			_mosi, _sclk;
 		uint8_t 			_cs;
@@ -737,7 +738,7 @@ class TFT_ILI9163C : public Print {
 	-------------------- Common low level commands ------------------------
 	Teensy 3.x uses different functions, This are for all the rest of MCU's
    ========================================================================*/
-	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
+	#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__MK64FX512__) && !defined(__MK66FX1M0__)
 		void writecommand_cont(const uint8_t c)
 		__attribute__((always_inline)) {
 			enableCommandStream();
@@ -845,7 +846,7 @@ class TFT_ILI9163C : public Print {
 	void 		clearMemory(void);
 	
 	#if defined(_ILI9163C_SIZEOPTIMIZER)
-		#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
+		#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__MK64FX512__) && !defined(__MK66FX1M0__)
 			void 		writecommand_cont(const uint8_t c);
 			void 		writedata8_cont(uint8_t c);
 			void 		writedata16_cont(uint16_t d);

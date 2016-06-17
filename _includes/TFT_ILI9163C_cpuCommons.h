@@ -38,7 +38,7 @@
 			const uint32_t TFT_ILI9163C_SPI_SPEED 			= 24000000;
 		#endif
 		#define _SPI_MULTITRANSFER	//enable burst multy byte transfer
-	#elif defined(__MKL26Z64__)	|| defined(__MK20DX128__) || defined(__MK20DX256__)
+	#elif defined(__MKL26Z64__)	|| defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 		//#include <avr/pgmspace.h>
 		//#define _FORCE_PROGMEM__
 		#define _smCharType	unsigned char
