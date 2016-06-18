@@ -36,17 +36,17 @@
 
 
 
-const _smCharType image_data_Terminal_9_0x20[6] 
+const _smCharType image_data_Terminal_9_0x20[1] 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif  
-= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: ' '
+= { 0x00};//character: ' '
 
 const tImage Terminal_9_0x20 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif 
-= { image_data_Terminal_9_0x20, 6, 6};//character: ' ' (charW,total bytes)
+= { image_data_Terminal_9_0x20, 6, 1};//character: ' ' (charW,total bytes)
 
 const _smCharType image_data_Terminal_9_0x21[6] 
 #if defined(_FORCE_PROGMEM__) 
@@ -1474,7 +1474,7 @@ const tChar Terminal_9_array[] = {
 	2:remap CAPITAL to minus
 */
 
-const tFont Terminal_9 = { 95, Terminal_9_array, RLE_monospaced, 8, 0, RLE_no, 0 };
+const tFont Terminal_9 = { 95, Terminal_9_array, RLE_monospaced, 8, 1, RLE_no, 0 };
 
 
 #endif

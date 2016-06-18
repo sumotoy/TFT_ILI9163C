@@ -36,17 +36,17 @@
 
 
 
-const _smCharType image_data_mono_mid_0x20[8] 
+const _smCharType image_data_mono_mid_0x20[1] 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif  
-= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: ' '
+= { 0x00};//character: ' '
 
 const tImage mono_mid_0x20 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif 
-= { image_data_mono_mid_0x20, 6, 8};//character: ' ' (charW,total bytes)
+= { image_data_mono_mid_0x20, 6, 1};//character: ' ' (charW,total bytes)
 
 const _smCharType image_data_mono_mid_0x21[3] 
 #if defined(_FORCE_PROGMEM__) 
@@ -1489,7 +1489,7 @@ const tChar mono_mid_array[] = {
 	2:remap CAPITAL to minus
 */
 
-const tFont mono_mid = { 96, mono_mid_array, RLE_proportional, 10, 0, RLE_no, 0 };
+const tFont mono_mid = { 96, mono_mid_array, RLE_proportional, 10, 2, RLE_no, 0 };
 
 
 #endif

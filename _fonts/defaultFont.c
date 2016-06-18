@@ -36,17 +36,17 @@
 
 
 
-const _smCharType image_data_defaultFont_0x20[2] 
+const _smCharType image_data_defaultFont_0x20[1] 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif  
-= { 0x00, 0x00 };//character: ' '
+= { 0x00 };//character: ' '
 
 const tImage defaultFont_0x20 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif 
-= { image_data_defaultFont_0x20, 2, 2};//character: ' ' (charW,total bytes)
+= { image_data_defaultFont_0x20, 2, 1};//character: ' ' (charW,total bytes)
 
 const _smCharType image_data_defaultFont_0x21[2] 
 #if defined(_FORCE_PROGMEM__) 

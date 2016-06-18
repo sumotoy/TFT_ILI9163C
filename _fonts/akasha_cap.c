@@ -36,17 +36,17 @@
 
 
 
-const _smCharType image_data_akasha_cap_0x20[10] 
+const _smCharType image_data_akasha_cap_0x20[1] 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif  
-= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//character: ' '
+= { 0x00};//character: ' '
 
 const tImage akasha_cap_0x20 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif 
-= { image_data_akasha_cap_0x20, 7, 10};//character: ' ' (charW,total bytes)
+= { image_data_akasha_cap_0x20, 7, 1};//character: ' ' (charW,total bytes)
 
 const _smCharType image_data_akasha_cap_0x2b[11] 
 #if defined(_FORCE_PROGMEM__) 
@@ -724,7 +724,7 @@ const tChar akasha_cap_array[] = {
 	2:remap CAPITAL to minus
 */
 
-const tFont akasha_cap = { 45, akasha_cap_array, RLE_proportional, 11, 0, RLE_no, 0 };
+const tFont akasha_cap = { 45, akasha_cap_array, RLE_proportional, 11, 1, RLE_no, 0 };
 
 
 #endif

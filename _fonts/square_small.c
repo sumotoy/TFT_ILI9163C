@@ -36,17 +36,17 @@
 
 
 
-const _smCharType image_data_square_small_0x20[3] 
+const _smCharType image_data_square_small_0x20[1] 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif  
-= { 0x00, 0x00, 0x00 };//character: ' '
+= { 0x00};//character: ' '
 
 const tImage square_small_0x20 
 #if defined(_FORCE_PROGMEM__) 
 PROGMEM 
 #endif 
-= { image_data_square_small_0x20, 3, 3};//character: ' ' (charW,total bytes)
+= { image_data_square_small_0x20, 3, 1};//character: ' ' (charW,total bytes)
 
 const _smCharType image_data_square_small_0x21[2] 
 #if defined(_FORCE_PROGMEM__) 
@@ -1489,7 +1489,7 @@ const tChar square_small_array[] = {
 	2:remap CAPITAL to minus
 */
 
-const tFont square_small = { 96, square_small_array, RLE_proportional, 7, 0, RLE_no, 0 };
+const tFont square_small = { 96, square_small_array, RLE_proportional, 7, 1, RLE_no, 0 };
 
 
 #endif
