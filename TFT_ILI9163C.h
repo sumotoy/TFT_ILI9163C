@@ -537,21 +537,6 @@ class TFT_ILI9163C : public Print {
 			} while ((sr & (15 << 12)) > (3 << 12));
 		}
 
-		void waitFifoEmpty(void) {
-			uint32_t sr;
-			uint32_t tmp __attribute__((unused));
-			do {
-				sr = KINETISK_SPI0.SR;
-				if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
-			} while ((sr & 0xF0F0) > 0);             // wait both RX & TX empty
-		}
-
-		void waitTransmitComplete(void) __attribute__((always_inline)) {
-			uint32_t tmp __attribute__((unused));
-			while (!(KINETISK_SPI0.SR & SPI_SR_TCF)) ; // wait until final output done
-			tmp = KINETISK_SPI0.POPR;                  // drain the final RX FIFO word
-		}
-
 		void waitTransmitComplete(uint32_t mcr) __attribute__((always_inline)) {
 			uint32_t tmp __attribute__((unused));
 			while (1) {
