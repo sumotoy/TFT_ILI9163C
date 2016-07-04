@@ -2,7 +2,7 @@
 
 A fast SPI driver for TFT that use Ilitek ILI9163C driver for Arduino's,Teensy's,ESP8266 and more...
 
-<b>Preview of the 1.0p7</b>, the official release 1.0<br>
+<b>Preview of the 1.0p8</b>, the official release 1.0<br>
 Current version it's a preview, scroll is not complete and other optimizations coming.<br>
 Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 <b>This is a massive update, many differences from any other version!</b>, so please read changes, font scheme changed to be compatible with all future libraries (interchangeable), some command deprecated (but there's alternative).<br><br>
@@ -13,9 +13,11 @@ Follow WIKI https://github.com/sumotoy/TFT_ILI9163C/wiki for some help<br>
 
 ***
 
-<b>1.0p7 Version Features, Fixes and Updates:</b><br>
+<b>1.0p8 Version Features, Fixes and Updates:</b><br>
 - [ ]  **Bug Fix**  Scroll, should fix for all display's.
 - [x]  **Bug Fix**  Fixed a language typo (horrible, sorry!) grandient is now gradient (thanks Giulio!)
+- [x]  **Bug Fix**  Fixed a couple of missplaced endTransaction.
+- [x]  **Added** Compatibility with Teensy 3.4 and Teensy 3.5 (k64 & k66 CPU's)
 - [x]  **Added** AVR code fixed, added a parameter in user setting to optimize the size of the code in AVR.
 - [x]  **Added** setCursor can use a keyword called 'CENTER' in x, y or both. It will center text (regardless font size, etc.) es. _setCursor(CENTER,x);_ will center incoming text on x axis
 - [x]  **Added** New font parameter inside Font File. It allows automatical char reassign (es. minus to capital). Useful for include small font file that uses less resources.
