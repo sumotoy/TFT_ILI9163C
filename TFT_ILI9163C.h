@@ -1,6 +1,6 @@
 /*
 	ILI9163C - A fast SPI driver for TFT that use Ilitek ILI9163C.
-	Version: 1.0r7
+	Version: 1.0p8.1
 
 	Features:
 	- Very FAST!, expecially with Teensy 3.x where uses hyper optimized SPI.
@@ -70,6 +70,7 @@
 	1.0p7.8:Slight optimized AVR code (less space and tiny slower)
 	1.0p7.9:Fixed LGPO issue, added autocenter flag to setCursor, updated font template, updated font file format
 	1.0p8: Compatibility with Teensy (codename)3.4 and 3.5
+	1.0p8.1:Some cleaning, fixed a couple of stupid errors that affects all CPU's.
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	BugList of the current version:
 	- Due hardware limitation the scroll it's only vertical but in rotation mode change direction!
@@ -157,7 +158,6 @@ class TFT_ILI9163C : public Print {
 			TFT_ILI9163C(const uint8_t cspin,const uint8_t dcpin,const uint8_t rstpin=255);
 		#endif
 	#endif
-	
 				//avoidSPIinit=true set everithing but not call SPI.init()(you should init SPI before!)
 	void     	begin(bool avoidSPIinit=false);
 	void		setArea(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
@@ -232,8 +232,6 @@ class TFT_ILI9163C : public Print {
 	void 		setFont(const tFont *font);
 	virtual size_t 	write(uint8_t b) { _textWrite((const char *)&b, 1); return 1;}
 	virtual size_t  write(const uint8_t *buffer, size_t size) {_textWrite((const char *)buffer, size); return size;}
-	//void		getStringBox(int16_t &w,int16_t &h);
-	//inline void swap(int16_t &a, int16_t &b) { int16_t t = a; a = b; b = t; }
     //------------------------------- CURSOR ----------------------------------------------------
 	void		setCursor(int16_t x,int16_t y,enum ILI9163C_centerMode c=NORM);
 	void		getCursor(int16_t &x,int16_t &y);
@@ -277,7 +275,7 @@ class TFT_ILI9163C : public Print {
 		1:minus to CAPITAL  if (c > 96 && c < 123) c -= 32;
 		2:CAPITAl to minus  if (c > 64 && c < 91)  c += 32;
 	*/
-	
+
 	bool					_backlight;
 	uint8_t					_initError;
 	uint8_t					_sleep;
@@ -297,7 +295,7 @@ class TFT_ILI9163C : public Print {
 
 	uint8_t 				_dc,_rst;
 	uint8_t					_bklPin;
-		//Variable holders for init parameters
+	//Variable holders for init parameters
 	#if defined (TFT_ILI9163C_INSTANCES)
 		uint8_t		TFT_ILI9163C_DISP;
 		uint8_t 	TFT_ILI9163C_GAMMASET;
@@ -334,7 +332,7 @@ class TFT_ILI9163C : public Print {
 /* ========================================================================
 					       Low Level SPI Routines
    ========================================================================*/
-/* ----------------- AVR (UNO,Duemilanove, etc.) ------------------------*/
+/* --------------------- AVR (UNO,Duemilanove, etc.) ------------------------*/
 	#if defined(__AVR__)
 		volatile uint8_t 	*dataport, *clkport, *csport, *rsport;
 		uint8_t  			datapinmask, clkpinmask, cspinmask, dcpinmask;
@@ -346,28 +344,21 @@ class TFT_ILI9163C : public Print {
 			while(!(SPSR & _BV(SPIF)));//wait for the data to be transmitted on MOSI
 		}
 		
-
 		void spiwrite16(uint16_t c)
-		__attribute__((always_inline)) {
-			spiwrite(c >> 8); spiwrite(c);
-		}
+		__attribute__((always_inline)) { spiwrite(c >> 8); spiwrite(c); }
 
 		void enableCommandStream(void)
-		__attribute__((always_inline)) {
-			*rsport &= ~dcpinmask;//low
-		}
+		__attribute__((always_inline)) { *rsport &= ~dcpinmask;//low }
 
 		void enableDataStream(void)
-		__attribute__((always_inline)) {
-			*rsport |= dcpinmask;//hi
-		}
+		__attribute__((always_inline)) { *rsport |= dcpinmask;//hi }
 
 		void startTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
 				SPI.beginTransaction(_ILI9163CSPI);
 			#endif
-				*csport &= ~cspinmask;//low
+			*csport &= ~cspinmask;//low
 		}
 
 		void endTransaction(void)
@@ -378,38 +369,24 @@ class TFT_ILI9163C : public Print {
 		}
 
 		void disableCS(void)
-		__attribute__((always_inline)) {
-			*csport |= cspinmask;//hi
-		}
-
-/* -----------------  ARM (DUE)  ------------------------*/
+		__attribute__((always_inline)) { *csport |= cspinmask;//hi }
+/* -----------------------------  ARM (DUE)  -------------------------------*/
 	#elif defined(__SAM3X8E__)
 		Pio 				*dataport, *clkport, *csport, *rsport;
 		uint32_t  			datapinmask, clkpinmask, cspinmask, dcpinmask;
 		uint8_t 			_cs;
 
 		void spiwrite(uint8_t c)
-		__attribute__((always_inline)) {
-			SPI.transfer(c);
-		}
+		__attribute__((always_inline)) { SPI.transfer(c); }
 		
-
 		void spiwrite16(uint16_t c)
-		__attribute__((always_inline)) {
-			//SPI.transfer(c >> 8); SPI.transfer(c);
-			SPI.transfer16(c);
-		}
-
+		__attribute__((always_inline)) { SPI.transfer16(c); }
 
 		void enableCommandStream(void)
-		__attribute__((always_inline)) {
-			rsport->PIO_CODR |=  dcpinmask;//LO
-		}
+		__attribute__((always_inline)) { rsport->PIO_CODR |=  dcpinmask;//LO }
 
 		void enableDataStream(void)
-		__attribute__((always_inline)) {
-			rsport->PIO_SODR |=  dcpinmask;//HI
-		}
+		__attribute__((always_inline)) { rsport->PIO_SODR |=  dcpinmask;//HI }
 
 		void startTransaction(void)
 		__attribute__((always_inline)) {
@@ -419,7 +396,6 @@ class TFT_ILI9163C : public Print {
 				csport->PIO_CODR |=  cspinmask;//LO
 		}
 
-
 		void endTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
@@ -428,19 +404,15 @@ class TFT_ILI9163C : public Print {
 		}
 
 		void disableCS(void)
-		__attribute__((always_inline)) {
-			csport->PIO_SODR |=  cspinmask;//HI
-		}
+		__attribute__((always_inline)) { csport->PIO_SODR |=  cspinmask;//HI }
 
-/* ----------------- ARM (Teensy LC) ------------------------*/
+/* --------------------------- ARM (Teensy LC) ------------------------*/
 	#elif defined(__MKL26Z64__)
 		uint8_t 			_mosi, _sclk;
 		bool				_useSPI1;
 		uint8_t 			_cs;
 		volatile uint8_t *dcportSet, *dcportClear, *csportSet, *csportClear;
 		uint8_t  cspinmask, dcpinmask;
-
-		
 
 		void spiwrite(uint8_t c)
 		__attribute__((always_inline)) {
@@ -462,20 +434,20 @@ class TFT_ILI9163C : public Print {
 
 		void enableCommandStream(void)
 		__attribute__((always_inline)) {
-				#if !defined(_TEENSYLC_FASTPORT)
-					digitalWriteFast(_dc,LOW);
-				#else
-					*dcportClear = dcpinmask;
-				#endif
+			#if !defined(_TEENSYLC_FASTPORT)
+				digitalWriteFast(_dc,LOW);
+			#else
+				*dcportClear = dcpinmask;
+			#endif
 		}
 
 		void enableDataStream(void)
 		__attribute__((always_inline)) {
-				#if !defined(_TEENSYLC_FASTPORT)
-					digitalWriteFast(_dc,HIGH);
-				#else
-					*dcportSet = dcpinmask;
-				#endif
+			#if !defined(_TEENSYLC_FASTPORT)
+				digitalWriteFast(_dc,HIGH);
+			#else
+				*dcportSet = dcpinmask;
+			#endif
 		}
 
 		void startTransaction(void)
@@ -491,7 +463,6 @@ class TFT_ILI9163C : public Print {
 				*csportClear = cspinmask;
 			#endif
 		}
-
 
 		void endTransaction(void)
 		__attribute__((always_inline)) {
@@ -511,23 +482,19 @@ class TFT_ILI9163C : public Print {
 			#endif
 		}
 
-/* ----------------- ARM (Teensy 3.0, Teensy 3.1, Teensy 3.2), Teensy (codename)3.4 and 3.5*/
+/* ----------------- ARM (Teensy 3.0, Teensy 3.1, Teensy 3.2), Teensy (codename)3.4 and 3.5 --------*/
 	#elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 		uint8_t 			pcs_data, pcs_command;
 		uint8_t 			_mosi, _sclk;
 		uint8_t 			_cs;
 
 		void startTransaction(void)
-		__attribute__((always_inline)) {
-			SPI.beginTransaction(_ILI9163CSPI);
-		}
+		__attribute__((always_inline)) { SPI.beginTransaction(_ILI9163CSPI); }
 
 		void endTransaction(void)
-		__attribute__((always_inline)) {
-			SPI.endTransaction();
-		}
+		__attribute__((always_inline)) { SPI.endTransaction(); }
 
-		//Here's Paul Stoffregen magic in action...
+		//Here's Paul Stoffregen SPI FIFO magic in action...
 		void waitFifoNotFull(void) {
 			uint32_t sr;
 			uint32_t tmp __attribute__((unused));
@@ -537,10 +504,11 @@ class TFT_ILI9163C : public Print {
 			} while ((sr & (15 << 12)) > (3 << 12));
 		}
 
-		void waitTransmitComplete(uint32_t mcr) __attribute__((always_inline)) {
+		void waitTransmitComplete(uint32_t mcr) 
+			__attribute__((always_inline)) {
 			uint32_t tmp __attribute__((unused));
 			while (1) {
-				uint32_t sr = KINETISK_SPI0.SR;
+				uint32_t sr = KINETISK_SPI0.SR;//// DSPI Status Register
 				if (sr & SPI_SR_EOQF) break;  // wait for last transmit
 				if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
 			}
@@ -549,41 +517,46 @@ class TFT_ILI9163C : public Print {
 			while (KINETISK_SPI0.SR & 0xF0) {tmp = KINETISK_SPI0.POPR;}
 		}
 
-		void writecommand_cont(const uint8_t c) __attribute__((always_inline)) {
+		void writecommand_cont(const uint8_t c) 
+			__attribute__((always_inline)) {
 			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 
-		void writedata8_cont(uint8_t d) __attribute__((always_inline)) {
+		void writedata8_cont(uint8_t d) 
+			__attribute__((always_inline)) {
 			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 
-		void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
+		void writedata16_cont(uint16_t d) 
+			__attribute__((always_inline)) {
 			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
 			waitFifoNotFull();
 		}
 
-		void writecommand_last(const uint8_t c) __attribute__((always_inline)) {
+		void writecommand_last(const uint8_t c) 
+			__attribute__((always_inline)) {
 			uint32_t mcr = SPI0_MCR;
 			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
 			waitTransmitComplete(mcr);
 		}
 
-
-		void writedata8_last(uint8_t c) __attribute__((always_inline)) {
+		void writedata8_last(uint8_t c) 
+			__attribute__((always_inline)) {
 			uint32_t mcr = SPI0_MCR;
 			KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
 			waitTransmitComplete(mcr);
 		}
 
-		void writedata16_last(uint16_t d) __attribute__((always_inline)) {
+		void writedata16_last(uint16_t d) 
+			__attribute__((always_inline)) {
 			uint32_t mcr = SPI0_MCR;
 			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
 			waitTransmitComplete(mcr);
 		}
 
-/* ----------------- ARM (XTENSA ESP8266) ------------------------*/
+/* --------------------------- ARM (XTENSA ESP8266) --------------------------------*/
 	#elif defined(ESP8266)
 		#if defined(_ESP8266_STANDARDMODE)
 			uint8_t 			_cs;
@@ -605,7 +578,6 @@ class TFT_ILI9163C : public Print {
 			#endif
 		}
 		
-
 		void spiwrite16(uint16_t c)
 		__attribute__((always_inline)) {
 			#if defined(_ESP8266_SPIFAST)
@@ -651,7 +623,6 @@ class TFT_ILI9163C : public Print {
 			#endif
 		}
 
-
 		void endTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
@@ -668,29 +639,21 @@ class TFT_ILI9163C : public Print {
 			#endif
 		}
 
-/* ----------------- UNCKNOWN (Legacy) ------------------------*/
+/* ---------------------------- UNKNOWN (Legacy) ------------------------------*/
 	#else
 		uint8_t 			_cs;
 
 		void spiwrite(uint8_t c)
-		__attribute__((always_inline)) {
-			SPI.transfer(c);
-		}
+		__attribute__((always_inline)) { SPI.transfer(c); }
 
 		void spiwrite16(uint16_t c)
-		__attribute__((always_inline)) {
-			SPI.transfer(c >> 8); SPI.transfer(c >> 0);
-		}
+		__attribute__((always_inline)) { SPI.transfer(c >> 8); SPI.transfer(c >> 0); }
 		
 		void enableCommandStream(void)
-		__attribute__((always_inline)) {
-			digitalWrite(_dc,LOW);
-		}
+		__attribute__((always_inline)) { digitalWrite(_dc,LOW); }
 
 		void enableDataStream(void)
-		__attribute__((always_inline)) {
-			digitalWrite(_dc,HIGH);
-		}
+		__attribute__((always_inline)) { digitalWrite(_dc,HIGH); }
 
 		void startTransaction(void)
 		__attribute__((always_inline)) {
@@ -700,7 +663,6 @@ class TFT_ILI9163C : public Print {
 				digitalWrite(_cs,LOW);
 		}
 
-
 		void endTransaction(void)
 		__attribute__((always_inline)) {
 			#if defined(SPI_HAS_TRANSACTION)
@@ -709,111 +671,121 @@ class TFT_ILI9163C : public Print {
 		}
 
 		void disableCS(void)
-		__attribute__((always_inline)) {
-			digitalWrite(_cs,HIGH);
-		}
+		__attribute__((always_inline)) { digitalWrite(_cs,HIGH); }
 
+	#endif//end CPU specific Low Level SPI Routines
+	
+	//This is common to all CPU
+	#if !defined(_ILI9163C_SIZEOPTIMIZER)
+		void closeTransaction(void)
+		__attribute__((always_inline)) {
+			#if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+				writecommand_last(CMD_NOP);
+			#else
+				disableCS();
+			#endif
+			endTransaction();
+		}
 	#endif
 
  private:
 
    /* All functions here are active only when _ILI9163C_SIZEOPTIMIZER is NOT active. */
    #if !defined(_ILI9163C_SIZEOPTIMIZER)
-/* ========================================================================
-	-------------------- Common low level commands ------------------------
-	Teensy 3.x uses different functions, This are for all the rest of MCU's
-   ========================================================================*/
-	#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__MK64FX512__) && !defined(__MK66FX1M0__)
-		void writecommand_cont(const uint8_t c)
-		__attribute__((always_inline)) {
-			enableCommandStream();
-			spiwrite(c);
-		}
+	/* ================================================================================
+		-------------------- Common low level commands ------------------------
+		These are for all CPU's but not for Teensy's 3.x (that uses different stuff)
+		===============================================================================*/
+		#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__MK64FX512__) && !defined(__MK66FX1M0__)
+			void writecommand_cont(const uint8_t c)
+			__attribute__((always_inline)) {
+				enableCommandStream();
+				spiwrite(c);
+			}
 
-		void writedata8_cont(uint8_t c)
-		__attribute__((always_inline)) {
-			enableDataStream();
-			spiwrite(c);
-		}
+			void writedata8_cont(uint8_t c)
+			__attribute__((always_inline)) {
+				enableDataStream();
+				spiwrite(c);
+			}
 
-		void writedata16_cont(uint16_t d)
-		__attribute__((always_inline)) {
-			enableDataStream();
-			spiwrite16(d);
-		}
+			void writedata16_cont(uint16_t d)
+			__attribute__((always_inline)) {
+				enableDataStream();
+				spiwrite16(d);
+			}
 
-		void writecommand_last(const uint8_t c)
-		__attribute__((always_inline)) {
-			enableCommandStream();
-			spiwrite(c);
-			disableCS();
-		}
+			void writecommand_last(const uint8_t c)
+			__attribute__((always_inline)) {
+				enableCommandStream();
+				spiwrite(c);
+				disableCS();
+			}
 
+			void writedata8_last(uint8_t c)
+			__attribute__((always_inline)) {
+				enableDataStream();
+				spiwrite(c);
+				disableCS();
+			}
 
-		void writedata8_last(uint8_t c)
-		__attribute__((always_inline)) {
-			enableDataStream();
-			spiwrite(c);
-			disableCS();
-		}
-
-		void writedata16_last(uint16_t d)
-		__attribute__((always_inline)) {
-			enableDataStream();
-			spiwrite16(d);
-			disableCS();
-		}
-	#endif
-/* ========================================================================
-					    Fast Common Graphic Primitives
-   ========================================================================*/
+			void writedata16_last(uint16_t d)
+			__attribute__((always_inline)) {
+				enableDataStream();
+				spiwrite16(d);
+				disableCS();
+			}
+		#endif//only NOT teensy's
+		/* ===========================================================================
+					           Fast Common Graphic Primitives
+						(only when _ILI9163C_SIZEOPTIMIZER not active)
+		==============================================================================*/
    
-	void setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool disComp=false)
-	__attribute__((always_inline)) {
-		if (!disComp){//if false, offset compensate?
-			x0 += TFT_ILI9163C_OFST[_rotation][0];
-			x1 += TFT_ILI9163C_OFST[_rotation][0];
-			y0 += TFT_ILI9163C_OFST[_rotation][1];
-			y1 += TFT_ILI9163C_OFST[_rotation][1];
+		void setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool disComp=false)
+		__attribute__((always_inline)) {
+			if (!disComp){//if false, offset compensate?
+				x0 += TFT_ILI9163C_OFST[_rotation][0];
+				x1 += TFT_ILI9163C_OFST[_rotation][0];
+				y0 += TFT_ILI9163C_OFST[_rotation][1];
+				y1 += TFT_ILI9163C_OFST[_rotation][1];
+			}
+			writecommand_cont(CMD_CLMADRS); //Column
+			writedata16_cont(x0); writedata16_cont(x1);
+			writecommand_cont(CMD_PGEADRS); //Page
+			writedata16_cont(y0); writedata16_cont(y1);
+			writecommand_cont(CMD_RAMWR); //Into ILI Ram
 		}
-		writecommand_cont(CMD_CLMADRS); //Column
-		writedata16_cont(x0); writedata16_cont(x1);
-		writecommand_cont(CMD_PGEADRS); //Page
-		writedata16_cont(y0); writedata16_cont(y1);
-		writecommand_cont(CMD_RAMWR); //Into ILI Ram
-	}
 	
+		void drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color)
+		__attribute__((always_inline)) {
+			setAddrWindow_cont(x, y, x + w - 1, y);
+			do { writedata16_cont(color); } while (--w > 0);
+		}
 
-	void drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color)
-	__attribute__((always_inline)) {
-		setAddrWindow_cont(x, y, x + w - 1, y);
-		do { writedata16_cont(color); } while (--w > 0);
-	}
+		void drawFastVLine_cont(int16_t x, int16_t y, int16_t h, uint16_t color)
+		__attribute__((always_inline)) {
+			setAddrWindow_cont(x, y, x, y + h - 1);
+			do { writedata16_cont(color); } while (--h > 0);
+		}
 
-	void drawFastVLine_cont(int16_t x, int16_t y, int16_t h, uint16_t color)
-	__attribute__((always_inline)) {
-		setAddrWindow_cont(x, y, x, y + h - 1);
-		do { writedata16_cont(color); } while (--h > 0);
-	}
+		void drawPixel_cont(int16_t x, int16_t y, uint16_t color)
+		__attribute__((always_inline)) {
+			setAddrWindow_cont(x, y, x + 1, y + 1);
+			writedata16_cont(color);
+		}
 
-	void drawPixel_cont(int16_t x, int16_t y, uint16_t color)
-	__attribute__((always_inline)) {
-		setAddrWindow_cont(x, y, x + 1, y + 1);
-		writedata16_cont(color);
-	}
+		bool boundaryCheck(int16_t x,int16_t y)
+		__attribute__((always_inline)) {
+			if ((x >= _width) || (y >= _height)) return true;
+			return false;
+		}
 
-	bool boundaryCheck(int16_t x,int16_t y)
-	__attribute__((always_inline)) {
-		if ((x >= _width) || (y >= _height)) return true;
-		return false;
-	}
-
-	int16_t sizeCheck(int16_t origin,int16_t len,int16_t maxVal)
-	__attribute__((always_inline)) {
-		if (((origin + len) - 1) >= maxVal) len = maxVal - origin;
-		return len;
-	}
-	#endif
+		int16_t sizeCheck(int16_t origin,int16_t len,int16_t maxVal)
+		__attribute__((always_inline)) {
+			if (((origin + len) - 1) >= maxVal) len = maxVal - origin;
+			return len;
+		}
+	#endif//end !_ILI9163C_SIZEOPTIMIZER
 
 /* ========================================================================
 					       Helpers
@@ -832,6 +804,7 @@ class TFT_ILI9163C : public Print {
 	
 	#if defined(_ILI9163C_SIZEOPTIMIZER)
 		#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__MK64FX512__) && !defined(__MK66FX1M0__)
+		//not the Teensy's (have special stuff)
 			void 		writecommand_cont(const uint8_t c);
 			void 		writedata8_cont(uint8_t c);
 			void 		writedata16_cont(uint16_t d);
@@ -839,6 +812,8 @@ class TFT_ILI9163C : public Print {
 			void 		writedata8_last(uint8_t c);
 			void 		writedata16_last(uint16_t d);
 		#endif
+		//common to all
+		void 		closeTransaction(void);
 		void 		setAddrWindow_cont(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool disComp=false);
 		void 		drawFastHLine_cont(int16_t x, int16_t y, int16_t w, uint16_t color);
 		void 		drawFastVLine_cont(int16_t x, int16_t y, int16_t h, uint16_t color);
@@ -849,7 +824,7 @@ class TFT_ILI9163C : public Print {
 	#if defined (TFT_ILI9163C_INSTANCES)
 		void 		_paramInit(uint8_t disp);
 	#endif
-	//GPO
+	//LGPO
 	int						_STRlen_helper(const char* buffer,int len);
 	int						_getCharCode(uint8_t ch);
 	void					_textWrite(const char* buffer, uint16_t len);

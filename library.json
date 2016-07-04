@@ -1,7 +1,16 @@
 {
   "name": "TFT_ILI9163C",
+  "frameworks": "Arduino",
+  "platforms":
+  [
+	"Teensy",
+    "atmelavr",
+    "espressif",
+	"arm"
+  ],
   "keywords": "display",
   "description": "A very fast driver for ILI9163C TFT displays that works with many MCU",
+  "version": "1.0",
   "exclude": [
 	"doc",
 	"*.pdf"
@@ -16,17 +25,15 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/sumotoy/TFT_ILI9163C/tree/Pre-Release-1.0p7"
+    "url": "https://github.com/sumotoy/TFT_ILI9163C/tree/1.0p8"
   },
+  "dependencies":
+  {
+    "name": "SPI",
+    "frameworks": "arduino"
+},
   "examples": [
     "examples/*/*.ino",
     "examples/*/*/*.ino"
-  ],  
-  "frameworks": "arduino",
-  "platforms":
-  [
-    "atmelavr",
-    "espressif",
-	"arm"
   ]
 }
