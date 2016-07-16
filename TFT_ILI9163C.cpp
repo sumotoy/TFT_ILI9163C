@@ -278,7 +278,7 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 		digitalWriteFast(_cs,HIGH);
 	#endif
 		enableDataStream();
-#elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)//(arm) Teensy 3.0, 3.1, 3.2
+#elif defined(__MK20DX128__) || defined(__MK20DX256__)//Teensy 3.0 -> 3.2
 	if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
         SPI.setMOSI(_mosi);
         SPI.setSCK(_sclk);
@@ -294,6 +294,42 @@ void TFT_ILI9163C::begin(bool avoidSPIinit)
 		pcs_data = 0;
 		pcs_command = 0;
 		bitSet(_initError,1);
+		return;
+	}
+#elif defined(__MK64FX512__) || defined(__MK66FX1M0__)//Teensy 3.4 -> 3.5
+	if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
+		// ------------ SPI0 ---------------
+		_useSPI = 0;
+		SPI.setMOSI(_mosi);
+		SPI.setSCK(_sclk);
+		if (!avoidSPIinit) SPI.begin();
+		if (SPI.pinIsChipSelect(_cs, _dc)) {
+			pcs_data = SPI.setCS(_cs);
+			pcs_command = pcs_data | SPI.setCS(_dc);
+		} else {
+			bitSet(_initError,1);
+			return;
+		}
+	} else if (_mosi == 0 && _sclk == 32) {
+		// ------------ SPI1 ---------------
+		// [hint], instead assign CS I'm assigning DC that will be much busy
+		// CS will be handled separately by startTransition and command/data_last
+		_useSPI = 1;
+		SPI1.setMOSI(_mosi);
+		SPI1.setSCK(_sclk);
+		pinMode(_cs, OUTPUT);
+		disableCS();
+		if (!avoidSPIinit) SPI1.begin();
+		if (SPI1.pinIsChipSelect(_dc)) {
+			pcs_data = 0;
+			pcs_command = pcs_data | SPI1.setCS(_dc);
+		} else {
+			bitSet(_initError,1);
+			return;
+		}
+	// TODO SPI2 --------------------------
+	} else {
+		bitSet(_initError,0);
 		return;
 	}
 #elif defined(ESP8266)//(arm) XTENSA ESP8266

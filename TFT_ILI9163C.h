@@ -1,6 +1,6 @@
 /*
 	ILI9163C - A fast SPI driver for TFT that use Ilitek ILI9163C.
-	Version: 1.0p8.1
+	Version: 1.0p8.1 K64/66 testing version
 
 	Features:
 	- Very FAST!, expecially with Teensy 3.x where uses hyper optimized SPI.
@@ -295,6 +295,9 @@ class TFT_ILI9163C : public Print {
 
 	uint8_t 				_dc,_rst;
 	uint8_t					_bklPin;
+	#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+	uint8_t					_useSPI;
+	#endif
 	//Variable holders for init parameters
 	#if defined (TFT_ILI9163C_INSTANCES)
 		uint8_t		TFT_ILI9163C_DISP;
@@ -489,71 +492,195 @@ class TFT_ILI9163C : public Print {
 		uint8_t 			_cs;
 
 		void startTransaction(void)
-		__attribute__((always_inline)) { SPI.beginTransaction(_ILI9163CSPI); }
+		__attribute__((always_inline)) {
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				SPI.beginTransaction(_ILI9163CSPI);
+			#else
+				if (_useSPI == 0){
+					SPI.beginTransaction(_ILI9163CSPI);
+				} else if (_useSPI == 1){
+					SPI1.beginTransaction(_ILI9163CSPI);
+					digitalWriteFast(_cs,LOW);
+				}
+			#endif
+		}
 
 		void endTransaction(void)
-		__attribute__((always_inline)) { SPI.endTransaction(); }
+		__attribute__((always_inline)) {
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				SPI.endTransaction();
+			#else
+				if (_useSPI == 0){
+					SPI.endTransaction();
+				} else if (_useSPI == 1){
+					SPI1.endTransaction();
+				}
+			#endif
+		}
+		
+		#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+		void disableCS(void)
+		__attribute__((always_inline)) {
+			if (_useSPI > 0) digitalWriteFast(_cs,HIGH);
+		}
+		#endif
 
 		//Here's Paul Stoffregen SPI FIFO magic in action...
 		void waitFifoNotFull(void) {
 			uint32_t sr;
 			uint32_t tmp __attribute__((unused));
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
 			do {
 				sr = KINETISK_SPI0.SR;
 				if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
 			} while ((sr & (15 << 12)) > (3 << 12));
+			#else
+				if (_useSPI == 0){
+					do {
+						sr = KINETISK_SPI0.SR;
+						if (sr & 0xF0) tmp = KINETISK_SPI0.POPR;  // drain RX FIFO
+					} while ((sr & (15 << 12)) > (3 << 12));
+				} else if (_useSPI == 1){
+					do {
+						sr = KINETISK_SPI1.SR;
+						if (sr & 0xF0) tmp = KINETISK_SPI1.POPR;  // drain RX FIFO
+					} while ((sr & (15 << 12)) > (0 << 12));
+				}
+			#endif
 		}
 
-		void waitTransmitComplete(uint32_t mcr) 
-			__attribute__((always_inline)) {
+		void waitTransmitComplete(uint32_t mcr) __attribute__((always_inline)) {
 			uint32_t tmp __attribute__((unused));
-			while (1) {
-				uint32_t sr = KINETISK_SPI0.SR;//// DSPI Status Register
-				if (sr & SPI_SR_EOQF) break;  // wait for last transmit
-				if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
-			}
-			KINETISK_SPI0.SR = SPI_SR_EOQF;
-			SPI0_MCR = mcr;
-			while (KINETISK_SPI0.SR & 0xF0) {tmp = KINETISK_SPI0.POPR;}
+			uint32_t sr = 0;
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				while (1) {
+					sr = KINETISK_SPI0.SR;
+					if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+					if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
+				}
+				KINETISK_SPI0.SR = SPI_SR_EOQF;
+				SPI0_MCR = mcr;
+				while (KINETISK_SPI0.SR & 0xF0) {tmp = KINETISK_SPI0.POPR;}
+			#else
+				if (_useSPI == 0){
+					while (1) {
+						sr = KINETISK_SPI0.SR;
+						if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+						if (sr &  0xF0) tmp = KINETISK_SPI0.POPR;
+					}
+					KINETISK_SPI0.SR = SPI_SR_EOQF;
+					SPI0_MCR = mcr;
+					while (KINETISK_SPI0.SR & 0xF0) {tmp = KINETISK_SPI0.POPR;}
+				} else if (_useSPI == 1){
+					while (1) {
+						sr = KINETISK_SPI1.SR;
+						if (sr & SPI_SR_EOQF) break;  // wait for last transmit
+						if (sr &  0xF0) tmp = KINETISK_SPI1.POPR;
+					}
+					KINETISK_SPI1.SR = SPI_SR_EOQF;
+					SPI1_MCR = mcr;
+					while (KINETISK_SPI1.SR & 0xF0) {tmp = KINETISK_SPI1.POPR;}
+				}
+			#endif
 		}
 
-		void writecommand_cont(const uint8_t c) 
-			__attribute__((always_inline)) {
-			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		void writecommand_cont(const uint8_t c) __attribute__((always_inline)) {
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+			#else
+				if (_useSPI == 0){
+					KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+				} else if (_useSPI == 1){
+					KINETISK_SPI1.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+				}
+			#endif
 			waitFifoNotFull();
 		}
 
-		void writedata8_cont(uint8_t d) 
-			__attribute__((always_inline)) {
-			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+		void writedata8_cont(uint8_t d) __attribute__((always_inline)) {
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+			#else
+				if (_useSPI == 0){
+					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+				} else if (_useSPI == 1){
+					KINETISK_SPI1.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_CONT;
+				}
+			#endif
 			waitFifoNotFull();
 		}
 
-		void writedata16_cont(uint16_t d) 
-			__attribute__((always_inline)) {
-			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+		void writedata16_cont(uint16_t d) __attribute__((always_inline)) {
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+			#else
+				if (_useSPI == 0){
+					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+				} else if (_useSPI == 1){
+					KINETISK_SPI1.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_CONT;
+				}
+			#endif
 			waitFifoNotFull();
 		}
 
-		void writecommand_last(const uint8_t c) 
-			__attribute__((always_inline)) {
-			uint32_t mcr = SPI0_MCR;
-			KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+		void writecommand_last(const uint8_t c) __attribute__((always_inline)) {
+			uint32_t mcr = 0;
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				mcr = SPI0_MCR;
+				KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+			#else
+				if (_useSPI == 0){
+					mcr = SPI0_MCR;
+					KINETISK_SPI0.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				} else if (_useSPI == 1){
+					mcr = SPI1_MCR;
+					KINETISK_SPI1.PUSHR = c | (pcs_command << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				}
+			#endif
 			waitTransmitComplete(mcr);
+			#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+				disableCS();
+			#endif
 		}
 
-		void writedata8_last(uint8_t c) 
-			__attribute__((always_inline)) {
-			uint32_t mcr = SPI0_MCR;
-			KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+		void writedata8_last(uint8_t c) __attribute__((always_inline)) {
+			uint32_t mcr = 0;
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				mcr = SPI0_MCR;
+				KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+			#else
+				if (_useSPI == 0){
+					mcr = SPI0_MCR;
+					KINETISK_SPI0.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				} else if (_useSPI == 1){
+					mcr = SPI1_MCR;
+					KINETISK_SPI1.PUSHR = c | (pcs_data << 16) | SPI_PUSHR_CTAS(0) | SPI_PUSHR_EOQ;
+				}
+			#endif
 			waitTransmitComplete(mcr);
+			#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+				disableCS();
+			#endif
 		}
 
-		void writedata16_last(uint16_t d) 
-			__attribute__((always_inline)) {
-			uint32_t mcr = SPI0_MCR;
-			KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+		void writedata16_last(uint16_t d) __attribute__((always_inline)) {
+			uint32_t mcr = 0;
+			#if defined(__MK20DX128__) || defined(__MK20DX256__)
+				 mcr = SPI0_MCR;
+				 KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+			#else
+				if (_useSPI == 0){
+					mcr = SPI0_MCR;
+					KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+				} else if (_useSPI == 1){
+					mcr = SPI1_MCR;
+					KINETISK_SPI1.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
+				}
+			#endif
 			waitTransmitComplete(mcr);
+			#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+				disableCS();
+			#endif
 		}
 
 /* --------------------------- ARM (XTENSA ESP8266) --------------------------------*/
