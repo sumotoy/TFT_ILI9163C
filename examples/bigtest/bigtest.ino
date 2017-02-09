@@ -191,7 +191,7 @@ void randomRect(bool fill) {
 	uint8_t k, c;
 	for (k = 0; k < 16; k++) {
 		for (c = 0; c < 32; c++) {
-			uint8_t cx, cy, x, y, w, h;
+			int8_t cx, cy, x, y, w, h;
 			//  center
 			cx = random(0, tft.width());
 			cy = random(0, tft.height());
