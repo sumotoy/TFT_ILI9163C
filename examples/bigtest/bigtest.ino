@@ -72,20 +72,6 @@ void testlines(uint16_t color) {
 	delay(500);
 }
 
-
-void testdrawtext(char *text, uint16_t color) {
-	tft.setTextScale(1);
-	tft.setTextColor(WHITE);
-	tft.setCursor(0, 0);
-
-	for (uint8_t i = 0; i < 168; i++) {
-		if (i == '\n') continue;
-		tft.write(i);
-		if ((i > 0) && (i % 21 == 0))
-			tft.println();
-	}
-}
-
 void testfastlines(uint16_t color1, uint16_t color2) {
 	tft.clearScreen();
 	for (int16_t y = 0; y < tft.height() - 1; y += 5) {
@@ -146,7 +132,7 @@ void testtriangles() {
 
 void testroundrects() {
 	tft.clearScreen();
-	int color = 100;
+	unsigned int color = 100;
 	int i;
 	int t;
 	for (t = 0; t <= 4; t += 1) {
@@ -205,7 +191,7 @@ void randomRect(bool fill) {
 	uint8_t k, c;
 	for (k = 0; k < 16; k++) {
 		for (c = 0; c < 32; c++) {
-			uint8_t cx, cy, x, y, w, h;
+			int8_t cx, cy, x, y, w, h;
 			//  center
 			cx = random(0, tft.width());
 			cy = random(0, tft.height());

@@ -348,10 +348,10 @@ class TFT_ILI9163C : public Print {
 		__attribute__((always_inline)) { spiwrite(c >> 8); spiwrite(c); }
 
 		void enableCommandStream(void)
-		__attribute__((always_inline)) { *rsport &= ~dcpinmask;//low }
+		__attribute__((always_inline)) { *rsport &= ~dcpinmask;/*low*/ }
 
 		void enableDataStream(void)
-		__attribute__((always_inline)) { *rsport |= dcpinmask;//hi }
+		__attribute__((always_inline)) { *rsport |= dcpinmask;/*hi*/ }
 
 		void startTransaction(void)
 		__attribute__((always_inline)) {
@@ -369,7 +369,7 @@ class TFT_ILI9163C : public Print {
 		}
 
 		void disableCS(void)
-		__attribute__((always_inline)) { *csport |= cspinmask;//hi }
+		__attribute__((always_inline)) { *csport |= cspinmask;/*hi*/ }
 /* -----------------------------  ARM (DUE)  -------------------------------*/
 	#elif defined(__SAM3X8E__)
 		Pio 				*dataport, *clkport, *csport, *rsport;
@@ -383,10 +383,10 @@ class TFT_ILI9163C : public Print {
 		__attribute__((always_inline)) { SPI.transfer16(c); }
 
 		void enableCommandStream(void)
-		__attribute__((always_inline)) { rsport->PIO_CODR |=  dcpinmask;//LO }
+		__attribute__((always_inline)) { rsport->PIO_CODR |=  dcpinmask;/*LO*/ }
 
 		void enableDataStream(void)
-		__attribute__((always_inline)) { rsport->PIO_SODR |=  dcpinmask;//HI }
+		__attribute__((always_inline)) { rsport->PIO_SODR |=  dcpinmask;/*HI*/ }
 
 		void startTransaction(void)
 		__attribute__((always_inline)) {
@@ -404,7 +404,7 @@ class TFT_ILI9163C : public Print {
 		}
 
 		void disableCS(void)
-		__attribute__((always_inline)) { csport->PIO_SODR |=  cspinmask;//HI }
+		__attribute__((always_inline)) { csport->PIO_SODR |=  cspinmask;/*HI*/ }
 
 /* --------------------------- ARM (Teensy LC) ------------------------*/
 	#elif defined(__MKL26Z64__)
