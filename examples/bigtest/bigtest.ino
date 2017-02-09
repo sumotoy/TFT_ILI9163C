@@ -146,7 +146,7 @@ void testtriangles() {
 
 void testroundrects() {
 	tft.clearScreen();
-	int color = 100;
+	unsigned int color = 100;
 	int i;
 	int t;
 	for (t = 0; t <= 4; t += 1) {
