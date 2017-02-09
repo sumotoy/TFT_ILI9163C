@@ -72,20 +72,6 @@ void testlines(uint16_t color) {
 	delay(500);
 }
 
-
-void testdrawtext(char *text, uint16_t color) {
-	tft.setTextScale(1);
-	tft.setTextColor(WHITE);
-	tft.setCursor(0, 0);
-
-	for (uint8_t i = 0; i < 168; i++) {
-		if (i == '\n') continue;
-		tft.write(i);
-		if ((i > 0) && (i % 21 == 0))
-			tft.println();
-	}
-}
-
 void testfastlines(uint16_t color1, uint16_t color2) {
 	tft.clearScreen();
 	for (int16_t y = 0; y < tft.height() - 1; y += 5) {
