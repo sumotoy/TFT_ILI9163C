@@ -4,7 +4,7 @@
 
 //DID YOU HAVE A RED PCB, BLACk PCB or WHAT DISPLAY TYPE???????????? 
 //  ---> SELECT HERE <----
-#define __144_RED_PCB__//128x128
+//#define __144_RED_PCB__//128x128
 //#define __144_BLACK_PCB__//128x128
 //#define __22_RED_PCB__//240x320
 //---------------------------------------
