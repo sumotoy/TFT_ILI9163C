@@ -936,12 +936,12 @@ void TFT_ILI9163C::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint1
 
 	bool steep = abs(y1 - y0) > abs(x1 - x0);
 	if (steep) {
-		swap(x0, y0);
-		swap(x1, y1);
+		std::swap(x0, y0);
+		std::swap(x1, y1);
 	}
 	if (x0 > x1) {
-		swap(x0, x1);
-		swap(y0, y1);
+		std::swap(x0, x1);
+		std::swap(y0, y1);
 	}
 
 	int16_t dx, dy;
