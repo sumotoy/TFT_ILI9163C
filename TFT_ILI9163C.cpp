@@ -93,7 +93,7 @@
 		#endif
 	} 
 
-	void TFT_ILI9163C::setBitrate(uint32_t n)
+	void TFT_ILI9163C::setBitrate(uint32_t)
 	{
 		#if !defined (SPI_HAS_TRANSACTION)
 			if (n >= 8000000) {
