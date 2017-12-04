@@ -588,7 +588,7 @@ void TFT_ILI9163C::chipInit() {
 		delay(1);
   
 		writecommand(CMD_CLMADRS);//Set Column Address  
-		writedata16(0x00); 
+		writedata16(0x00);
 		writedata16(_GRAMWIDTH); 
   
 		writecommand(CMD_PGEADRS);//Set Page Address  
@@ -623,6 +623,7 @@ void TFT_ILI9163C::colorSpace(uint8_t cspace) {
 	} else {
 		bitSet(_Mactrl_Data,3);
 	}
+	_colorspaceData = cspace;
 }
 
 void TFT_ILI9163C::invertDisplay(boolean i) {

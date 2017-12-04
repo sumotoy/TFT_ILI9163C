@@ -57,7 +57,7 @@ Not tested!
 #else
 	#define _TFTWIDTH  		128//128
 	#define _TFTHEIGHT 		160//160
-	#define _GRAMWIDTH      128
+	#define _GRAMWIDTH      127
 	#define _GRAMHEIGH      160
 	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
 	#define __COLORSPC		1// 1:GBR - 0:RGB
