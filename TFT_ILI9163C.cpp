@@ -588,7 +588,7 @@ void TFT_ILI9163C::chipInit() {
 		delay(1);
   
 		writecommand(CMD_CLMADRS);//Set Column Address  
-		writedata16(0x00); 
+		writedata16(0x00);
 		writedata16(_GRAMWIDTH); 
   
 		writecommand(CMD_PGEADRS);//Set Page Address  
@@ -623,6 +623,7 @@ void TFT_ILI9163C::colorSpace(uint8_t cspace) {
 	} else {
 		bitSet(_Mactrl_Data,3);
 	}
+	_colorspaceData = cspace;
 }
 
 void TFT_ILI9163C::invertDisplay(boolean i) {
@@ -748,7 +749,8 @@ void TFT_ILI9163C::clearScreen(uint16_t color) {
 		writecommand_last(CMD_NOP);
 		SPI.endTransaction();
 	#else
-		setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
+		if (rotation % 2) setAddr(0x00,0x00,_GRAMHEIGH,_GRAMWIDTH);//go home
+		else              setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
 		for (px = 0;px < _GRAMSIZE; px++){
 			writedata16(color);
 		}
@@ -808,7 +810,8 @@ void TFT_ILI9163C::writeScreen24(const uint32_t *bitmap,uint16_t size) {
 }
 
 void TFT_ILI9163C::homeAddress() {
-	setAddrWindow(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);
+	if (rotation % 2) setAddr(0x00,0x00,_GRAMHEIGH,_GRAMWIDTH);//go home
+	else              setAddr(0x00,0x00,_GRAMWIDTH,_GRAMHEIGH);//go home
 }
 
 
@@ -1093,8 +1096,8 @@ void TFT_ILI9163C::setRotation(uint8_t m) {
 		break;
 	case 3:
 		_Mactrl_Data = 0b10101000;
-		_width  = _TFTWIDTH;
-		_height = _TFTHEIGHT;//-__OFFSET;
+		_width  = _TFTHEIGHT;
+		_height = _TFTWIDTH;//-__OFFSET;
 		break;
 	}
 	colorSpace(_colorspaceData);

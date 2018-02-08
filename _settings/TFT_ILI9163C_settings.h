@@ -4,7 +4,7 @@
 
 //DID YOU HAVE A RED PCB, BLACk PCB or WHAT DISPLAY TYPE???????????? 
 //  ---> SELECT HERE <----
-#define __144_RED_PCB__//128x128
+//#define __144_RED_PCB__//128x128
 //#define __144_BLACK_PCB__//128x128
 //#define __22_RED_PCB__//240x320
 //---------------------------------------
@@ -57,7 +57,7 @@ Not tested!
 #else
 	#define _TFTWIDTH  		128//128
 	#define _TFTHEIGHT 		160//160
-	#define _GRAMWIDTH      128
+	#define _GRAMWIDTH      127
 	#define _GRAMHEIGH      160
 	#define _GRAMSIZE		_GRAMWIDTH * _GRAMHEIGH
 	#define __COLORSPC		1// 1:GBR - 0:RGB

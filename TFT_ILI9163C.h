@@ -179,6 +179,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
   //convert 24bit color into packet 16 bit one (credits for this are all mine)
 	inline uint16_t Color24To565(int32_t color_) { return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) &  0xFF) / 8);}
 	void 		setBitrate(uint32_t n);	
+	void 		colorSpace(uint8_t cspace);
  protected:
 	volatile uint8_t		_Mactrl_Data;//container for the memory access control data
 	uint8_t					_colorspaceData;
@@ -407,7 +408,6 @@ class TFT_ILI9163C : public Adafruit_GFX {
 		void		writedata16(uint16_t d);
 	#endif
  private:
-	void 		colorSpace(uint8_t cspace);
 	void 		setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 	uint8_t		sleep;
 	void 		chipInit();
