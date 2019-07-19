@@ -7,6 +7,7 @@
 #define __144_RED_PCB__//128x128
 //#define __144_BLACK_PCB__//128x128
 //#define __22_RED_PCB__//240x320
+//#define __144_BLUE_PCB__//160x128
 //---------------------------------------
 
 
@@ -54,6 +55,15 @@ Not tested!
 	#define __COLORSPC		1// 1:GBR - 0:RGB
 	#define __GAMMASET1		//uncomment for another gamma
 	#define __OFFSET		0
+#elif defined (__144_BLUE_PCB__)
+        #define _TFTWIDTH               160//128
+        #define _TFTHEIGHT              128//160
+        #define _GRAMWIDTH      160
+        #define _GRAMHEIGH      128
+        #define _GRAMSIZE               _GRAMWIDTH * _GRAMHEIGH
+        #define __COLORSPC              1// 1:GBR - 0:RGB
+        #define __GAMMASET1
+        #define __OFFSET                0
 #else
 	#define _TFTWIDTH  		128//128
 	#define _TFTHEIGHT 		160//160
