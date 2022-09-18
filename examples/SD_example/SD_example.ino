@@ -71,7 +71,7 @@ void bmpDraw(const char *filename, uint8_t x, uint16_t y) {
     uint8_t  r, g, b;
     uint32_t pos = 0;
 
-    if((x >= tft.width()) || (y >= tft.height())) return;
+    if((x >= tft.width()) || ((int)y >= tft.height())) return;
 
     // Open requested file on SD card
     if ((bmpFile = SD.open(filename)) == false) {
@@ -101,8 +101,8 @@ void bmpDraw(const char *filename, uint8_t x, uint16_t y) {
           // Crop area to be loaded
           w = bmpWidth;
           h = bmpHeight;
-          if((x+w-1) >= tft.width())  w = tft.width()  - x;
-          if((y+h-1) >= tft.height()) h = tft.height() - y;
+          if((int)(x+w-1) >= tft.width())  w = tft.width()  - x;
+          if((int)(y+h-1) >= tft.height()) h = tft.height() - y;
           tft.startPushData(x, y, x+w-1, y+h-1);
           for (row=0; row<h; row++) { // For each scanline...
             if (flip){ // Bitmap is stored bottom-to-top order (normal BMP)
