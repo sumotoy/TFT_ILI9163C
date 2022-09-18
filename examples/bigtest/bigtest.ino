@@ -218,7 +218,7 @@ void testtriangles() {
 
 void testroundrects() {
   display.clearScreen();
-  int color = 100;
+  uint16_t color = 100;
   int i;
   int t;
   for(t = 0 ; t <= 4; t+=1) {
