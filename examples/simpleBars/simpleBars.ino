@@ -66,7 +66,6 @@ void verticalBarGraphs(uint16_t datax[],uint8_t barWidth,uint8_t barHeight,uint8
   uint8_t startX;
   uint16_t color;
   uint8_t dataToWidth;
-  uint8_t div;
   for (uint8_t i = 1; i <= NBINS-1; i++) {
     startX = (i * 11);
     //tft.drawRect((startX-1),vOrigin,barWidth,barHeight,WHITE);//container
@@ -74,7 +73,6 @@ void verticalBarGraphs(uint16_t datax[],uint8_t barWidth,uint8_t barHeight,uint8
     uint8_t b = map(datax[i],0,1024,255,0);
     uint8_t g = map(datax[i],0,1024,128,0);
     uint8_t r = map(datax[i],0,1024,0,255);
-    div = (barHeight-2)/10;
     color = ((b & 0xF8) << 8) | ((g & 0xFC) << 3) | (r >> 3);
     tft.fillRect(startX,(vOrigin+1),(bar_Width+3),dataToWidth,BLACK);//mask ok
     tft.fillRect(startX,(dataToWidth+vOrigin)+1,(bar_Width+3),((barHeight-2)-dataToWidth),color);//fillRect(X,Y,width,height,color)

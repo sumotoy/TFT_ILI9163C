@@ -11,7 +11,7 @@ An SD bmp image load example. (extracted and modded by Adafruit old library http
  */
 
 #include <SPI.h>
-#include <SdFat.h>
+#include <SD.h>
 #include <Adafruit_GFX.h>
 #include <TFT_ILI9163C.h>
 
@@ -32,8 +32,6 @@ An SD bmp image load example. (extracted and modded by Adafruit old library http
 boolean SDInited = true;
 
 TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
-SdFat SD;
-SdFile myFile;
 
 void setup(void) {
   Serial.begin(9600);
@@ -41,10 +39,7 @@ void setup(void) {
   tft.begin();
   //tft.setRotation(2);
 
-  //I have a crappy chinese SD card holder that it's not compatible
-  //with hi speeds SPI (SPI_FULL_SPEED). If you have better luck set it to
-  //SPI_FULL_SPEED
-  if (!SD.begin(__SDCS,SPI_HALF_SPEED)) {
+  if (!SD.begin(__SDCS)) {
     tft.setCursor(0,0);
     tft.print("sd failed!");
     SDInited = false;
@@ -76,10 +71,10 @@ void bmpDraw(const char *filename, uint8_t x, uint16_t y) {
     uint8_t  r, g, b;
     uint32_t pos = 0;
 
-    if((x >= tft.width()) || (y >= tft.height())) return;
+    if((x >= tft.width()) || ((int)y >= tft.height())) return;
 
     // Open requested file on SD card
-    if ((bmpFile = SD.open(filename)) == NULL) {
+    if ((bmpFile = SD.open(filename)) == false) {
       tft.setCursor(0,0);
       tft.print("file not found!");
       return;
@@ -106,8 +101,8 @@ void bmpDraw(const char *filename, uint8_t x, uint16_t y) {
           // Crop area to be loaded
           w = bmpWidth;
           h = bmpHeight;
-          if((x+w-1) >= tft.width())  w = tft.width()  - x;
-          if((y+h-1) >= tft.height()) h = tft.height() - y;
+          if((int)(x+w-1) >= tft.width())  w = tft.width()  - x;
+          if((int)(y+h-1) >= tft.height()) h = tft.height() - y;
           tft.startPushData(x, y, x+w-1, y+h-1);
           for (row=0; row<h; row++) { // For each scanline...
             if (flip){ // Bitmap is stored bottom-to-top order (normal BMP)

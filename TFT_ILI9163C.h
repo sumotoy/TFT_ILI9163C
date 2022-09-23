@@ -140,7 +140,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 
  public:
 
-	#if defined(__MK20DX128__) || defined(__MK20DX256__)
+	#if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,uint8_t mosi=11,uint8_t sclk=13);
 	#elif defined(__MKL26Z64__)
 		TFT_ILI9163C(uint8_t cspin,uint8_t dcpin,uint8_t rstpin=255,uint8_t mosi=11,uint8_t sclk=13);
@@ -158,7 +158,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 				drawPixel(int16_t x, int16_t y, uint16_t color),
 				drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
 				drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
-				#if defined(__MK20DX128__) || defined(__MK20DX256__)//workaround to get more speed from Teensy
+				#if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) //workaround to get more speed from Teensy
 					drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1, uint16_t color),
 					drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
 				#endif
@@ -197,7 +197,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 		uint8_t 			_cs,_rs,_rst;
 		uint8_t 			_mosi, _sclk;
 		bool				_useSPI1;
-	#elif defined(__MK20DX128__) || defined(__MK20DX256__)
+	#elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 		uint8_t 			_cs, _rs, _rst;
 		uint8_t 			pcs_data, pcs_command;
 		uint8_t 			_mosi, _sclk;
@@ -401,7 +401,7 @@ class TFT_ILI9163C : public Adafruit_GFX {
 		uint8_t 			_cs,_rs,_rst;	
 	#endif
 	
-	#if !defined(__MK20DX128__) && !defined(__MK20DX256__)
+	#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__MK64FX512__) && !defined(__MK66FX1M0__)
 		void		writecommand(uint8_t c);
 		void		writedata(uint8_t d);
 		void		writedata16(uint16_t d);
